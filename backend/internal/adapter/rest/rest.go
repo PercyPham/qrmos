@@ -4,6 +4,7 @@ import (
 	"qrmos/internal/usecase/repo"
 	"strconv"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,6 +22,8 @@ type server struct {
 }
 
 func (s *server) Run(port int) {
+	s.r.Use(cors.Default())
+
 	api := s.r.Group("/api")
 
 	api.GET("/health", s.checkHealth)
