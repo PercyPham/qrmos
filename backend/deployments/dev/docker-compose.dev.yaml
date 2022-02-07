@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  db:
+    image: bitnami/mysql:8.0.27
+    container_name: qrmos-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: qrmos
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+    volumes:
+      - qrmos_db_volume:/bitnami/mysql/data
+      - ../../init/db:/docker-entrypoint-initdb.d
+    networks:
+      - qrmos
+
+  db-gui:
+    image: phpmyadmin/phpmyadmin
+    container_name: qrmos-db-gui
+    depends_on:
+      - db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      PMA_HOST: qrmos-db
+      PMA_PORT: 3306
+      PMA_USER: admin
+      PMA_PASSWORD: password
+    ports:
+      - 8081:80
+    restart: unless-stopped
+    networks:
+      - qrmos
+
+networks:
+  qrmos:
+    driver: bridge
+
+volumes:
+  qrmos_db_volume: null
