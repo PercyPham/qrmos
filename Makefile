@@ -15,4 +15,7 @@ dev_db_clean:
 dev_run_backend:
 	@cd backend && go run cmd/server/main.go
 
-.PHONY: dev_db_up dev_db_down dev_db_clean dev_run_backend
+dev_run_frontend:
+	@cd frontend && flutter run
+
+.PHONY: dev_db_up dev_db_down dev_db_clean dev_run_backend dev_run_frontend

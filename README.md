@@ -8,18 +8,19 @@ HungpmSE00234x's FUNiX Capstone Project.
 
 Development environment requirements:
 
-- [Golang 1.17](https://go.dev/dl/)
-- [Docker](https://www.docker.com/get-started)
+- [Golang v1.17.5](https://go.dev/dl/)
+- [Docker v20.10.10](https://www.docker.com/get-started)
+- [Flutter - stable, v2.10.0](https://docs.flutter.dev/get-started/install)
 
 <details>
-  <summary>Prepare Database (MUST)</summary>
+  <summary>Database Preparation (MUST)</summary>
 
 Spin up database:
 ```
 make dev_db_up
 ```
 
-- First time running will take a few **minutes** to complete. Please be patient.
+- First time running will take a **few minutes** to complete. Please be patient.
 - `pgAdmin` will be available at `localhost:8081` after spinning up the database.
 - Default database name is `qrmos`.
 
@@ -41,4 +42,9 @@ make dev_db_clean
 Run backend:
 ```
 make dev_run_backend
+```
+
+Run frontend:
+```
+make dev_run_frontend
 ```
