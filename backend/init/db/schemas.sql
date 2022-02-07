@@ -8,10 +8,11 @@
 
 USE qrmos;
 
--- TODO: remove this `users` table, since it's just a placeholder
 CREATE TABLE users (
-  id INT(6) AUTO_INCREMENT PRIMARY KEY,
-  firstname VARCHAR(30) NOT NULL,
-  lastname VARCHAR(30) NOT NULL,
-  email VARCHAR(50)
+  username VARCHAR(255) NOT NULL PRIMARY KEY,
+  password VARCHAR(255) NOT NULL,
+  password_salt VARCHAR(255) NOT NULL,
+  full_name VARCHAR(30) NOT NULL,
+  role VARCHAR(10),
+  active BOOLEAN default true
 );

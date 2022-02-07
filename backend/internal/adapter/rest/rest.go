@@ -1,29 +1,31 @@
 package rest
 
 import (
+	"qrmos/internal/usecase/repo"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func NewServer() *server {
+func NewServer(ur repo.UserRepo) *server {
 	return &server{
-		r: gin.Default(),
+		r:        gin.Default(),
+		userRepo: ur,
 	}
 }
 
 type server struct {
 	r *gin.Engine
+
+	userRepo repo.UserRepo
 }
 
 func (s *server) Run(port int) {
 	api := s.r.Group("/api")
 
-	api.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "OK",
-		})
-	})
+	api.GET("/health", s.checkHealth)
+
+	api.GET("/users", s.getAllUsers)
 
 	s.r.Run(":" + strconv.Itoa(port))
 }
