@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"qrmos/internal/adapter/rest"
+)
 
 func main() {
-	fmt.Println("OK")
+	server := rest.NewServer()
+
+	server.Run(5000)
 }

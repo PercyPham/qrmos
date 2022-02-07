@@ -13,6 +13,6 @@ dev_db_clean:
 	@echo "Cleaned!";
 
 dev_run_backend:
-	@go run backend/cmd/server/main.go
+	@cd backend && go run cmd/server/main.go
 
 .PHONY: dev_db_up dev_db_down dev_db_clean dev_run_backend
