@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"qrmos/internal/common/config"
 	"qrmos/internal/usecase/repo"
 	"strconv"
 
@@ -21,14 +22,20 @@ type server struct {
 	userRepo repo.UserRepo
 }
 
-func (s *server) Run(port int) {
-	s.r.Use(cors.Default())
+func (s *server) Run() {
+	isDevMode := config.App().ENV == "dev"
+
+	if isDevMode {
+		s.r.Use(cors.Default())
+	} else {
+		gin.SetMode(gin.ReleaseMode)
+	}
 
 	api := s.r.Group("/api")
 
 	api.GET("/health", s.checkHealth)
-
 	api.GET("/users", s.getAllUsers)
 
-	s.r.Run(":" + strconv.Itoa(port))
+	port := strconv.Itoa(config.App().Port)
+	s.r.Run(":" + port)
 }
