@@ -48,3 +48,25 @@ Run frontend:
 ```
 make dev_run_frontend
 ```
+
+### Production
+
+Build QRMOS:
+```
+make build
+```
+- Built files are located in `build` folder at root.
+
+Export env variables to current process:
+```bash
+export APP_ENV=prod
+```
+- Default environment variables are specified in `backend/.default.env`.
+- For production code, default env variables will be read from `build/.default.env`.
+- Export prod env variables accordingly in order to run production code.
+
+Run production code:
+```bash
+cd build
+./main
+```

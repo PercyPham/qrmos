@@ -10,6 +10,11 @@ import (
 )
 
 func NewServer(ur repo.UserRepo) *server {
+	isDevMode := config.App().ENV == "dev"
+	if !isDevMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	return &server{
 		r:        gin.Default(),
 		userRepo: ur,
@@ -27,14 +32,16 @@ func (s *server) Run() {
 
 	if isDevMode {
 		s.r.Use(cors.Default())
-	} else {
-		gin.SetMode(gin.ReleaseMode)
 	}
 
 	api := s.r.Group("/api")
 
 	api.GET("/health", s.checkHealth)
 	api.GET("/users", s.getAllUsers)
+
+	if !isDevMode {
+		s.r.Static("/web/", "./web")
+	}
 
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)
