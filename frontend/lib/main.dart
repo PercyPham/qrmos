@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qrmos/common/cfg.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
@@ -31,23 +32,23 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  String _userNames = "loading...";
+  String _apiServerHealth = "loading...";
 
   @override
   void initState() {
     super.initState();
-    http.get(Uri.parse('http://localhost:5000/api/users'))
-    .then((response) {
+    http.get(Uri.parse(apiBaseUrl + '/health')).then((response) {
       if (response.statusCode == 200) {
         setState(() {
-          _userNames = response.body;
+          _apiServerHealth = response.body;
         });
       } else {
         throw Exception('Failed to load users');
       }
-    })
-    .catchError((exception) {
-      print(exception);
+    }).catchError((exception) {
+      setState(() {
+        _apiServerHealth = "Got error in Catch";
+      });
     });
   }
 
@@ -67,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('User names: ' + _userNames),
+            Text('API server\'s health: ' + _apiServerHealth),
             const Text(""),
             const Text(
               'You have pushed the button this many times:',

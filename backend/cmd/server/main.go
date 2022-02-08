@@ -9,6 +9,7 @@ import (
 )
 
 func main() {
+	godotenv.Load() // load `.env` if has
 	godotenv.Load(".default.env")
 	config.Load()
 

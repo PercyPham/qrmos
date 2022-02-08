@@ -70,3 +70,12 @@ Run production code:
 cd build
 ./main
 ```
+
+### Deployment
+
+Currently deployed to DigitalOcean's droplet. Read [here](deployments/prod/README.md) for setup instruction
+
+Deploy:
+```
+make deploy
+```
