@@ -10,8 +10,7 @@ import (
 )
 
 func NewServer(ur repo.UserRepo) *server {
-	isDevMode := config.App().ENV == "dev"
-	if !isDevMode {
+	if !isDevMode() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -22,27 +21,23 @@ func NewServer(ur repo.UserRepo) *server {
 }
 
 type server struct {
-	r *gin.Engine
-
+	r        *gin.Engine
 	userRepo repo.UserRepo
 }
 
 func (s *server) Run() {
-	isDevMode := config.App().ENV == "dev"
-
-	if isDevMode {
+	if isDevMode() {
 		s.r.Use(cors.Default())
-	}
-
-	api := s.r.Group("/api")
-
-	api.GET("/health", s.checkHealth)
-	api.GET("/users", s.getAllUsers)
-
-	if !isDevMode {
+	} else {
 		s.r.Static("/web/", "./web")
 	}
 
+	s.setupAPIs()
+
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)
+}
+
+func isDevMode() bool {
+	return config.App().ENV == "dev"
 }
