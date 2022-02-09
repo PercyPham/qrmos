@@ -29,15 +29,27 @@ type server struct {
 }
 
 func (s *server) Run() {
-	if isDevMode() {
+	switch config.App().ENV {
+	case "dev":
 		s.runDev()
-	} else {
+	case "staging":
+		s.runStaging()
+	case "prod":
 		s.runProd()
+	default:
+		panic("unsupported environment")
 	}
 }
 
 func (s *server) runDev() {
 	s.r.Use(cors.Default())
+	s.setupAPIs()
+	port := strconv.Itoa(config.App().Port)
+	s.r.Run(":" + port)
+}
+
+func (s *server) runStaging() {
+	s.r.Static("/web/", "./web")
 	s.setupAPIs()
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)

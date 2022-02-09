@@ -1,4 +1,4 @@
-.PHONY: dev_db_up dev_db_down dev_db_clean dev_run_backend dev_run_frontend build build_clean build_backend build_frontend deploy
+.PHONY: dev_db_up dev_db_down dev_db_clean dev_run_backend dev_run_frontend build_clean build_backend build_frontend build run_built deploy
 
 # Color section
 # Ref: https://qastack.vn/programming/5947742/how-to-change-the-output-color-of-echo-in-linux
@@ -50,6 +50,11 @@ build: build_clean
 
 	@echo "$(GREEN)> Building frontend ...$(NC)"
 	@make build_frontend
+
+run_built:
+	@cd build &&\
+		echo "APP_ENV=staging" > .env &&\
+		./main
 
 
 ##################### PRODUCTION: DEPLOY #########################
