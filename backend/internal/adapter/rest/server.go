@@ -6,6 +6,7 @@ import (
 	"qrmos/internal/common/config"
 	"qrmos/internal/usecase/repo"
 	"strconv"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/autotls"
@@ -13,7 +14,7 @@ import (
 )
 
 func NewServer(ur repo.UserRepo) *server {
-	if !isDevMode() {
+	if config.App().ENV != "dev" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
@@ -44,19 +45,21 @@ func (s *server) Run() {
 func (s *server) runDev() {
 	s.r.Use(cors.Default())
 	s.setupAPIs()
+
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)
 }
 
 func (s *server) runStaging() {
-	s.r.Static("/web/", "./web")
+	s.serveStatic("/web/", "./web")
 	s.setupAPIs()
+
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)
 }
 
 func (s *server) runProd() {
-	s.r.Static("/web/", "./web")
+	s.serveStatic("/web/", "./web")
 	s.setupAPIs()
 
 	s.r.GET("/ping", func(c *gin.Context) {
@@ -65,6 +68,16 @@ func (s *server) runProd() {
 	log.Fatal(autotls.Run(s.r, config.App().Domains...))
 }
 
-func isDevMode() bool {
-	return config.App().ENV == "dev"
+func (s *server) serveStatic(relativePath, root string) {
+	s.r.Use(addCacheControlHeaderFor(relativePath))
+	s.r.Static(relativePath, root)
+}
+
+func addCacheControlHeaderFor(prefix string) func(*gin.Context) {
+	return func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.RequestURI, prefix) {
+			c.Header("Cache-Control", "max-age=3600")
+			c.Next()
+		}
+	}
 }
