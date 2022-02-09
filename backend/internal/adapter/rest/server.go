@@ -1,11 +1,14 @@
 package rest
 
 import (
+	"log"
+	"net/http"
 	"qrmos/internal/common/config"
 	"qrmos/internal/usecase/repo"
 	"strconv"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,15 +30,27 @@ type server struct {
 
 func (s *server) Run() {
 	if isDevMode() {
-		s.r.Use(cors.Default())
+		s.runDev()
 	} else {
-		s.r.Static("/web/", "./web")
+		s.runProd()
 	}
+}
 
+func (s *server) runDev() {
+	s.r.Use(cors.Default())
 	s.setupAPIs()
-
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)
+}
+
+func (s *server) runProd() {
+	s.r.Static("/web/", "./web")
+	s.setupAPIs()
+
+	s.r.GET("/ping", func(c *gin.Context) {
+		c.String(http.StatusOK, "pong")
+	})
+	log.Fatal(autotls.Run(s.r, config.App().Domains...))
 }
 
 func isDevMode() bool {
