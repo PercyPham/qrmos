@@ -1,4 +1,4 @@
-package rest
+package controller
 
 func (s *server) setupAPIs() {
 	api := s.r.Group("/api")

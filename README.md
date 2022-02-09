@@ -62,13 +62,13 @@ Export env variables to current process:
 export APP_ENV=prod
 ```
 - Default environment variables are specified in `backend/.default.env`.
-- For production code, default env variables will be read from `build/.default.env`.
+- For production code, default env variables will be read from `.default.env`.
+  To overide those env, use `.env` file.
 - Export prod env variables accordingly in order to run production code.
 
-Run production code:
+Run built code:
 ```bash
-cd build
-./main
+make run_built
 ```
 
 ### Deployment
