@@ -75,6 +75,11 @@ cd build
 
 Currently deployed to DigitalOcean's droplet. Read [here](deployments/prod/README.md) for setup instruction
 
+[Optional] Push `main` branch to `origin` remote since prod's backend will be built based on this.
+```
+git push origin main
+```
+
 Deploy:
 ```
 make deploy

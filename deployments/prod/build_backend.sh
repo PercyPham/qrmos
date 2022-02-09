@@ -8,6 +8,7 @@ cd ~/qrmos
 git reset --hard HEAD
 git checkout -b temp_branch
 git branch -D main
+git fetch
 git checkout main
 git branch -D temp_branch
 
