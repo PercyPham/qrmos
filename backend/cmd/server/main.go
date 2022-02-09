@@ -1,8 +1,8 @@
 package main
 
 import (
+	"qrmos/internal/adapter/controller"
 	"qrmos/internal/adapter/repoimpl/mysqlrepo"
-	"qrmos/internal/adapter/rest"
 	"qrmos/internal/common/config"
 
 	"github.com/joho/godotenv"
@@ -20,7 +20,7 @@ func main() {
 
 	userRepo := mysqlrepo.NewUserRepo(db)
 
-	server := rest.NewServer(userRepo)
+	server := controller.NewServer(userRepo)
 
 	server.Run()
 }

@@ -1,4 +1,4 @@
-package rest
+package controller
 
 import (
 	"qrmos/internal/usecase"
