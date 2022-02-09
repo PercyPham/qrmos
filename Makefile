@@ -54,7 +54,7 @@ build: build_clean
 
 ##################### PRODUCTION: DEPLOY #########################
 
-SERVER_PROD_SSH?=root@128.199.78.3
+SERVER_PROD_SSH?=qrmos_prod
 
 deploy: build
 	@echo "$(GREEN)> Building backend on prod server ...$(NC)"

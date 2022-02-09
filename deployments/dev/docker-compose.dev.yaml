@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     volumes:
       - qrmos_db_volume:/bitnami/mysql/data
-      - ../../init/db:/docker-entrypoint-initdb.d
+      - ../../backend/init/db:/docker-entrypoint-initdb.d
     networks:
       - qrmos
 
