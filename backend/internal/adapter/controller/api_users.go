@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"qrmos/internal/adapter/controller/internal/response"
+	"qrmos/internal/common/apperror"
 	"qrmos/internal/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -11,8 +13,9 @@ func (s *server) getAllUsers(c *gin.Context) {
 
 	users, err := getUsersUsecase.GetUsers()
 	if err != nil {
-		c.JSON(500, err.Error())
+		response.Error(c, apperror.Wrap(err, "usecase gets users"))
+		return
 	}
 
-	c.JSON(200, users)
+	response.Success(c, users)
 }
