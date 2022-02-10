@@ -16,6 +16,14 @@ type userRepo struct {
 	db *gorm.DB
 }
 
+func (ur *userRepo) CreateUser(user *entity.User) error {
+	result := ur.db.Create(user)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm create user")
+	}
+	return nil
+}
+
 func (ur *userRepo) GetUsers() ([]*entity.User, error) {
 	users := []*entity.User{}
 

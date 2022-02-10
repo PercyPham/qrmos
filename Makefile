@@ -24,6 +24,9 @@ dev_db_clean:
 
 ##################### DEVELOPMENT: RUN ###########################
 
+init_data:
+	@cd backend && go run cmd/initdata/main.go
+
 dev_run_backend:
 	@cd backend && go run cmd/server/main.go
 

@@ -24,6 +24,12 @@ make dev_db_up
 - `pgAdmin` will be available at `localhost:8081` after spinning up the database.
 - Default database name is `qrmos`.
 
+After spinning up DB for the first time, we need to initialize data by running this command (**only once**):
+```
+make init_data
+```
+- This will add an `admin` user with `password` as password.
+
 Shutdown database:
 ```
 make dev_db_down
