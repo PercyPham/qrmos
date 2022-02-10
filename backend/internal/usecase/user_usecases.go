@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
 )
@@ -14,5 +15,9 @@ type GetUsersUsecase struct {
 }
 
 func (u *GetUsersUsecase) GetUsers() ([]*entity.User, error) {
-	return u.userRepo.GetUsers()
+	users, err := u.userRepo.GetUsers()
+	if err != nil {
+		return nil, apperror.Wrap(err, "userRepo gets users")
+	}
+	return users, nil
 }

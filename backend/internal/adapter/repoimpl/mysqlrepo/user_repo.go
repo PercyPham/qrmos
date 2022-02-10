@@ -1,6 +1,7 @@
 package mysqlrepo
 
 import (
+	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
 
@@ -20,7 +21,7 @@ func (ur *userRepo) GetUsers() ([]*entity.User, error) {
 
 	result := ur.db.Find(&users)
 	if result.Error != nil {
-		return nil, result.Error
+		return nil, apperror.Wrap(result.Error, "gorm db find users")
 	}
 
 	return users, nil
