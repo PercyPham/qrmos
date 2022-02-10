@@ -6,8 +6,8 @@ import (
 	"qrmos/internal/usecase/repo"
 )
 
-func NewGetUsersUsecase(userRepo repo.UserRepo) *GetUsersUsecase {
-	return &GetUsersUsecase{userRepo}
+func NewGetUsersUsecase(ur repo.UserRepo) *GetUsersUsecase {
+	return &GetUsersUsecase{ur}
 }
 
 type GetUsersUsecase struct {

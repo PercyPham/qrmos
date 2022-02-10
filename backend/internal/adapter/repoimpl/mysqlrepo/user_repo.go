@@ -34,3 +34,12 @@ func (ur *userRepo) GetUsers() ([]*entity.User, error) {
 
 	return users, nil
 }
+
+func (ur *userRepo) GetUserByUsername(username string) *entity.User {
+	user := new(entity.User)
+	result := ur.db.Where("username = ?", username).First(user)
+	if result.Error != nil {
+		return nil
+	}
+	return user
+}

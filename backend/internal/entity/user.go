@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"errors"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/common/config"
 	"qrmos/internal/common/security"
@@ -36,7 +37,7 @@ func (u *User) CheckPassword(password string) bool {
 
 func (u *User) validatePasswordFormat(password string) error {
 	if password == "" {
-		return apperror.New("password must not be empty")
+		return errors.New("password must not be empty")
 	}
 	return nil
 }

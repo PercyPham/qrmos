@@ -20,16 +20,24 @@ type AppError interface {
 	WithPublicMessagef(format string, args ...interface{}) AppError
 }
 
-// New returns a new AppError with message and default InternalServerError status code
-func New(message string) AppError {
-	return &appErr{msg: message, code: http.StatusInternalServerError}
+// New returns a new AppError with status code and message
+func New(code int, message string) AppError {
+	return &appErr{
+		code:      code,
+		msg:       message,
+		publicMsg: message,
+	}
 }
 
-// Newf formats error message and returns a new AppError with default
-// InternalServerError status code
-func Newf(format string, args ...interface{}) AppError {
+// Newf formats error message and returns a new AppError with
+// status code and message
+func Newf(code int, format string, args ...interface{}) AppError {
 	message := fmt.Sprintf(format, args...)
-	return &appErr{msg: message, code: http.StatusInternalServerError}
+	return &appErr{
+		code:      code,
+		msg:       message,
+		publicMsg: message,
+	}
 }
 
 // Wrap wraps an error and returns a new AppError with error status
