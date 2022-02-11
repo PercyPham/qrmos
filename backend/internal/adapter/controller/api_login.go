@@ -4,6 +4,7 @@ import (
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/usecase"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +21,7 @@ func (s *server) login(c *gin.Context) {
 	}
 
 	loginUsecase := usecase.NewLoginUsecase(s.userRepo)
-	accessToken, err := loginUsecase.Login(body.Username, body.Password)
+	accessToken, err := loginUsecase.Login(time.Now(), body.Username, body.Password)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase gets users"))
 		return
