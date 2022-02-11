@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+const ErrCodeNotYetDefined = 1000
+
 type AppError interface {
 	Error() string
 	Code() int
@@ -20,24 +22,20 @@ type AppError interface {
 	WithPublicMessagef(format string, args ...interface{}) AppError
 }
 
-// New returns a new AppError with status code and message
-func New(code int, message string) AppError {
+// New returns a new AppError with message and default ErrCodeNotYetDefined
+func New(message string) AppError {
 	return &appErr{
-		code:      code,
+		code:      ErrCodeNotYetDefined,
 		msg:       message,
 		publicMsg: message,
 	}
 }
 
 // Newf formats error message and returns a new AppError with
-// status code and message
-func Newf(code int, format string, args ...interface{}) AppError {
+// message and default ErrCodeNotYetDefined
+func Newf(format string, args ...interface{}) AppError {
 	message := fmt.Sprintf(format, args...)
-	return &appErr{
-		code:      code,
-		msg:       message,
-		publicMsg: message,
-	}
+	return New(message)
 }
 
 // Wrap wraps an error and returns a new AppError with error status
