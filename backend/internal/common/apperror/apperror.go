@@ -20,6 +20,8 @@ type AppError interface {
 	// WithPublicMessagef formats the error message
 	// and sets it to AppError's public message.
 	WithPublicMessagef(format string, args ...interface{}) AppError
+	// Unwrap provides compatibility for Go 1.13 error chains.
+	Unwrap() error
 }
 
 // New returns a new AppError with message and default ErrCodeNotYetDefined
@@ -60,6 +62,16 @@ func wrap(err error, message string) AppError {
 		code = aErr.Code()
 	}
 	return &appErr{cause: err, msg: message, code: code}
+}
+
+func RootCause(e error) error {
+	if ae, ok := e.(AppError); ok {
+		if ae.Unwrap() == nil {
+			return ae
+		}
+		return RootCause(ae.Unwrap())
+	}
+	return e
 }
 
 type appErr struct {

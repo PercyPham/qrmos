@@ -10,9 +10,7 @@ import (
 
 func Error(c *gin.Context, err error) {
 	appErr := apperror.Wrap(apperror.Wrap(err, getReqInfo(c)), "api")
-	if appErr.Code() == http.StatusInternalServerError {
-		logError(appErr)
-	}
+	logError(appErr)
 	response(c, newErrorResponse(appErr.Code(), appErr.PublicMessage()))
 }
 
@@ -38,9 +36,10 @@ type errorContent struct {
 	Message string `json:"message"`
 }
 
-func logError(err error) {
+func logError(err apperror.AppError) {
+	errMsg := fmt.Sprintf("[Error] [%d] %v", err.Code(), err)
 	redStrFormat := "\033[1;31m%s\033[0m"
-	errMsg := fmt.Sprintf(redStrFormat, "[Error] "+err.Error())
+	errMsg = fmt.Sprintf(redStrFormat, errMsg)
 	fmt.Println(errMsg)
 }
 

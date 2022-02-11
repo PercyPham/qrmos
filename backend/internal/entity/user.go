@@ -13,8 +13,8 @@ const UserRoleNormalStaff = "normal-staff"
 
 type User struct {
 	Username     string `json:"username"`
-	Password     string `json:"password"`
-	PasswordSalt string `json:"passwordSalt"`
+	Password     string `json:"password,omitempty"`
+	PasswordSalt string `json:"passwordSalt,omitempty"`
 	FullName     string `json:"fullName"`
 	Role         string `json:"role"`
 	Active       bool   `json:"active"`
@@ -39,4 +39,9 @@ func (u *User) validatePasswordFormat(password string) error {
 		return apperror.New("password must not be empty")
 	}
 	return nil
+}
+
+func (u *User) RemoveSensityInfo() {
+	u.Password = ""
+	u.PasswordSalt = ""
 }

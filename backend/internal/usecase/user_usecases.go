@@ -19,5 +19,8 @@ func (u *GetUsersUsecase) GetUsers() ([]*entity.User, error) {
 	if err != nil {
 		return nil, apperror.Wrap(err, "userRepo gets users")
 	}
+	for _, user := range users {
+		user.RemoveSensityInfo()
+	}
 	return users, nil
 }

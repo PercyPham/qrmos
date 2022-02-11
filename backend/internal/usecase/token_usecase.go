@@ -43,3 +43,21 @@ func (u *TokenUsecase) GenStaffAccessToken(t time.Time, user *entity.User) (stri
 
 	return signedToken, nil
 }
+
+func (u *TokenUsecase) ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {
+	token, err := jwt.ParseWithClaims(staffAccessToken, &StaffAccessTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, apperror.Newf(
+				"expected signing method '%v', got '%v'",
+				jwt.SigningMethodHS256.Name,
+				token.Header["alg"])
+		}
+		return []byte(config.App().Secret), nil
+	})
+
+	if claims, ok := token.Claims.(*StaffAccessTokenClaims); ok && token.Valid {
+		return claims, nil
+	} else {
+		return nil, apperror.Wrap(err, "parse token")
+	}
+}
