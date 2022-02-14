@@ -51,7 +51,7 @@ func (s *server) runDev() {
 }
 
 func (s *server) runStaging() {
-	s.serveStatic("/web/", "./web")
+	s.serveWebStatic()
 	s.setupAPIs()
 
 	port := strconv.Itoa(config.App().Port)
@@ -59,13 +59,20 @@ func (s *server) runStaging() {
 }
 
 func (s *server) runProd() {
-	s.serveStatic("/web/", "./web")
+	s.serveWebStatic()
 	s.setupAPIs()
 
 	s.r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
 	log.Fatal(autotls.Run(s.r, config.App().Domains...))
+}
+
+func (s *server) serveWebStatic() {
+	s.r.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/web/")
+	})
+	s.serveStatic("/web/", "./web")
 }
 
 func (s *server) serveStatic(relativePath, root string) {

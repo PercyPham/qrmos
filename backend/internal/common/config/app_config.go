@@ -16,6 +16,7 @@ type appConfig struct {
 	ENV     string
 	Port    int
 	Domains []string
+	Secret  string
 }
 
 func loadAppConfig() {
@@ -23,6 +24,7 @@ func loadAppConfig() {
 		ENV:     getENV("APP_ENV"),
 		Port:    getIntENV("APP_PORT"),
 		Domains: strings.Split(getENV("APP_DOMAINS"), ";"),
+		Secret:  getENV("APP_SECRET"),
 	}
 
 	if !(app.ENV == "dev" || app.ENV == "staging" || app.ENV == "prod") {

@@ -24,6 +24,12 @@ make dev_db_up
 - `pgAdmin` will be available at `localhost:8081` after spinning up the database.
 - Default database name is `qrmos`.
 
+After spinning up DB for the first time, we need to initialize data by running this command (**only once**):
+```
+make init_data
+```
+- This will add an `admin` user with `password` as password.
+
 Shutdown database:
 ```
 make dev_db_down
@@ -57,14 +63,20 @@ make build
 ```
 - Built files are located in `build` folder at root.
 
-Export env variables to current process:
+
+<details>
+  <summary>Config env variables</summary>
+
+Default environment variables are specified in `backend/.default.env`. It will be copied to `build` folder during building.
+
+For production code, default env variables will be read from `.default.env`.
+To ovewrite those env, create a `.env` file, and add env variable to it.
+
+Or simple export env variables to current process, example:
 ```bash
 export APP_ENV=prod
 ```
-- Default environment variables are specified in `backend/.default.env`.
-- For production code, default env variables will be read from `.default.env`.
-  To overide those env, use `.env` file.
-- Export prod env variables accordingly in order to run production code.
+</details>
 
 Run built code:
 ```bash

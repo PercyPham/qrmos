@@ -5,4 +5,5 @@ func (s *server) setupAPIs() {
 
 	api.GET("/health", s.checkHealth)
 	api.GET("/users", s.getAllUsers)
+	api.POST("/login", s.login)
 }
