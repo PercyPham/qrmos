@@ -1,23 +1,14 @@
-import 'package:http/http.dart' as http;
-import "dart:convert";
-import "utils.dart";
+import 'utils/utils.dart';
 
-Future<ApiResponse<String>> checkHealth() async {
-  var url = Uri.parse(apiBaseUrl + "/health");
-  var response = await http.get(url);
-  if (response.statusCode != 200) {
-    throw Exception("internal server error");
-  }
+Future<HealthCheckResponse> checkHealth() async {
+  var apiResp = await get("/health");
+  return HealthCheckResponse.fromApiResponse(apiResp);
+}
 
-  var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-  var apiResponse = ApiResponse<String>(
-    data: decodedResponse["data"],
-    error: decodedResponse["error"] == null
-        ? null
-        : ApiError(
-            code: decodedResponse["error"]["code"],
-            message: decodedResponse["error"]["message"],
-          ),
-  );
-  return apiResponse;
+class HealthCheckResponse {
+  String? data;
+  ApiError? error;
+  HealthCheckResponse.fromApiResponse(ApiResponse apiResp)
+      : data = apiResp.dataJson,
+        error = apiResp.error;
 }
