@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/screens/home/home.dart';
 import 'package:qrmos/screens/login/login.dart';
+import 'package:qrmos/screens/dashboard/dashboard.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       routes: {
         "/": (context) => const HomeScreen(title: 'QRMOS'),
-        "/login": (context) => const LoginScreen()
+        "/login": (context) => const LoginScreen(),
+        "/dashboard": (context) => const DashboardScreen(),
       },
     );
   }
