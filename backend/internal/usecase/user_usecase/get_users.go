@@ -6,16 +6,16 @@ import (
 	"qrmos/internal/usecase/repo"
 )
 
-func NewGetUsersUsecase(ur repo.UserRepo) *GetUsersUsecase {
+func NewGetUsersUsecase(ur repo.User) *GetUsersUsecase {
 	return &GetUsersUsecase{ur}
 }
 
 type GetUsersUsecase struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 func (u *GetUsersUsecase) GetUsers() ([]*entity.User, error) {
-	users, err := u.userRepo.GetUsers()
+	users, err := u.userRepo.GetMany()
 	if err != nil {
 		return nil, apperror.Wrap(err, "userRepo gets users")
 	}

@@ -11,12 +11,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewAuthCheck(ur repo.UserRepo) *AuthCheck {
+func NewAuthCheck(ur repo.User) *AuthCheck {
 	return &AuthCheck{ur}
 }
 
 type AuthCheck struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {

@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-func NewCreateUserUsecase(ur repo.UserRepo) *CreateUserUsecase {
+func NewCreateUserUsecase(ur repo.User) *CreateUserUsecase {
 	return &CreateUserUsecase{ur}
 }
 
 type CreateUserUsecase struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 type CreateUserInput struct {
@@ -51,7 +51,7 @@ func (u *CreateUserUsecase) CreateUser(t time.Time, input *CreateUserInput) erro
 			WithCode(http.StatusBadRequest).
 			WithPublicMessage(apperror.RootCause(err).Error())
 	}
-	user := u.userRepo.GetUserByUsername(input.Username)
+	user := u.userRepo.GetByUsername(input.Username)
 	if user != nil {
 		return apperror.New("username already exists")
 	}
@@ -62,7 +62,7 @@ func (u *CreateUserUsecase) CreateUser(t time.Time, input *CreateUserInput) erro
 		Active:   true,
 	}
 	user.SetPassword(t, input.Password)
-	if err := u.userRepo.CreateUser(user); err != nil {
+	if err := u.userRepo.Create(user); err != nil {
 		return apperror.Wrap(err, "user repo creates user")
 	}
 	return nil

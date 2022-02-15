@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-func NewUpdateUserUsecase(ur repo.UserRepo) *UpdateUserUsecase {
+func NewUpdateUserUsecase(ur repo.User) *UpdateUserUsecase {
 	return &UpdateUserUsecase{ur}
 }
 
 type UpdateUserUsecase struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 type UpdateUserInput struct {
@@ -53,7 +53,7 @@ func (u *UpdateUserUsecase) UpdateUser(t time.Time, input *UpdateUserInput) erro
 			WithPublicMessage(apperror.RootCause(err).Error())
 	}
 
-	user := u.userRepo.GetUserByUsername(input.Username)
+	user := u.userRepo.GetByUsername(input.Username)
 	if user == nil {
 		return apperror.Newf("user '%s' not found", input.Username).WithCode(http.StatusNotFound)
 	}
@@ -65,7 +65,7 @@ func (u *UpdateUserUsecase) UpdateUser(t time.Time, input *UpdateUserInput) erro
 	user.Role = input.Role
 	user.Active = input.Active
 
-	if err := u.userRepo.UpdateUser(user); err != nil {
+	if err := u.userRepo.Update(user); err != nil {
 		return apperror.Wrap(err, "user repo update user")
 	}
 

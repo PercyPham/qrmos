@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewServer(ur repo.UserRepo) *server {
+func NewServer(ur repo.User) *server {
 	if config.App().ENV != "dev" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -28,7 +28,7 @@ func NewServer(ur repo.UserRepo) *server {
 
 type server struct {
 	r         *gin.Engine
-	userRepo  repo.UserRepo
+	userRepo  repo.User
 	authCheck *authcheck.AuthCheck
 }
 

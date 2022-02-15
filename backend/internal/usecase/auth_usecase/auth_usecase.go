@@ -9,12 +9,12 @@ import (
 	"time"
 )
 
-func NewAuthUsecase(ur repo.UserRepo) *AuthUsecase {
+func NewAuthUsecase(ur repo.User) *AuthUsecase {
 	return &AuthUsecase{ur}
 }
 
 type AuthUsecase struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 func (u *AuthUsecase) AuthenticateStaff(t time.Time, accessToken string) (*entity.User, error) {
@@ -22,7 +22,7 @@ func (u *AuthUsecase) AuthenticateStaff(t time.Time, accessToken string) (*entit
 	if err != nil {
 		return nil, apperror.Wrap(err, "validate staff access token")
 	}
-	user := u.userRepo.GetUserByUsername(staffAccessTokenClaims.Username)
+	user := u.userRepo.GetByUsername(staffAccessTokenClaims.Username)
 	if user == nil {
 		return nil, apperror.Wrapf(err, "user repo gets user with username 'v'", staffAccessTokenClaims.Username)
 	}

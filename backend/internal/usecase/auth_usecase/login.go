@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
-func NewLoginUsecase(ur repo.UserRepo) *LoginUsecase {
+func NewLoginUsecase(ur repo.User) *LoginUsecase {
 	return &LoginUsecase{ur}
 }
 
 type LoginUsecase struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 type LoginInput struct {
@@ -38,7 +38,7 @@ func (u *LoginUsecase) Login(t time.Time, input *LoginInput) (staffAccessToken s
 			WithPublicMessage(apperror.RootCause(err).Error())
 	}
 
-	user := u.userRepo.GetUserByUsername(input.Username)
+	user := u.userRepo.GetByUsername(input.Username)
 	if user == nil {
 		return "", apperror.Newf("username '%v' not found", input.Username).
 			WithCode(http.StatusBadRequest).
