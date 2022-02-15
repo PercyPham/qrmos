@@ -9,42 +9,31 @@ final String _apiBaseUrl = kDebugMode
     : '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}/api';
 
 Future<ApiResponse> get(
-  String url, {
+  String apiRelativePath, {
   Map<String, String>? headers,
-  Object? body,
 }) async {
-  var fullUrl = Uri.parse(_apiBaseUrl + url);
   var response = await http.get(
-    fullUrl,
+    _prepFullUrl(apiRelativePath),
     headers: await _prepHeaders(headers),
   );
-
-  if (response.statusCode != 200) {
-    return ApiResponse(null, ApiError(500, 'something wrong happened'));
-  }
-
-  var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-  return ApiResponse.fromJson(decodedResponse);
+  return ApiResponse.fromHttpResponse(response);
 }
 
 Future<ApiResponse> post(
-  String url, {
+  String apiRelativePath, {
   Map<String, String>? headers,
   Object? body,
 }) async {
-  var fullUrl = Uri.parse(_apiBaseUrl + url);
   var response = await http.post(
-    fullUrl,
+    _prepFullUrl(apiRelativePath),
     headers: await _prepHeaders(headers),
     body: json.encode(body),
   );
+  return ApiResponse.fromHttpResponse(response);
+}
 
-  if (response.statusCode != 200) {
-    return ApiResponse(null, ApiError(500, 'something wrong happened'));
-  }
-
-  var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
-  return ApiResponse.fromJson(decodedResponse);
+Uri _prepFullUrl(String url) {
+  return Uri.parse(_apiBaseUrl + url);
 }
 
 Future<Map<String, String>> _prepHeaders(Map<String, String>? headers) async {
@@ -61,10 +50,15 @@ class ApiResponse {
   dynamic dataJson;
   ApiError? error;
 
-  ApiResponse(this.dataJson, this.error);
-  ApiResponse.fromJson(Map<String, dynamic> json)
-      : dataJson = json['data'],
-        error = json['error'] != null ? ApiError.fromJson(json['error']) : null;
+  ApiResponse.fromHttpResponse(http.Response response) {
+    if (response.statusCode != 200) {
+      error = ApiError(500, 'something wrong happened');
+      return;
+    }
+    var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+    dataJson = decodedResponse['data'];
+    error = decodedResponse['error'] != null ? ApiError.fromJson(decodedResponse['error']) : null;
+  }
 }
 
 class ApiError {

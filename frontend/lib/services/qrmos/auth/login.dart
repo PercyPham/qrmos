@@ -18,17 +18,11 @@ class LoginResponse {
   AccessToken? data;
   ApiError? error;
   LoginResponse.fromApiResponse(ApiResponse apiResp)
-      : data = AccessToken.fromJson(apiResp.dataJson),
+      : data = apiResp.dataJson != null ? AccessToken.fromJson(apiResp.dataJson) : null,
         error = apiResp.error;
 }
 
 class AccessToken {
   final String accessToken;
-  AccessToken(this.accessToken);
-  static AccessToken? fromJson(Map<String, dynamic>? dataJson) {
-    if (dataJson == null) {
-      return null;
-    }
-    return AccessToken(dataJson['accessToken']);
-  }
+  AccessToken.fromJson(Map<String, dynamic> dataJson) : accessToken = dataJson['accessToken'];
 }
