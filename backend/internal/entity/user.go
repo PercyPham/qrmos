@@ -12,7 +12,7 @@ const UserRoleManager = "manager"
 const UserRoleNormalStaff = "normal-staff"
 
 type User struct {
-	Username     string `json:"username"`
+	Username     string `json:"username" gorm:"primaryKey"`
 	Password     string `json:"password,omitempty"`
 	PasswordSalt string `json:"passwordSalt,omitempty"`
 	FullName     string `json:"fullName"`
@@ -22,7 +22,7 @@ type User struct {
 
 func (u *User) SetPassword(t time.Time, password string) error {
 	if err := ValidatePasswordFormat(password); err != nil {
-		return apperror.Wrap(err, "validate new password format")
+		return apperror.Wrap(err, "validate password format")
 	}
 	u.PasswordSalt = security.GenRanStr(t, 50)
 	u.Password = security.HashHS256(password+u.PasswordSalt, config.App().Secret)

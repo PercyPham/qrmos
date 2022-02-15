@@ -45,7 +45,30 @@ func (s *server) createUser(c *gin.Context) {
 		return
 	}
 
-	response.Success(c, "OK")
+	response.Success(c, true)
+}
+
+func (s *server) updateUser(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsAdmin(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	body := new(user_usecase.UpdateUserInput)
+	if err := c.ShouldBindJSON(body); err != nil {
+		response.Error(c, apperror.Wrap(err, "bind json req body"))
+		return
+	}
+	body.Username = c.Param("username")
+
+	userUsecase := user_usecase.NewUserUsecase(s.userRepo)
+	if err := userUsecase.UpdateUser(now, body); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase updates user"))
+		return
+	}
+
+	response.Success(c, true)
 }
 
 func newUnauthorizedError(err error) error {

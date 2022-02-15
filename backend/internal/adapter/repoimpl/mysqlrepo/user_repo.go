@@ -43,3 +43,11 @@ func (ur *userRepo) GetUserByUsername(username string) *entity.User {
 	}
 	return user
 }
+
+func (ur *userRepo) UpdateUser(user *entity.User) error {
+	result := ur.db.Save(user)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm db save user")
+	}
+	return nil
+}
