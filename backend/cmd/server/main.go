@@ -18,9 +18,11 @@ func main() {
 		panic(err)
 	}
 
-	userRepo := mysqlrepo.NewUserRepo(db)
-
-	server := controller.NewServer(userRepo)
+	serverCfg := controller.ServerConfig{
+		UserRepo:     mysqlrepo.NewUserRepo(db),
+		DeliveryRepo: mysqlrepo.NewDeliveryRepo(db),
+	}
+	server := controller.NewServer(serverCfg)
 
 	server.Run()
 }

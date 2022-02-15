@@ -14,21 +14,30 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewServer(ur repo.User) *server {
+type ServerConfig struct {
+	UserRepo     repo.User
+	DeliveryRepo repo.Delivery
+}
+
+func NewServer(cfg ServerConfig) *server {
 	if config.App().ENV != "dev" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	return &server{
-		r:         gin.Default(),
-		userRepo:  ur,
-		authCheck: authcheck.NewAuthCheck(ur),
+		r:            gin.Default(),
+		userRepo:     cfg.UserRepo,
+		deliveryRepo: cfg.DeliveryRepo,
+		authCheck:    authcheck.NewAuthCheck(cfg.UserRepo),
 	}
 }
 
 type server struct {
-	r         *gin.Engine
-	userRepo  repo.User
+	r *gin.Engine
+
+	userRepo     repo.User
+	deliveryRepo repo.Delivery
+
 	authCheck *authcheck.AuthCheck
 }
 

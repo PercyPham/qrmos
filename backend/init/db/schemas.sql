@@ -16,3 +16,8 @@ CREATE TABLE users (
   role VARCHAR(10),
   active BOOLEAN default true
 );
+
+CREATE TABLE delivery_destinations (
+  name VARCHAR(255) NOT NULL PRIMARY KEY,
+  security_code VARCHAR(255) NOT NULL
+);

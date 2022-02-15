@@ -20,6 +20,14 @@ type AuthCheck struct {
 }
 
 func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {
+	return ac.isStaffRole(t, c, entity.UserRoleAdmin)
+}
+
+func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) error {
+	return ac.isStaffRole(t, c, entity.UserRoleManager)
+}
+
+func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) error {
 	accessToken, err := extractAccessToken(c)
 	if err != nil {
 		return apperror.Wrap(err, "extract access token")
@@ -29,10 +37,10 @@ func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {
 	if err != nil {
 		return apperror.Wrap(err, "authenticate staff")
 	}
-	if user.Role != entity.UserRoleAdmin {
+	if user.Role != role {
 		return apperror.Newf(
 			"expected role '%v', got '%v'",
-			entity.UserRoleAdmin,
+			role,
 			user.Role)
 	}
 	return nil
