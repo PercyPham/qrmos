@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *server) createDeliveryDestination(c *gin.Context) {
+func (s *server) createDeliveryDest(c *gin.Context) {
 	now := time.Now()
 	if err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
@@ -25,6 +25,25 @@ func (s *server) createDeliveryDestination(c *gin.Context) {
 	createDestUsecase := delivery_usecase.NewCreateDestUsecase(s.deliveryRepo)
 	if err := createDestUsecase.Create(time.Now(), body); err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase creates delivery destination"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) refreshDeliveryDestSecurityCode(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	body := new(delivery_usecase.RefreshSecurityCodeInput)
+	body.Name = c.Param("name")
+
+	refreshSecurityCodeUsecase := delivery_usecase.NewRefreshSecurityCodeUsecase(s.deliveryRepo)
+	if err := refreshSecurityCodeUsecase.Refresh(time.Now(), body); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase refreshes security code"))
 		return
 	}
 

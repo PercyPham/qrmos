@@ -40,10 +40,14 @@ func (u *CreateDestUsecase) Create(t time.Time, input *CreateDestInput) error {
 	}
 	deliverDest = &entity.DeliveryDestination{
 		Name:         input.Name,
-		SecurityCode: security.GenRanStr(t, 15),
+		SecurityCode: genNewSecurityCode(t),
 	}
 	if err := u.DeliveryRepo.Create(deliverDest); err != nil {
 		return apperror.Wrap(err, "repo create deliver destination")
 	}
 	return nil
+}
+
+func genNewSecurityCode(t time.Time) string {
+	return security.GenRanStr(t, 15)
 }

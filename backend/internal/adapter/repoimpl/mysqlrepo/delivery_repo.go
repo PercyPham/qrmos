@@ -16,19 +16,27 @@ type deliveryRepo struct {
 	db *gorm.DB
 }
 
-func (ur *deliveryRepo) Create(dest *entity.DeliveryDestination) error {
-	result := ur.db.Create(dest)
+func (dr *deliveryRepo) Create(dest *entity.DeliveryDestination) error {
+	result := dr.db.Create(dest)
 	if result.Error != nil {
 		return apperror.Wrap(result.Error, "gorm creates delivery destination")
 	}
 	return nil
 }
 
-func (ur *deliveryRepo) GetByName(name string) *entity.DeliveryDestination {
+func (dr *deliveryRepo) GetByName(name string) *entity.DeliveryDestination {
 	dest := new(entity.DeliveryDestination)
-	result := ur.db.Where("name = ?", name).First(dest)
+	result := dr.db.Where("name = ?", name).First(dest)
 	if result.Error != nil {
 		return nil
 	}
 	return dest
+}
+
+func (dr *deliveryRepo) Update(dest *entity.DeliveryDestination) error {
+	result := dr.db.Save(dest)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm db save delivery destination")
+	}
+	return nil
 }

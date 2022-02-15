@@ -14,5 +14,6 @@ func (s *server) setupAPIs() {
 	api.POST("/customers", s.createCustomer)
 	api.PUT("/customers/me", s.updateCustomer)
 
-	api.POST("/delivery-destinations", s.createDeliveryDestination)
+	api.POST("/delivery-destinations", s.createDeliveryDest)
+	api.PUT("/delivery-destinations/:name/security-code/refresh", s.refreshDeliveryDestSecurityCode)
 }
