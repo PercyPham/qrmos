@@ -40,3 +40,11 @@ func (dr *deliveryRepo) Update(dest *entity.DeliveryDestination) error {
 	}
 	return nil
 }
+
+func (dr *deliveryRepo) DeleteByName(name string) error {
+	result := dr.db.Where("name = ?", name).Delete(entity.DeliveryDestination{})
+	if result.Error != nil {
+		return apperror.Wrapf(result.Error, "gorm db delete delivery destination '%s'", name)
+	}
+	return nil
+}
