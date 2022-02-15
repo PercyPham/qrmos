@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"qrmos/internal/adapter/controller/internal/authcheck"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/usecase"
@@ -12,7 +11,7 @@ import (
 )
 
 func (s *server) getAllUsers(c *gin.Context) {
-	if err := authcheck.IsAdmin(time.Now(), c); err != nil {
+	if err := s.authCheck.IsAdmin(time.Now(), c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}

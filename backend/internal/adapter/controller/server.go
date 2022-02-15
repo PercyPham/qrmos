@@ -3,6 +3,7 @@ package controller
 import (
 	"log"
 	"net/http"
+	"qrmos/internal/adapter/controller/internal/authcheck"
 	"qrmos/internal/common/config"
 	"qrmos/internal/usecase/repo"
 	"strconv"
@@ -19,14 +20,16 @@ func NewServer(ur repo.UserRepo) *server {
 	}
 
 	return &server{
-		r:        gin.Default(),
-		userRepo: ur,
+		r:         gin.Default(),
+		userRepo:  ur,
+		authCheck: *authcheck.NewAuthCheck(ur),
 	}
 }
 
 type server struct {
-	r        *gin.Engine
-	userRepo repo.UserRepo
+	r         *gin.Engine
+	userRepo  repo.UserRepo
+	authCheck authcheck.AuthCheck
 }
 
 func (s *server) Run() {

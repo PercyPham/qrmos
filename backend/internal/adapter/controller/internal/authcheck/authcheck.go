@@ -4,38 +4,38 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase"
+	"qrmos/internal/usecase/repo"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func IsAdmin(t time.Time, c *gin.Context) error {
-	staffAccessToken, err := extractStaffAccessToken(t, c)
+func NewAuthCheck(ur repo.UserRepo) *AuthCheck {
+	return &AuthCheck{}
+}
+
+type AuthCheck struct {
+	userRepo repo.UserRepo
+}
+
+func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {
+	accessToken, err := extractAccessToken(c)
 	if err != nil {
-		return apperror.Wrap(err, "extract staff access token")
+		return apperror.Wrap(err, "extract access token")
 	}
-	if staffAccessToken.Role != entity.UserRoleAdmin {
+	authUsecase := usecase.NewAuthUsecase(ac.userRepo)
+	user, err := authUsecase.AuthenticateStaff(t, accessToken)
+	if err != nil {
+		return apperror.Wrap(err, "authenticate staff")
+	}
+	if user.Role != entity.UserRoleAdmin {
 		return apperror.Newf(
 			"expected role '%v', got '%v'",
 			entity.UserRoleAdmin,
-			staffAccessToken.Role)
+			user.Role)
 	}
 	return nil
-}
-
-func extractStaffAccessToken(t time.Time, c *gin.Context) (*usecase.StaffAccessTokenClaims, error) {
-	accessToken, err := extractAccessToken(c)
-	if err != nil {
-		return nil, apperror.Wrap(err, "extract access token")
-	}
-	staffAccessToken, err := usecase.
-		NewTokenUsecase().
-		ValidateStaffAccessToken(t, accessToken)
-	if err != nil {
-		return nil, apperror.Wrap(err, "validate staff access token")
-	}
-	return staffAccessToken, nil
 }
 
 func extractAccessToken(c *gin.Context) (string, error) {

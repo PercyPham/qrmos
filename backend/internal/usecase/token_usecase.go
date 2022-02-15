@@ -1,8 +1,10 @@
 package usecase
 
 import (
+	"fmt"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/common/config"
+	"qrmos/internal/common/security"
 	"qrmos/internal/entity"
 	"time"
 
@@ -10,11 +12,12 @@ import (
 )
 
 const AccessTokenTypeStaff = "staff"
+const AccessTokenTypeCustomer = "customer"
 
 type StaffAccessTokenClaims struct {
 	Type     string `json:"type"`
 	Username string `json:"username"`
-	Role     string `json:"role"`
+	Key      string `json:"key"`
 	jwt.StandardClaims
 }
 
@@ -29,7 +32,7 @@ func (u *TokenUsecase) GenStaffAccessToken(t time.Time, user *entity.User) (stri
 	claims := &StaffAccessTokenClaims{
 		Type:     AccessTokenTypeStaff,
 		Username: user.Username,
-		Role:     user.Role,
+		Key:      genStaffTokenKey(t, user.Password),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: t.UnixNano() + int64(8*time.Hour),
 		},
@@ -42,6 +45,21 @@ func (u *TokenUsecase) GenStaffAccessToken(t time.Time, user *entity.User) (stri
 	}
 
 	return signedToken, nil
+}
+
+func genStaffTokenKey(t time.Time, password string) string {
+	salt := security.GenRanStr(t, 10)
+	rawKey := security.HashHS256(password+salt, config.App().Secret)
+	key := salt + rawKey
+	return key
+}
+
+func checkStaffTokenKey(key, password string) bool {
+	if len(key) < 10 {
+		return false
+	}
+	salt := fmt.Sprint(key[:10])
+	return key == security.HashHS256(password+salt, config.App().Secret)
 }
 
 func (u *TokenUsecase) ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {
