@@ -4,8 +4,17 @@ import (
 	"net/http"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
+	"qrmos/internal/usecase/repo"
 	"time"
 )
+
+func NewCreateUserUsecase(ur repo.UserRepo) *CreateUserUsecase {
+	return &CreateUserUsecase{ur}
+}
+
+type CreateUserUsecase struct {
+	userRepo repo.UserRepo
+}
 
 type CreateUserInput struct {
 	Username string `json:"username"`
@@ -36,7 +45,7 @@ func (i *CreateUserInput) validate() error {
 	return nil
 }
 
-func (u *UserUsecase) CreateUser(t time.Time, input *CreateUserInput) error {
+func (u *CreateUserUsecase) CreateUser(t time.Time, input *CreateUserInput) error {
 	if err := input.validate(); err != nil {
 		return apperror.Wrap(err, "validate input").
 			WithCode(http.StatusBadRequest).

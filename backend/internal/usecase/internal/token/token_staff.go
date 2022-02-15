@@ -1,4 +1,4 @@
-package usecase
+package token
 
 import (
 	"fmt"
@@ -12,7 +12,6 @@ import (
 )
 
 const AccessTokenTypeStaff = "staff"
-const AccessTokenTypeCustomer = "customer"
 
 type StaffAccessTokenClaims struct {
 	Type     string `json:"type"`
@@ -21,14 +20,7 @@ type StaffAccessTokenClaims struct {
 	jwt.StandardClaims
 }
 
-func NewTokenUsecase() *TokenUsecase {
-	return &TokenUsecase{}
-}
-
-type TokenUsecase struct {
-}
-
-func (u *TokenUsecase) GenStaffAccessToken(t time.Time, user *entity.User) (string, error) {
+func GenStaffAccessToken(t time.Time, user *entity.User) (string, error) {
 	claims := &StaffAccessTokenClaims{
 		Type:     AccessTokenTypeStaff,
 		Username: user.Username,
@@ -54,7 +46,7 @@ func genStaffTokenKey(t time.Time, password string) string {
 	return key
 }
 
-func checkStaffTokenKey(key, password string) bool {
+func CheckStaffTokenKey(key, password string) bool {
 	if len(key) < 10 {
 		return false
 	}
@@ -62,7 +54,7 @@ func checkStaffTokenKey(key, password string) bool {
 	return key == salt+security.HashHS256(password+salt, config.App().Secret)
 }
 
-func (u *TokenUsecase) ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {
+func ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {
 	token, err := jwt.ParseWithClaims(staffAccessToken, &StaffAccessTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodHS256 {
 			return nil, apperror.Newf(

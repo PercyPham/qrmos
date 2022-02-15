@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"net/http"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/usecase/user_usecase"
@@ -16,7 +15,7 @@ func (s *server) getAllUsers(c *gin.Context) {
 		return
 	}
 
-	userUsecase := user_usecase.NewUserUsecase(s.userRepo)
+	userUsecase := user_usecase.NewGetUsersUsecase(s.userRepo)
 	users, err := userUsecase.GetUsers()
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase gets users"))
@@ -35,12 +34,12 @@ func (s *server) createUser(c *gin.Context) {
 
 	body := new(user_usecase.CreateUserInput)
 	if err := c.ShouldBindJSON(body); err != nil {
-		response.Error(c, apperror.Wrap(err, "bind json req body"))
+		response.Error(c, newBindJsonReqBodyError(err))
 		return
 	}
 
-	userUsecase := user_usecase.NewUserUsecase(s.userRepo)
-	if err := userUsecase.CreateUser(now, body); err != nil {
+	createUserUsecase := user_usecase.NewCreateUserUsecase(s.userRepo)
+	if err := createUserUsecase.CreateUser(now, body); err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase creates user"))
 		return
 	}
@@ -57,22 +56,16 @@ func (s *server) updateUser(c *gin.Context) {
 
 	body := new(user_usecase.UpdateUserInput)
 	if err := c.ShouldBindJSON(body); err != nil {
-		response.Error(c, apperror.Wrap(err, "bind json req body"))
+		response.Error(c, newBindJsonReqBodyError(err))
 		return
 	}
 	body.Username = c.Param("username")
 
-	userUsecase := user_usecase.NewUserUsecase(s.userRepo)
-	if err := userUsecase.UpdateUser(now, body); err != nil {
+	updateUserUsecase := user_usecase.NewUpdateUserUsecase(s.userRepo)
+	if err := updateUserUsecase.UpdateUser(now, body); err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase updates user"))
 		return
 	}
 
 	response.Success(c, true)
-}
-
-func newUnauthorizedError(err error) error {
-	return apperror.Wrap(err, "authorize").
-		WithCode(http.StatusUnauthorized).
-		WithPublicMessage("unauthorized")
 }

@@ -3,7 +3,7 @@ package authcheck
 import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
-	"qrmos/internal/usecase"
+	"qrmos/internal/usecase/auth_usecase"
 	"qrmos/internal/usecase/repo"
 	"strings"
 	"time"
@@ -24,7 +24,7 @@ func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {
 	if err != nil {
 		return apperror.Wrap(err, "extract access token")
 	}
-	authUsecase := usecase.NewAuthUsecase(ac.userRepo)
+	authUsecase := auth_usecase.NewAuthUsecase(ac.userRepo)
 	user, err := authUsecase.AuthenticateStaff(t, accessToken)
 	if err != nil {
 		return apperror.Wrap(err, "authenticate staff")

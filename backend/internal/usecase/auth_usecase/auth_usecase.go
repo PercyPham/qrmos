@@ -1,9 +1,10 @@
-package usecase
+package auth_usecase
 
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
+	"qrmos/internal/usecase/internal/token"
 	"qrmos/internal/usecase/repo"
 	"time"
 )
@@ -17,7 +18,7 @@ type AuthUsecase struct {
 }
 
 func (u *AuthUsecase) AuthenticateStaff(t time.Time, accessToken string) (*entity.User, error) {
-	staffAccessToken, err := NewTokenUsecase().ValidateStaffAccessToken(t, accessToken)
+	staffAccessToken, err := token.ValidateStaffAccessToken(t, accessToken)
 	if err != nil {
 		return nil, apperror.Wrap(err, "validate staff access token")
 	}
@@ -29,7 +30,7 @@ func (u *AuthUsecase) AuthenticateStaff(t time.Time, accessToken string) (*entit
 		return nil, apperror.New("user is not active").
 			WithCode(http.StatusForbidden)
 	}
-	if !checkStaffTokenKey(staffAccessToken.Key, user.Password) {
+	if !token.CheckStaffTokenKey(staffAccessToken.Key, user.Password) {
 		return nil, apperror.New("user password has changed").
 			WithCode(http.StatusUnauthorized)
 	}

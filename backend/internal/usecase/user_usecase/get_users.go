@@ -6,15 +6,15 @@ import (
 	"qrmos/internal/usecase/repo"
 )
 
-func NewUserUsecase(ur repo.UserRepo) *UserUsecase {
-	return &UserUsecase{ur}
+func NewGetUsersUsecase(ur repo.UserRepo) *GetUsersUsecase {
+	return &GetUsersUsecase{ur}
 }
 
-type UserUsecase struct {
+type GetUsersUsecase struct {
 	userRepo repo.UserRepo
 }
 
-func (u *UserUsecase) GetUsers() ([]*entity.User, error) {
+func (u *GetUsersUsecase) GetUsers() ([]*entity.User, error) {
 	users, err := u.userRepo.GetUsers()
 	if err != nil {
 		return nil, apperror.Wrap(err, "userRepo gets users")
