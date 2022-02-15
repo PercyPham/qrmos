@@ -12,4 +12,5 @@ func (s *server) setupAPIs() {
 	api.POST("/login", s.login)
 
 	api.POST("/customers", s.createCustomer)
+	api.PUT("/customers/me", s.updateCustomer)
 }

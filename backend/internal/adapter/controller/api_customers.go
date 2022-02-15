@@ -26,3 +26,29 @@ func (s *server) createCustomer(c *gin.Context) {
 		"accessToken": customerAccessToken,
 	})
 }
+
+func (s *server) updateCustomer(c *gin.Context) {
+	customer, err := s.authCheck.IsCustomer(c)
+	if err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	body := new(customer_usecase.UpdateCustomerInput)
+	if err := c.ShouldBindJSON(body); err != nil {
+		response.Error(c, newBindJsonReqBodyError(err))
+		return
+	}
+	body.CustomerID = customer.ID
+
+	updateCustomerUsecase := customer_usecase.NewUpdateCustomerUsecase()
+	newCustomerAccessToken, err := updateCustomerUsecase.UpdateCustomer(body)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase creates customer"))
+		return
+	}
+
+	response.Success(c, gin.H{
+		"accessToken": newCustomerAccessToken,
+	})
+}

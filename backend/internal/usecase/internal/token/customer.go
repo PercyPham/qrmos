@@ -4,7 +4,6 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/common/config"
 	"qrmos/internal/entity"
-	"time"
 
 	"github.com/golang-jwt/jwt"
 )
@@ -13,7 +12,7 @@ const AccessTokenTypeCustomer = "customer"
 
 type CustomerAccessTokenClaims struct {
 	Type        string `json:"type"`
-	ID          string `json:"id"`
+	CustomerID  string `json:"customerId"`
 	FullName    string `json:"fullName"`
 	PhoneNumber string `json:"phoneNumber"`
 	jwt.StandardClaims
@@ -21,8 +20,8 @@ type CustomerAccessTokenClaims struct {
 
 func GenCustomerAccessToken(customer *entity.Customer) (string, error) {
 	claims := &CustomerAccessTokenClaims{
-		Type:        AccessTokenTypeStaff,
-		ID:          customer.ID,
+		Type:        AccessTokenTypeCustomer,
+		CustomerID:  customer.ID,
 		FullName:    customer.FullName,
 		PhoneNumber: customer.PhoneNumber,
 	}
@@ -34,7 +33,7 @@ func GenCustomerAccessToken(customer *entity.Customer) (string, error) {
 	return signedToken, nil
 }
 
-func ValidateCustomerAccessToken(t time.Time, customerAccessToken string) (*CustomerAccessTokenClaims, error) {
+func ValidateCustomerAccessTokent(customerAccessToken string) (*CustomerAccessTokenClaims, error) {
 	token, err := jwt.ParseWithClaims(customerAccessToken, &CustomerAccessTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodHS256 {
 			return nil, apperror.Newf(
@@ -46,6 +45,9 @@ func ValidateCustomerAccessToken(t time.Time, customerAccessToken string) (*Cust
 	})
 
 	if claims, ok := token.Claims.(*CustomerAccessTokenClaims); ok && token.Valid {
+		if claims.Type != AccessTokenTypeCustomer {
+			return nil, apperror.New("wrong token type")
+		}
 		return claims, nil
 	} else {
 		return nil, apperror.Wrap(err, "parse token")
