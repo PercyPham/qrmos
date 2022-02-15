@@ -22,14 +22,14 @@ func NewServer(ur repo.UserRepo) *server {
 	return &server{
 		r:         gin.Default(),
 		userRepo:  ur,
-		authCheck: *authcheck.NewAuthCheck(ur),
+		authCheck: authcheck.NewAuthCheck(ur),
 	}
 }
 
 type server struct {
 	r         *gin.Engine
 	userRepo  repo.UserRepo
-	authCheck authcheck.AuthCheck
+	authCheck *authcheck.AuthCheck
 }
 
 func (s *server) Run() {

@@ -59,7 +59,7 @@ func checkStaffTokenKey(key, password string) bool {
 		return false
 	}
 	salt := fmt.Sprint(key[:10])
-	return key == security.HashHS256(password+salt, config.App().Secret)
+	return key == salt+security.HashHS256(password+salt, config.App().Secret)
 }
 
 func (u *TokenUsecase) ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {

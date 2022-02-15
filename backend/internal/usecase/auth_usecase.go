@@ -33,5 +33,5 @@ func (u *AuthUsecase) AuthenticateStaff(t time.Time, accessToken string) (*entit
 		return nil, apperror.New("user password has changed").
 			WithCode(http.StatusUnauthorized)
 	}
-	return nil, nil
+	return user, nil
 }

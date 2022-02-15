@@ -12,7 +12,7 @@ import (
 )
 
 func NewAuthCheck(ur repo.UserRepo) *AuthCheck {
-	return &AuthCheck{}
+	return &AuthCheck{ur}
 }
 
 type AuthCheck struct {
