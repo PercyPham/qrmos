@@ -32,3 +32,11 @@ func (r *menuRepo) GetCategoryByName(name string) *entity.MenuCategory {
 	}
 	return cat
 }
+
+func (r *menuRepo) DeleteCategoryByID(id int) error {
+	result := r.db.Where("id = ?", id).Delete(entity.MenuCategory{})
+	if result.Error != nil {
+		return apperror.Wrapf(result.Error, "gorm db delete menu category")
+	}
+	return nil
+}
