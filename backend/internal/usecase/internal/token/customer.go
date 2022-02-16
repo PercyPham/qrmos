@@ -43,6 +43,9 @@ func ValidateCustomerAccessTokent(customerAccessToken string) (*CustomerAccessTo
 		}
 		return []byte(config.App().Secret), nil
 	})
+	if err != nil {
+		return nil, apperror.Wrap(err, "parse token with claims")
+	}
 
 	if claims, ok := token.Claims.(*CustomerAccessTokenClaims); ok && token.Valid {
 		if claims.Type != AccessTokenTypeCustomer {

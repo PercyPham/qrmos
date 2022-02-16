@@ -64,6 +64,9 @@ func ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAcces
 		}
 		return []byte(config.App().Secret), nil
 	})
+	if err != nil {
+		return nil, apperror.Wrap(err, "parse token with claims")
+	}
 
 	if claims, ok := token.Claims.(*StaffAccessTokenClaims); ok && token.Valid {
 		if claims.Type != AccessTokenTypeStaff {
