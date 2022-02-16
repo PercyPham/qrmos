@@ -30,7 +30,7 @@ func main() {
 	}
 	admin.SetPassword(time.Now(), "password")
 
-	if err := userRepo.CreateUser(admin); err != nil {
+	if err := userRepo.Create(admin); err != nil {
 		log.Fatal("cannot create admin user: ", err)
 	}
 }

@@ -1,18 +1,19 @@
-package usecase
+package auth_usecase
 
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/usecase/internal/token"
 	"qrmos/internal/usecase/repo"
 	"time"
 )
 
-func NewLoginUsecase(ur repo.UserRepo) *LoginUsecase {
+func NewLoginUsecase(ur repo.User) *LoginUsecase {
 	return &LoginUsecase{ur}
 }
 
 type LoginUsecase struct {
-	userRepo repo.UserRepo
+	userRepo repo.User
 }
 
 type LoginInput struct {
@@ -30,39 +31,34 @@ func (i *LoginInput) validate() error {
 	return nil
 }
 
-func (u *LoginUsecase) Login(t time.Time, input *LoginInput) (resp *LoginResponse, err error) {
+func (u *LoginUsecase) Login(t time.Time, input *LoginInput) (staffAccessToken string, err error) {
 	if err := input.validate(); err != nil {
-		return nil, apperror.Wrap(err, "validate input").
+		return "", apperror.Wrap(err, "validate input").
 			WithCode(http.StatusBadRequest).
 			WithPublicMessage(apperror.RootCause(err).Error())
 	}
 
-	user := u.userRepo.GetUserByUsername(input.Username)
+	user := u.userRepo.GetByUsername(input.Username)
 	if user == nil {
-		return nil, apperror.Newf("username '%v' not found", input.Username).
+		return "", apperror.Newf("username '%v' not found", input.Username).
 			WithCode(http.StatusBadRequest).
 			WithPublicMessage("invalid username or password")
 	}
 
 	if !user.CheckPassword(input.Password) {
-		return nil, apperror.New("invalid password").
+		return "", apperror.New("invalid password").
 			WithCode(http.StatusBadRequest).
 			WithPublicMessage("invalid username or password")
 	}
 
 	if !user.Active {
-		return nil, apperror.New("user is not active").WithCode(http.StatusForbidden)
+		return "", apperror.New("user is not active").WithCode(http.StatusForbidden)
 	}
 
-	tokenUsecase := NewTokenUsecase()
-	accessToken, err := tokenUsecase.GenStaffAccessToken(t, user)
+	staffAccessToken, err = token.GenStaffAccessToken(t, user)
 	if err != nil {
-		return nil, apperror.Wrap(err, "generate access token")
+		return "", apperror.Wrap(err, "generate access token")
 	}
 
-	return &LoginResponse{accessToken}, nil
-}
-
-type LoginResponse struct {
-	AccessToken string `json:"accessToken"`
+	return staffAccessToken, nil
 }

@@ -3,39 +3,60 @@ package authcheck
 import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
-	"qrmos/internal/usecase"
+	"qrmos/internal/usecase/auth_usecase"
+	"qrmos/internal/usecase/repo"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-func IsAdmin(t time.Time, c *gin.Context) error {
-	staffAccessToken, err := extractStaffAccessToken(t, c)
+func NewAuthCheck(ur repo.User) *AuthCheck {
+	return &AuthCheck{ur}
+}
+
+type AuthCheck struct {
+	userRepo repo.User
+}
+
+func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {
+	return ac.isStaffRole(t, c, entity.UserRoleAdmin)
+}
+
+func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) error {
+	return ac.isStaffRole(t, c, entity.UserRoleManager)
+}
+
+func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) error {
+	accessToken, err := extractAccessToken(c)
 	if err != nil {
-		return apperror.Wrap(err, "extract staff access token")
+		return apperror.Wrap(err, "extract access token")
 	}
-	if staffAccessToken.Role != entity.UserRoleAdmin {
+	authUsecase := auth_usecase.NewAuthUsecase(ac.userRepo)
+	user, err := authUsecase.AuthenticateStaff(t, accessToken)
+	if err != nil {
+		return apperror.Wrap(err, "authenticate staff")
+	}
+	if user.Role != role {
 		return apperror.Newf(
 			"expected role '%v', got '%v'",
-			entity.UserRoleAdmin,
-			staffAccessToken.Role)
+			role,
+			user.Role)
 	}
 	return nil
 }
 
-func extractStaffAccessToken(t time.Time, c *gin.Context) (*usecase.StaffAccessTokenClaims, error) {
+func (ac *AuthCheck) IsCustomer(c *gin.Context) (*entity.Customer, error) {
 	accessToken, err := extractAccessToken(c)
 	if err != nil {
 		return nil, apperror.Wrap(err, "extract access token")
 	}
-	staffAccessToken, err := usecase.
-		NewTokenUsecase().
-		ValidateStaffAccessToken(t, accessToken)
+	authUsecase := auth_usecase.NewAuthUsecase(ac.userRepo)
+	customer, err := authUsecase.AuthenticateCustomer(accessToken)
 	if err != nil {
-		return nil, apperror.Wrap(err, "validate staff access token")
+		return nil, apperror.Wrap(err, "authenticate customer")
 	}
-	return staffAccessToken, nil
+	return customer, nil
 }
 
 func extractAccessToken(c *gin.Context) (string, error) {

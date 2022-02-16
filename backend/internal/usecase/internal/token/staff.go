@@ -1,8 +1,10 @@
-package usecase
+package token
 
 import (
+	"fmt"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/common/config"
+	"qrmos/internal/common/security"
 	"qrmos/internal/entity"
 	"time"
 
@@ -14,22 +16,15 @@ const AccessTokenTypeStaff = "staff"
 type StaffAccessTokenClaims struct {
 	Type     string `json:"type"`
 	Username string `json:"username"`
-	Role     string `json:"role"`
+	Key      string `json:"key"`
 	jwt.StandardClaims
 }
 
-func NewTokenUsecase() *TokenUsecase {
-	return &TokenUsecase{}
-}
-
-type TokenUsecase struct {
-}
-
-func (u *TokenUsecase) GenStaffAccessToken(t time.Time, user *entity.User) (string, error) {
+func GenStaffAccessToken(t time.Time, user *entity.User) (string, error) {
 	claims := &StaffAccessTokenClaims{
 		Type:     AccessTokenTypeStaff,
 		Username: user.Username,
-		Role:     user.Role,
+		Key:      genStaffTokenKey(t, user.Password),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: t.UnixNano() + int64(8*time.Hour),
 		},
@@ -44,7 +39,22 @@ func (u *TokenUsecase) GenStaffAccessToken(t time.Time, user *entity.User) (stri
 	return signedToken, nil
 }
 
-func (u *TokenUsecase) ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {
+func genStaffTokenKey(t time.Time, password string) string {
+	salt := security.GenRanStr(t, 10)
+	rawKey := security.HashHS256(password+salt, config.App().Secret)
+	key := salt + rawKey
+	return key
+}
+
+func CheckStaffTokenKey(key, password string) bool {
+	if len(key) < 10 {
+		return false
+	}
+	salt := fmt.Sprint(key[:10])
+	return key == salt+security.HashHS256(password+salt, config.App().Secret)
+}
+
+func ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAccessTokenClaims, error) {
 	token, err := jwt.ParseWithClaims(staffAccessToken, &StaffAccessTokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if token.Method != jwt.SigningMethodHS256 {
 			return nil, apperror.Newf(
@@ -56,6 +66,9 @@ func (u *TokenUsecase) ValidateStaffAccessToken(t time.Time, staffAccessToken st
 	})
 
 	if claims, ok := token.Claims.(*StaffAccessTokenClaims); ok && token.Valid {
+		if claims.Type != AccessTokenTypeStaff {
+			return nil, apperror.New("wrong token type")
+		}
 		return claims, nil
 	} else {
 		return nil, apperror.Wrap(err, "parse token")

@@ -3,25 +3,27 @@ package controller
 import (
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
-	"qrmos/internal/usecase"
+	"qrmos/internal/usecase/auth_usecase"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (s *server) login(c *gin.Context) {
-	body := new(usecase.LoginInput)
+	body := new(auth_usecase.LoginInput)
 	if err := c.ShouldBindJSON(body); err != nil {
-		response.Error(c, apperror.Wrap(err, "bind json req body"))
+		response.Error(c, newBindJsonReqBodyError(err))
 		return
 	}
 
-	loginUsecase := usecase.NewLoginUsecase(s.userRepo)
-	accessToken, err := loginUsecase.Login(time.Now(), body)
+	loginUsecase := auth_usecase.NewLoginUsecase(s.userRepo)
+	staffAccessToken, err := loginUsecase.Login(time.Now(), body)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase logins user"))
 		return
 	}
 
-	response.Success(c, accessToken)
+	response.Success(c, gin.H{
+		"accessToken": staffAccessToken,
+	})
 }
