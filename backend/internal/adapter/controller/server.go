@@ -17,6 +17,7 @@ import (
 type ServerConfig struct {
 	UserRepo     repo.User
 	DeliveryRepo repo.Delivery
+	MenuRepo     repo.Menu
 }
 
 func NewServer(cfg ServerConfig) *server {
@@ -28,6 +29,7 @@ func NewServer(cfg ServerConfig) *server {
 		r:            gin.Default(),
 		userRepo:     cfg.UserRepo,
 		deliveryRepo: cfg.DeliveryRepo,
+		menuRepo:     cfg.MenuRepo,
 		authCheck:    authcheck.NewAuthCheck(cfg.UserRepo),
 	}
 }
@@ -37,6 +39,7 @@ type server struct {
 
 	userRepo     repo.User
 	deliveryRepo repo.Delivery
+	menuRepo     repo.Menu
 
 	authCheck *authcheck.AuthCheck
 }

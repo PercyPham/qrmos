@@ -21,3 +21,19 @@ CREATE TABLE delivery_destinations (
   name VARCHAR(255) NOT NULL PRIMARY KEY,
   security_code VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE menu_categories (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT
+);
+
+CREATE TABLE menu_items (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  image TEXT,
+  base_unit_price INT,
+  options BLOB
+);
+

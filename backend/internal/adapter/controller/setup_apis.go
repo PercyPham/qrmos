@@ -17,4 +17,6 @@ func (s *server) setupAPIs() {
 	api.POST("/delivery-destinations", s.createDeliveryDest)
 	api.PUT("/delivery-destinations/:name/security-code/refresh", s.refreshDeliveryDestSecurityCode)
 	api.DELETE("/delivery-destinations/:name", s.deleteDeliveryDest)
+
+	api.POST("/menu/categories", s.createMenuCat)
 }
