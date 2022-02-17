@@ -78,6 +78,23 @@ func (s *server) createMenuItem(c *gin.Context) {
 	response.Success(c, item)
 }
 
+func (s *server) getMenuItem(c *gin.Context) {
+	itemID, err := getIntParam(c, "itemID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	getItemUsecase := menu_usecase.NewGetItemUsecase(s.menuRepo)
+	item, err := getItemUsecase.GetItemByID(itemID)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets menu item"))
+		return
+	}
+
+	response.Success(c, item)
+}
+
 func (s *server) updateMenuItem(c *gin.Context) {
 	now := time.Now()
 	if err := s.authCheck.IsManager(now, c); err != nil {

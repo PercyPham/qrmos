@@ -22,6 +22,7 @@ func (s *server) setupAPIs() {
 	api.DELETE("/menu/categories/:id", s.deleteMenuCat)
 
 	api.POST("/menu/items", s.createMenuItem)
+	api.GET("/menu/items/:itemID", s.getMenuItem)
 	api.PUT("/menu/items/:itemID", s.updateMenuItem)
 	api.PUT("/menu/items/:itemID/available", s.updateItemAvail)
 	api.PUT("/menu/items/:itemID/options/:optName/available", s.updateItemOptionAvail)
