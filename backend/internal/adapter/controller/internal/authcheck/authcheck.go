@@ -27,23 +27,36 @@ func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) error {
 	return ac.isStaffRole(t, c, entity.UserRoleManager)
 }
 
+func (ac *AuthCheck) IsStaff(t time.Time, c *gin.Context) error {
+	_, err := ac.isStaff(t, c)
+	return err
+}
+
 func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) error {
+	staff, err := ac.isStaff(t, c)
+	if err != nil {
+		return err
+	}
+	if staff.Role != role {
+		return apperror.Newf(
+			"expected role '%v', got '%v'",
+			role,
+			staff.Role)
+	}
+	return nil
+}
+
+func (ac *AuthCheck) isStaff(t time.Time, c *gin.Context) (*entity.User, error) {
 	accessToken, err := extractAccessToken(c)
 	if err != nil {
-		return apperror.Wrap(err, "extract access token")
+		return nil, apperror.Wrap(err, "extract access token")
 	}
 	authUsecase := auth_usecase.NewAuthUsecase(ac.userRepo)
 	user, err := authUsecase.AuthenticateStaff(t, accessToken)
 	if err != nil {
-		return apperror.Wrap(err, "authenticate staff")
+		return nil, apperror.Wrap(err, "authenticate staff")
 	}
-	if user.Role != role {
-		return apperror.Newf(
-			"expected role '%v', got '%v'",
-			role,
-			user.Role)
-	}
-	return nil
+	return user, nil
 }
 
 func (ac *AuthCheck) IsCustomer(c *gin.Context) (*entity.Customer, error) {

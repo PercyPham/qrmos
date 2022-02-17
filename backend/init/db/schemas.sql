@@ -13,7 +13,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   password_salt VARCHAR(255) NOT NULL,
   full_name VARCHAR(30) NOT NULL,
-  role VARCHAR(10),
+  role VARCHAR(12),
   active BOOLEAN default true
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE menu_items (
 CREATE TABLE cat_items (
   cat INT,
   item INT,
-  PRIMARY KEY(cat,item)
-  FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE
+  PRIMARY KEY(cat,item),
+  FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE,
   FOREIGN KEY (item) REFERENCES menu_items(id) ON DELETE CASCADE
 )
