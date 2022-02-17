@@ -21,6 +21,7 @@ func main() {
 	serverCfg := controller.ServerConfig{
 		UserRepo:     mysqlrepo.NewUserRepo(db),
 		DeliveryRepo: mysqlrepo.NewDeliveryRepo(db),
+		MenuRepo:     mysqlrepo.NewMenuRepo(db),
 	}
 	server := controller.NewServer(serverCfg)
 

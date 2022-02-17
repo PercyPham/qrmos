@@ -21,3 +21,27 @@ CREATE TABLE delivery_destinations (
   name VARCHAR(255) NOT NULL PRIMARY KEY,
   security_code VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE menu_categories (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT
+);
+
+CREATE TABLE menu_items (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  image TEXT,
+  available BOOLEAN default true,
+  base_unit_price INT,
+  options BLOB
+);
+
+CREATE TABLE cat_items (
+  cat INT,
+  item INT,
+  PRIMARY KEY(cat,item)
+  FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE
+  FOREIGN KEY (item) REFERENCES menu_items(id) ON DELETE CASCADE
+)

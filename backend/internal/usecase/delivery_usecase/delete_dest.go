@@ -33,7 +33,7 @@ func (u *DeleteDestUsecase) Delete(input *DeleteDestInput) error {
 	}
 
 	if err := u.deliveryRepo.DeleteByName(input.Name); err != nil {
-		return apperror.Wrap(err, "repo update delivery destination")
+		return apperror.Wrap(err, "repo delete delivery destination")
 	}
 
 	return nil
