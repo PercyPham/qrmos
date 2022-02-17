@@ -13,7 +13,7 @@ CREATE TABLE users (
   password VARCHAR(255) NOT NULL,
   password_salt VARCHAR(255) NOT NULL,
   full_name VARCHAR(30) NOT NULL,
-  role VARCHAR(10),
+  role VARCHAR(12),
   active BOOLEAN default true
 );
 
