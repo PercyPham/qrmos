@@ -38,3 +38,10 @@ CREATE TABLE menu_items (
   options BLOB
 );
 
+CREATE TABLE cat_items (
+  cat INT,
+  item INT,
+  PRIMARY KEY(cat,item)
+  FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE
+  FOREIGN KEY (item) REFERENCES menu_items(id) ON DELETE CASCADE
+)

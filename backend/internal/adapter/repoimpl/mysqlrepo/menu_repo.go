@@ -35,6 +35,15 @@ func (r *menuRepo) GetCategoryByName(name string) *entity.MenuCategory {
 	return cat
 }
 
+func (r *menuRepo) GetCategoryByID(catID int) *entity.MenuCategory {
+	cat := new(entity.MenuCategory)
+	result := r.db.Where("id = ?", catID).First(cat)
+	if result.Error != nil {
+		return nil
+	}
+	return cat
+}
+
 func (r *menuRepo) DeleteCategoryByID(id int) error {
 	result := r.db.Where("id = ?", id).Delete(entity.MenuCategory{})
 	if result.Error != nil {
@@ -117,4 +126,29 @@ func (r *menuRepo) GetItemByName(name string) *entity.MenuItem {
 		fmt.Println(err)
 	}
 	return item
+}
+
+type gormCatItem struct {
+	CategoryID int `gorm:"column:cat"`
+	ItemID     int `gorm:"column:item"`
+}
+
+func (r *menuRepo) AddItemToCategory(itemID, catID int) error {
+	gCatItem := &gormCatItem{
+		CategoryID: catID,
+		ItemID:     itemID,
+	}
+	result := r.db.Table("cat_items").Create(gCatItem)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm creates cat item")
+	}
+	return nil
+}
+
+func (r *menuRepo) RemoveItemFromCategory(itemID, catID int) error {
+	result := r.db.Where("cat = ? AND item = ?", catID, itemID).Delete(gormCatItem{})
+	if result.Error != nil {
+		return apperror.Wrapf(result.Error, "gorm deletes association between cat '%d' and item '%d'", catID, itemID)
+	}
+	return nil
 }

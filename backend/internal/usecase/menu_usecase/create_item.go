@@ -83,6 +83,12 @@ func (u *CreateMenuItemUsecase) Create(input *CreateMenuItemInput) (*entity.Menu
 		return nil, apperror.New("item already exists")
 	}
 
+	for _, catID := range input.Categories {
+		if category := u.menuRepo.GetCategoryByID(catID); category == nil {
+			return nil, apperror.Newf("category '%d' does not exist", catID).WithCode(http.StatusNotFound)
+		}
+	}
+
 	item = &entity.MenuItem{
 		Name:          input.Name,
 		Description:   input.Description,
@@ -95,7 +101,11 @@ func (u *CreateMenuItemUsecase) Create(input *CreateMenuItemInput) (*entity.Menu
 		return nil, apperror.Wrap(err, "repo creates menu item")
 	}
 
-	// TODO: associate menu item with menu categories
+	for _, catID := range input.Categories {
+		if err := u.menuRepo.AddItemToCategory(item.ID, catID); err != nil {
+			return nil, apperror.Wrapf(err, "repo adds item '%d' to category '%d'", item.ID, catID)
+		}
+	}
 
 	return item, nil
 }
