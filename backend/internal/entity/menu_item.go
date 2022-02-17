@@ -12,12 +12,14 @@ type MenuItem struct {
 
 type MenuItemOption struct {
 	Name      string                  `json:"name"`
+	Available bool                    `json:"available"`
 	MinChoice int                     `json:"minChoice"`
 	MaxChoice int                     `json:"maxChoice"`
 	Choices   []*MenuItemOptionChoice `json:"choices"`
 }
 
 type MenuItemOptionChoice struct {
-	Name  string `json:"name"`
-	Price int    `json:"price"`
+	Name      string `json:"name"`
+	Price     int    `json:"price"`
+	Available bool   `json:"available"`
 }
