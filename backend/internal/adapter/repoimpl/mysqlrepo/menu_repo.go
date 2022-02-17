@@ -115,6 +115,19 @@ func (r *menuRepo) CreateItem(item *entity.MenuItem) error {
 	return nil
 }
 
+func (r *menuRepo) GetItemByID(itemID int) *entity.MenuItem {
+	gItem := new(gormMenuItem)
+	result := r.db.Table("menu_items").Where("id = ?", itemID).First(gItem)
+	if result.Error != nil {
+		return nil
+	}
+	item, err := gItem.toMenuItem()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return item
+}
+
 func (r *menuRepo) GetItemByName(name string) *entity.MenuItem {
 	gItem := new(gormMenuItem)
 	result := r.db.Table("menu_items").Where("name = ?", name).First(gItem)
@@ -126,6 +139,18 @@ func (r *menuRepo) GetItemByName(name string) *entity.MenuItem {
 		fmt.Println(err)
 	}
 	return item
+}
+
+func (r *menuRepo) UpdateItem(item *entity.MenuItem) error {
+	gItem, err := convertToGormMenuItem(item)
+	if err != nil {
+		return apperror.Wrap(err, "convert to gorm menu item")
+	}
+	result := r.db.Table("menu_items").Save(gItem)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm db updates menu item")
+	}
+	return nil
 }
 
 type gormCatItem struct {
@@ -146,9 +171,22 @@ func (r *menuRepo) AddItemToCategory(itemID, catID int) error {
 }
 
 func (r *menuRepo) RemoveItemFromCategory(itemID, catID int) error {
-	result := r.db.Where("cat = ? AND item = ?", catID, itemID).Delete(gormCatItem{})
+	result := r.db.Table("cat_items").Where("cat = ? AND item = ?", catID, itemID).Delete(gormCatItem{})
 	if result.Error != nil {
 		return apperror.Wrapf(result.Error, "gorm deletes association between cat '%d' and item '%d'", catID, itemID)
 	}
 	return nil
+}
+
+func (r *menuRepo) GetAllCatIDsOfItem(itemID int) ([]int, error) {
+	gCatItems := []gormCatItem{}
+	result := r.db.Table("cat_items").Where("item = ?", itemID).Find(&gCatItems)
+	if result.Error != nil {
+		return nil, apperror.Wrapf(result.Error, "gorm gets associations of item '%d'", itemID)
+	}
+	catIDs := []int{}
+	for _, catItem := range gCatItems {
+		catIDs = append(catIDs, catItem.CategoryID)
+	}
+	return catIDs, nil
 }

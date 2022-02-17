@@ -1,11 +1,9 @@
 package controller
 
 import (
-	"net/http"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/usecase/menu_usecase"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -41,18 +39,14 @@ func (s *server) deleteMenuCat(c *gin.Context) {
 		return
 	}
 
-	catIDRaw := c.Param("id")
-	catID, err := strconv.ParseInt(catIDRaw, 10, 32)
+	catID, err := getIntParam(c, "id")
 	if err != nil {
-		appErr := apperror.Wrap(err, "casting category id").
-			WithCode(http.StatusBadRequest).
-			WithPublicMessagef("expected int32 category id, got '%v'", catIDRaw)
-		response.Error(c, appErr)
+		response.Error(c, err)
 		return
 	}
 
 	deleteMenuCatUsecase := menu_usecase.NewDeleteCatUsecase(s.menuRepo)
-	err = deleteMenuCatUsecase.DeleteByID(int(catID))
+	err = deleteMenuCatUsecase.DeleteByID(catID)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase creates menu category"))
 		return
@@ -82,4 +76,34 @@ func (s *server) createMenuItem(c *gin.Context) {
 	}
 
 	response.Success(c, item)
+}
+
+func (s *server) updateMenuItem(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	itemID, err := getIntParam(c, "id")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	body := new(menu_usecase.UpdateMenuItemInput)
+	if err := c.ShouldBindJSON(body); err != nil {
+		response.Error(c, newBindJsonReqBodyError(err))
+		return
+	}
+	body.ID = int(itemID)
+
+	updateMenuItemUsecase := menu_usecase.NewUpdateMenuItemUsecase(s.menuRepo)
+	err = updateMenuItemUsecase.Update(body)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase updates menu item"))
+		return
+	}
+
+	response.Success(c, true)
 }
