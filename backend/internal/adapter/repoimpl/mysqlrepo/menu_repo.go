@@ -153,6 +153,14 @@ func (r *menuRepo) UpdateItem(item *entity.MenuItem) error {
 	return nil
 }
 
+func (r *menuRepo) DeleteItemByID(id int) error {
+	result := r.db.Table("menu_items").Where("id = ?", id).Delete(gormMenuItem{})
+	if result.Error != nil {
+		return apperror.Wrapf(result.Error, "gorm db delete menu item")
+	}
+	return nil
+}
+
 type gormCatItem struct {
 	CategoryID int `gorm:"column:cat"`
 	ItemID     int `gorm:"column:item"`

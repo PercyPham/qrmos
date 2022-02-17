@@ -23,4 +23,5 @@ func (s *server) setupAPIs() {
 
 	api.POST("/menu/items", s.createMenuItem)
 	api.PUT("/menu/items/:id", s.updateMenuItem)
+	api.DELETE("/menu/items/:id", s.deleteMenuItem)
 }

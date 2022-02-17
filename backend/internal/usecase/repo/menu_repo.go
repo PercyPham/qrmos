@@ -12,6 +12,7 @@ type Menu interface {
 	GetItemByID(id int) *entity.MenuItem
 	GetItemByName(name string) *entity.MenuItem
 	UpdateItem(item *entity.MenuItem) error
+	DeleteItemByID(id int) error
 
 	AddItemToCategory(itemID, catID int) error
 	RemoveItemFromCategory(itemID, catID int) error

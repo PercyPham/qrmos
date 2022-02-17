@@ -48,7 +48,7 @@ func (s *server) deleteMenuCat(c *gin.Context) {
 	deleteMenuCatUsecase := menu_usecase.NewDeleteCatUsecase(s.menuRepo)
 	err = deleteMenuCatUsecase.DeleteByID(catID)
 	if err != nil {
-		response.Error(c, apperror.Wrap(err, "usecase creates menu category"))
+		response.Error(c, apperror.Wrap(err, "usecase deletes menu category"))
 		return
 	}
 
@@ -102,6 +102,29 @@ func (s *server) updateMenuItem(c *gin.Context) {
 	err = updateMenuItemUsecase.Update(body)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase updates menu item"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) deleteMenuItem(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	itemID, err := getIntParam(c, "id")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	deleteMenuItemUsecase := menu_usecase.NewDeleteItemUsecase(s.menuRepo)
+	err = deleteMenuItemUsecase.DeleteByID(itemID)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase deletes menu item"))
 		return
 	}
 
