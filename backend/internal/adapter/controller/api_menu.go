@@ -85,7 +85,7 @@ func (s *server) updateMenuItem(c *gin.Context) {
 		return
 	}
 
-	itemID, err := getIntParam(c, "id")
+	itemID, err := getIntParam(c, "itemID")
 	if err != nil {
 		response.Error(c, err)
 		return
@@ -102,6 +102,92 @@ func (s *server) updateMenuItem(c *gin.Context) {
 	err = updateMenuItemUsecase.Update(body)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase updates menu item"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) updateItemAvail(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsStaff(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	itemID, err := getIntParam(c, "itemID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	val, err := getBoolQuery(c, "val")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	updateItemAvailUsecase := menu_usecase.NewUpdateItemAvailUsecase(s.menuRepo)
+	err = updateItemAvailUsecase.UpdateItemAvail(itemID, val)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase updates menu item avail"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) updateItemOptionAvail(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsStaff(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	itemID, err := getIntParam(c, "itemID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	optName := c.Param("optName")
+	val, err := getBoolQuery(c, "val")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	updateItemAvailUsecase := menu_usecase.NewUpdateItemAvailUsecase(s.menuRepo)
+	err = updateItemAvailUsecase.UpdateItemOptionAvail(itemID, optName, val)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase updates menu item avail"))
+		return
+	}
+
+	response.Success(c, true)
+}
+func (s *server) updateItemOptionChoiceAvail(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsStaff(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	itemID, err := getIntParam(c, "itemID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	optName := c.Param("optName")
+	choiceName := c.Param("choiceName")
+	val, err := getBoolQuery(c, "val")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	updateItemAvailUsecase := menu_usecase.NewUpdateItemAvailUsecase(s.menuRepo)
+	err = updateItemAvailUsecase.UpdateItemOptionChoiceAvail(itemID, optName, choiceName, val)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase updates menu item avail"))
 		return
 	}
 

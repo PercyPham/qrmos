@@ -30,3 +30,19 @@ func getIntParam(c *gin.Context, key string) (int, error) {
 	}
 	return int(num), err
 }
+
+func getBoolQuery(c *gin.Context, key string) (bool, error) {
+	val := c.Query(key)
+	if val == "true" {
+		return true, nil
+	}
+	if val == "false" {
+		return false, nil
+	}
+	if val == "" {
+		apperror.Newf("expected boolean query with key '%s'", key).
+			WithCode(http.StatusBadRequest)
+	}
+	return false, apperror.Newf("expected boolean query with key '%s', got '%s'", key, val).
+		WithCode(http.StatusBadRequest)
+}
