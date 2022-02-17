@@ -60,3 +60,26 @@ func (s *server) deleteMenuCat(c *gin.Context) {
 
 	response.Success(c, true)
 }
+
+func (s *server) createMenuItem(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	body := new(menu_usecase.CreateMenuItemInput)
+	if err := c.ShouldBindJSON(body); err != nil {
+		response.Error(c, newBindJsonReqBodyError(err))
+		return
+	}
+
+	createMenuItemUsecase := menu_usecase.NewCreateMenuItemUsecase(s.menuRepo)
+	item, err := createMenuItemUsecase.Create(body)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase creates menu item"))
+		return
+	}
+
+	response.Success(c, item)
+}

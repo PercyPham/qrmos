@@ -1,6 +1,8 @@
 package mysqlrepo
 
 import (
+	"encoding/json"
+	"fmt"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
@@ -39,4 +41,80 @@ func (r *menuRepo) DeleteCategoryByID(id int) error {
 		return apperror.Wrapf(result.Error, "gorm db delete menu category")
 	}
 	return nil
+}
+
+type gormMenuItem struct {
+	ID            int    `json:"id" gorm:"primaryKey"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	Image         string `json:"image"`
+	Available     bool   `json:"available"`
+	BaseUnitPrice int    `json:"baseUnitPrice"`
+	Options       []byte `json:"options"`
+}
+
+func (i *gormMenuItem) toMenuItem() (*entity.MenuItem, error) {
+	options := []*entity.MenuItemOption{}
+	if i.Options != nil {
+		err := json.Unmarshal(i.Options, &options)
+		if err != nil {
+			return nil, apperror.Wrap(err, "json unmarshal item options")
+		}
+	}
+
+	return &entity.MenuItem{
+		ID:            i.ID,
+		Name:          i.Name,
+		Description:   i.Description,
+		Image:         i.Image,
+		Available:     i.Available,
+		BaseUnitPrice: i.BaseUnitPrice,
+		Options:       options,
+	}, nil
+}
+
+func convertToGormMenuItem(i *entity.MenuItem) (*gormMenuItem, error) {
+	var options []byte
+	if i.Options != nil {
+		optionsJson, err := json.Marshal(i.Options)
+		if err != nil {
+			return nil, apperror.Wrap(err, "json marshal item options")
+		}
+		options = optionsJson
+	}
+	return &gormMenuItem{
+		ID:            i.ID,
+		Name:          i.Name,
+		Description:   i.Description,
+		Image:         i.Image,
+		Available:     i.Available,
+		BaseUnitPrice: i.BaseUnitPrice,
+		Options:       options,
+	}, nil
+}
+
+func (r *menuRepo) CreateItem(item *entity.MenuItem) error {
+	gItem, err := convertToGormMenuItem(item)
+	if err != nil {
+		return apperror.Wrap(err, "convert to gorm menu item")
+	}
+	result := r.db.Table("menu_items").Create(gItem)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm creates menu item")
+	}
+	item.ID = gItem.ID
+	return nil
+}
+
+func (r *menuRepo) GetItemByName(name string) *entity.MenuItem {
+	gItem := new(gormMenuItem)
+	result := r.db.Table("menu_items").Where("name = ?", name).First(gItem)
+	if result.Error != nil {
+		return nil
+	}
+	item, err := gItem.toMenuItem()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return item
 }

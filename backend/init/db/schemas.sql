@@ -33,6 +33,7 @@ CREATE TABLE menu_items (
   name VARCHAR(255) UNIQUE NOT NULL,
   description TEXT,
   image TEXT,
+  available BOOLEAN default true,
   base_unit_price INT,
   options BLOB
 );
