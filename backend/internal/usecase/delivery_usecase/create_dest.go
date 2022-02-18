@@ -43,7 +43,7 @@ func (u *CreateDestUsecase) Create(t time.Time, input *CreateDestInput) error {
 		SecurityCode: genNewSecurityCode(t),
 	}
 	if err := u.DeliveryRepo.Create(deliverDest); err != nil {
-		return apperror.Wrap(err, "repo create deliver destination")
+		return apperror.Wrap(err, "repo creates deliver destination")
 	}
 	return nil
 }

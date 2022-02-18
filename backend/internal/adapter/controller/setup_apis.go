@@ -30,4 +30,6 @@ func (s *server) setupAPIs() {
 	api.PUT("/menu/items/:itemID/options/:optName/available", s.updateItemOptionAvail)
 	api.PUT("/menu/items/:itemID/options/:optName/choices/:choiceName/available", s.updateItemOptionChoiceAvail)
 	api.DELETE("/menu/items/:id", s.deleteMenuItem)
+
+	api.POST("/vouchers", s.createVoucher)
 }

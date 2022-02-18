@@ -14,7 +14,7 @@ CREATE TABLE users (
   password_salt VARCHAR(255) NOT NULL,
   full_name VARCHAR(30) NOT NULL,
   role VARCHAR(12),
-  active BOOLEAN default true
+  active BOOLEAN DEFAULT true
 );
 
 CREATE TABLE delivery_destinations (
@@ -33,7 +33,7 @@ CREATE TABLE menu_items (
   name VARCHAR(255) UNIQUE NOT NULL,
   description TEXT,
   image TEXT,
-  available BOOLEAN default true,
+  available BOOLEAN DEFAULT true,
   base_unit_price BIGINT,
   options BLOB
 );
@@ -44,4 +44,10 @@ CREATE TABLE cat_items (
   PRIMARY KEY(cat,item),
   FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE,
   FOREIGN KEY (item) REFERENCES menu_items(id) ON DELETE CASCADE
-)
+);
+
+CREATE TABLE vouchers (
+  code VARCHAR(255) NOT NULL PRIMARY KEY,
+  discount BIGINT,
+  is_used BOOLEAN DEFAULT false
+);

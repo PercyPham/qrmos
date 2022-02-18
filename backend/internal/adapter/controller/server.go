@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"qrmos/internal/adapter/controller/internal/authcheck"
+	"qrmos/internal/common/apperror"
 	"qrmos/internal/common/config"
 	"qrmos/internal/usecase/repo"
 	"strconv"
@@ -18,9 +19,30 @@ type ServerConfig struct {
 	UserRepo     repo.User
 	DeliveryRepo repo.Delivery
 	MenuRepo     repo.Menu
+	VoucherRepo  repo.Voucher
 }
 
-func NewServer(cfg ServerConfig) *server {
+func (cfg *ServerConfig) validate() error {
+	if cfg.UserRepo == nil {
+		return apperror.New("user repo must be provided")
+	}
+	if cfg.DeliveryRepo == nil {
+		return apperror.New("delivery repo must be provided")
+	}
+	if cfg.MenuRepo == nil {
+		return apperror.New("menu repo must be provided")
+	}
+	if cfg.VoucherRepo == nil {
+		return apperror.New("voucher repo must be provided")
+	}
+	return nil
+}
+
+func NewServer(cfg ServerConfig) (*server, error) {
+	if err := cfg.validate(); err != nil {
+		return nil, apperror.Wrap(err, "validate server configs")
+	}
+
 	if config.App().ENV != "dev" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -30,8 +52,9 @@ func NewServer(cfg ServerConfig) *server {
 		userRepo:     cfg.UserRepo,
 		deliveryRepo: cfg.DeliveryRepo,
 		menuRepo:     cfg.MenuRepo,
+		voucherRepo:  cfg.VoucherRepo,
 		authCheck:    authcheck.NewAuthCheck(cfg.UserRepo),
-	}
+	}, nil
 }
 
 type server struct {
@@ -40,6 +63,7 @@ type server struct {
 	userRepo     repo.User
 	deliveryRepo repo.Delivery
 	menuRepo     repo.Menu
+	voucherRepo  repo.Voucher
 
 	authCheck *authcheck.AuthCheck
 }
