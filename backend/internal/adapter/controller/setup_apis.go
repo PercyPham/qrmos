@@ -32,4 +32,5 @@ func (s *server) setupAPIs() {
 	api.DELETE("/menu/items/:id", s.deleteMenuItem)
 
 	api.POST("/vouchers", s.createVoucher)
+	api.DELETE("/vouchers/:code", s.deleteVoucher)
 }

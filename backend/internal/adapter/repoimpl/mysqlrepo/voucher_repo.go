@@ -32,3 +32,11 @@ func (r *voucherRepo) GetByCode(code string) *entity.Voucher {
 	}
 	return voucher
 }
+
+func (r *voucherRepo) DeleteByCode(code string) error {
+	result := r.db.Where("code = ?", code).Delete(entity.Voucher{})
+	if result.Error != nil {
+		return apperror.Wrapf(result.Error, "gorm db delete voucher code '%s'", code)
+	}
+	return nil
+}

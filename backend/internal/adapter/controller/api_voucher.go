@@ -30,3 +30,22 @@ func (s *server) createVoucher(c *gin.Context) {
 
 	response.Success(c, true)
 }
+
+func (s *server) deleteVoucher(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	body := new(voucher_usecase.DeleteVoucherInput)
+	body.Code = c.Param("code")
+
+	deleteVoucherUsecase := voucher_usecase.NewDeleteVoucherUsecase(s.voucherRepo)
+	if err := deleteVoucherUsecase.Delete(body); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase deletes voucher"))
+		return
+	}
+
+	response.Success(c, true)
+}
