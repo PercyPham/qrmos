@@ -27,6 +27,17 @@ func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) error {
 	return ac.isStaffRole(t, c, entity.UserRoleManager)
 }
 
+// IsAuthenticated checks if the user is either customer or staff
+func (ac *AuthCheck) IsAuthenticated(t time.Time, c *gin.Context) bool {
+	if _, err := ac.IsCustomer(c); err == nil {
+		return true
+	}
+	if err := ac.IsStaff; err == nil {
+		return true
+	}
+	return false
+}
+
 func (ac *AuthCheck) IsStaff(t time.Time, c *gin.Context) error {
 	_, err := ac.isStaff(t, c)
 	return err

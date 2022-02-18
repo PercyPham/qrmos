@@ -1,5 +1,16 @@
 package entity
 
+type MenuCategory struct {
+	ID          int    `json:"id" grom:"primaryKey"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+type MenuAssociation struct {
+	CatID  int `json:"catID"`
+	ItemID int `json:"itemID"`
+}
+
 type MenuItem struct {
 	ID            int               `json:"id"`
 	Name          string            `json:"name"`

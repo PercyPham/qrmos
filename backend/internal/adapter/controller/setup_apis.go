@@ -18,6 +18,8 @@ func (s *server) setupAPIs() {
 	api.PUT("/delivery-destinations/:name/security-code/refresh", s.refreshDeliveryDestSecurityCode)
 	api.DELETE("/delivery-destinations/:name", s.deleteDeliveryDest)
 
+	api.GET("/menu", s.getMenu)
+
 	api.POST("/menu/categories", s.createMenuCat)
 	api.DELETE("/menu/categories/:id", s.deleteMenuCat)
 

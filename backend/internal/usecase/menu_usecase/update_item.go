@@ -90,14 +90,14 @@ func (u *UpdateMenuItemUsecase) reassociate(itemID int, catIDs []int) error {
 
 	catIDsToAdd := excludeListFromList(currentCatIDs, catIDs)
 	for _, catID := range catIDsToAdd {
-		if err := u.menuRepo.AddItemToCategory(itemID, catID); err != nil {
+		if err := u.menuRepo.AssociateItemToCategory(itemID, catID); err != nil {
 			return apperror.Wrapf(err, "repo associate item '%d' to cat '%d'", itemID, catID)
 		}
 	}
 
 	catIDsToRemove := excludeListFromList(catIDs, currentCatIDs)
 	for _, catID := range catIDsToRemove {
-		if err := u.menuRepo.RemoveItemFromCategory(itemID, catID); err != nil {
+		if err := u.menuRepo.DisassociateItemFromCategory(itemID, catID); err != nil {
 			return apperror.Wrapf(err, "repo disassociate item '%d' from cat '%d'", itemID, catID)
 		}
 	}

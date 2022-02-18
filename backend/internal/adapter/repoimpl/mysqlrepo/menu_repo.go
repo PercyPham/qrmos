@@ -26,6 +26,15 @@ func (r *menuRepo) CreateCategory(cat *entity.MenuCategory) error {
 	return nil
 }
 
+func (r *menuRepo) GetAllCategories() ([]*entity.MenuCategory, error) {
+	cats := []*entity.MenuCategory{}
+	result := r.db.Find(&cats)
+	if result.Error != nil {
+		return nil, apperror.Wrapf(result.Error, "gorm gets all categories")
+	}
+	return cats, nil
+}
+
 func (r *menuRepo) GetCategoryByName(name string) *entity.MenuCategory {
 	cat := new(entity.MenuCategory)
 	result := r.db.Where("name = ?", name).First(cat)
@@ -115,6 +124,23 @@ func (r *menuRepo) CreateItem(item *entity.MenuItem) error {
 	return nil
 }
 
+func (r *menuRepo) GetAllItems() ([]*entity.MenuItem, error) {
+	gItems := []gormMenuItem{}
+	result := r.db.Table("menu_items").Find(&gItems)
+	if result.Error != nil {
+		return nil, apperror.Wrapf(result.Error, "gorm gets all items")
+	}
+	items := []*entity.MenuItem{}
+	for _, gItem := range gItems {
+		item, err := gItem.toMenuItem()
+		if err != nil {
+			return nil, apperror.Wrap(err, "gorm convert gItem to menu item")
+		}
+		items = append(items, item)
+	}
+	return items, nil
+}
+
 func (r *menuRepo) GetItemByID(itemID int) *entity.MenuItem {
 	gItem := new(gormMenuItem)
 	result := r.db.Table("menu_items").Where("id = ?", itemID).First(gItem)
@@ -166,7 +192,7 @@ type gormCatItem struct {
 	ItemID     int `gorm:"column:item"`
 }
 
-func (r *menuRepo) AddItemToCategory(itemID, catID int) error {
+func (r *menuRepo) AssociateItemToCategory(itemID, catID int) error {
 	gCatItem := &gormCatItem{
 		CategoryID: catID,
 		ItemID:     itemID,
@@ -178,7 +204,7 @@ func (r *menuRepo) AddItemToCategory(itemID, catID int) error {
 	return nil
 }
 
-func (r *menuRepo) RemoveItemFromCategory(itemID, catID int) error {
+func (r *menuRepo) DisassociateItemFromCategory(itemID, catID int) error {
 	result := r.db.Table("cat_items").Where("cat = ? AND item = ?", catID, itemID).Delete(gormCatItem{})
 	if result.Error != nil {
 		return apperror.Wrapf(result.Error, "gorm deletes association between cat '%d' and item '%d'", catID, itemID)
@@ -197,4 +223,20 @@ func (r *menuRepo) GetAllCatIDsOfItem(itemID int) ([]int, error) {
 		catIDs = append(catIDs, catItem.CategoryID)
 	}
 	return catIDs, nil
+}
+
+func (r *menuRepo) GetAllAssociations() ([]*entity.MenuAssociation, error) {
+	gCatItems := []gormCatItem{}
+	result := r.db.Table("cat_items").Find(&gCatItems)
+	if result.Error != nil {
+		return nil, apperror.Wrapf(result.Error, "gorm gets all associations")
+	}
+	associations := []*entity.MenuAssociation{}
+	for _, catItem := range gCatItems {
+		associations = append(associations, &entity.MenuAssociation{
+			CatID:  catItem.CategoryID,
+			ItemID: catItem.ItemID,
+		})
+	}
+	return associations, nil
 }

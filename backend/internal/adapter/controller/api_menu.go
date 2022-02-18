@@ -181,6 +181,7 @@ func (s *server) updateItemOptionAvail(c *gin.Context) {
 
 	response.Success(c, true)
 }
+
 func (s *server) updateItemOptionChoiceAvail(c *gin.Context) {
 	now := time.Now()
 	if err := s.authCheck.IsStaff(now, c); err != nil {
@@ -232,4 +233,21 @@ func (s *server) deleteMenuItem(c *gin.Context) {
 	}
 
 	response.Success(c, true)
+}
+
+func (s *server) getMenu(c *gin.Context) {
+	now := time.Now()
+	if !s.authCheck.IsAuthenticated(now, c) {
+		response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+		return
+	}
+
+	getMenuUsecase := menu_usecase.NewGetMenuUsecase(s.menuRepo)
+	menu, err := getMenuUsecase.GetMenu()
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets menu"))
+		return
+	}
+
+	response.Success(c, menu)
 }
