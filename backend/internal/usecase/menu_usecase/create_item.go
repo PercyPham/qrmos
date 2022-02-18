@@ -20,7 +20,7 @@ type CreateMenuItemInput struct {
 	Description   string                   `json:"description"`
 	Image         string                   `json:"image"`
 	Available     bool                     `json:"available"`
-	BaseUnitPrice int                      `json:"baseUnitPrice"`
+	BaseUnitPrice int64                    `json:"baseUnitPrice"`
 	Options       []*entity.MenuItemOption `json:"options"`
 	Categories    []int                    `json:"categories"`
 }
@@ -102,7 +102,7 @@ func (u *CreateMenuItemUsecase) Create(input *CreateMenuItemInput) (*entity.Menu
 	}
 
 	for _, catID := range input.Categories {
-		if err := u.menuRepo.AddItemToCategory(item.ID, catID); err != nil {
+		if err := u.menuRepo.AssociateItemToCategory(item.ID, catID); err != nil {
 			return nil, apperror.Wrapf(err, "repo adds item '%d' to category '%d'", item.ID, catID)
 		}
 	}

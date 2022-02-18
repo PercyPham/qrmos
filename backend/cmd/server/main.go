@@ -3,6 +3,7 @@ package main
 import (
 	"qrmos/internal/adapter/controller"
 	"qrmos/internal/adapter/repoimpl/mysqlrepo"
+	"qrmos/internal/common/apperror"
 	"qrmos/internal/common/config"
 
 	"github.com/joho/godotenv"
@@ -15,15 +16,19 @@ func main() {
 
 	db, err := mysqlrepo.Connect()
 	if err != nil {
-		panic(err)
+		panic(apperror.Wrap(err, "connect to mysql db"))
 	}
 
 	serverCfg := controller.ServerConfig{
 		UserRepo:     mysqlrepo.NewUserRepo(db),
 		DeliveryRepo: mysqlrepo.NewDeliveryRepo(db),
 		MenuRepo:     mysqlrepo.NewMenuRepo(db),
+		VoucherRepo:  mysqlrepo.NewVoucherRepo(db),
 	}
-	server := controller.NewServer(serverCfg)
+	server, err := controller.NewServer(serverCfg)
+	if err != nil {
+		panic(apperror.Wrap(err, "instanciate new server"))
+	}
 
 	server.Run()
 }
