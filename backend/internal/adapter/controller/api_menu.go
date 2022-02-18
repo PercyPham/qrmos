@@ -79,6 +79,12 @@ func (s *server) createMenuItem(c *gin.Context) {
 }
 
 func (s *server) getMenuItem(c *gin.Context) {
+	now := time.Now()
+	if !s.authCheck.IsAuthenticated(now, c) {
+		response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+		return
+	}
+
 	itemID, err := getIntParam(c, "itemID")
 	if err != nil {
 		response.Error(c, err)
