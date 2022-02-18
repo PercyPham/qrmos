@@ -21,7 +21,7 @@ type UpdateMenuItemInput struct {
 	Description   string                   `json:"description"`
 	Image         string                   `json:"image"`
 	Available     bool                     `json:"available"`
-	BaseUnitPrice int                      `json:"baseUnitPrice"`
+	BaseUnitPrice int64                    `json:"baseUnitPrice"`
 	Options       []*entity.MenuItemOption `json:"options"`
 	Categories    []int                    `json:"categories"`
 }

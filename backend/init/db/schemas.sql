@@ -34,7 +34,7 @@ CREATE TABLE menu_items (
   description TEXT,
   image TEXT,
   available BOOLEAN default true,
-  base_unit_price INT,
+  base_unit_price BIGINT,
   options BLOB
 );
 

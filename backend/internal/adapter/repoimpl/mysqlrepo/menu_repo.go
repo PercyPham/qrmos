@@ -67,7 +67,7 @@ type gormMenuItem struct {
 	Description   string `json:"description"`
 	Image         string `json:"image"`
 	Available     bool   `json:"available"`
-	BaseUnitPrice int    `json:"baseUnitPrice"`
+	BaseUnitPrice int64  `json:"baseUnitPrice"`
 	Options       []byte `json:"options"`
 }
 

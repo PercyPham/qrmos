@@ -17,7 +17,7 @@ type MenuItem struct {
 	Description   string            `json:"description"`
 	Image         string            `json:"image"`
 	Available     bool              `json:"available"`
-	BaseUnitPrice int               `json:"baseUnitPrice"`
+	BaseUnitPrice int64             `json:"baseUnitPrice"`
 	Options       []*MenuItemOption `json:"options"`
 }
 
@@ -31,6 +31,6 @@ type MenuItemOption struct {
 
 type MenuItemOptionChoice struct {
 	Name      string `json:"name"`
-	Price     int    `json:"price"`
+	Price     int64  `json:"price"`
 	Available bool   `json:"available"`
 }
