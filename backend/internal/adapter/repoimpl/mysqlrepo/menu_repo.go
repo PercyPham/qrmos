@@ -72,7 +72,7 @@ type gormMenuItem struct {
 }
 
 func (i *gormMenuItem) toMenuItem() (*entity.MenuItem, error) {
-	options := []*entity.MenuItemOption{}
+	options := map[string]*entity.MenuItemOption{}
 	if i.Options != nil {
 		err := json.Unmarshal(i.Options, &options)
 		if err != nil {

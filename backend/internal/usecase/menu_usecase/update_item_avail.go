@@ -3,7 +3,6 @@ package menu_usecase
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
-	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
 )
 
@@ -36,15 +35,8 @@ func (u *UpdateItemAvailUsecase) UpdateItemOptionAvail(itemID int, optName strin
 		return apperror.New("item not found").WithCode(http.StatusNotFound)
 	}
 
-	var foundOption *entity.MenuItemOption
-	for _, option := range item.Options {
-		if option.Name == optName {
-			foundOption = option
-			break
-		}
-	}
-
-	if foundOption == nil {
+	foundOption, ok := item.Options[optName]
+	if !ok {
 		return apperror.New("item option not found").WithCode(http.StatusNotFound)
 	}
 
@@ -66,25 +58,13 @@ func (u *UpdateItemAvailUsecase) UpdateItemOptionChoiceAvail(itemID int, optName
 		return apperror.New("item not found").WithCode(http.StatusNotFound)
 	}
 
-	var foundOption *entity.MenuItemOption
-	for _, option := range item.Options {
-		if option.Name == optName {
-			foundOption = option
-			break
-		}
-	}
-	if foundOption == nil {
+	foundOption, ok := item.Options[optName]
+	if !ok {
 		return apperror.New("item option not found").WithCode(http.StatusNotFound)
 	}
 
-	var foundChoice *entity.MenuItemOptionChoice
-	for _, choice := range foundOption.Choices {
-		if choice.Name == choiceName {
-			foundChoice = choice
-			break
-		}
-	}
-	if foundChoice == nil {
+	foundChoice, ok := foundOption.Choices[choiceName]
+	if !ok {
 		return apperror.New("item option choice not found").WithCode(http.StatusNotFound)
 	}
 

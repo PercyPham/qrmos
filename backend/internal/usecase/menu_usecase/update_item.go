@@ -16,31 +16,12 @@ type UpdateMenuItemUsecase struct {
 }
 
 type UpdateMenuItemInput struct {
-	ID            int                      `json:"id"`
-	Name          string                   `json:"name"`
-	Description   string                   `json:"description"`
-	Image         string                   `json:"image"`
-	Available     bool                     `json:"available"`
-	BaseUnitPrice int64                    `json:"baseUnitPrice"`
-	Options       []*entity.MenuItemOption `json:"options"`
+	ID int `json:"id"`
+	CreateMenuItemInput
 }
 
 func (i *UpdateMenuItemInput) validate() error {
-	if i.Name == "" {
-		return apperror.New("name must be provided")
-	}
-	if i.Image == "" {
-		return apperror.New("image must be provided")
-	}
-	if i.BaseUnitPrice <= 0 {
-		return apperror.New("baseUnitPrice must be greater than 0")
-	}
-	for i, option := range i.Options {
-		if err := validateMenuItemOption(option); err != nil {
-			return apperror.Wrapf(err, "validate item option %d", i)
-		}
-	}
-	return nil
+	return i.CreateMenuItemInput.validate()
 }
 
 func (u *UpdateMenuItemUsecase) Update(input *UpdateMenuItemInput) error {

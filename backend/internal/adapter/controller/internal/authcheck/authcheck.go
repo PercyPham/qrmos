@@ -32,7 +32,7 @@ func (ac *AuthCheck) IsAuthenticated(t time.Time, c *gin.Context) bool {
 	if _, err := ac.IsCustomer(c); err == nil {
 		return true
 	}
-	if err := ac.IsStaff; err == nil {
+	if err := ac.IsStaff(t, c); err == nil {
 		return true
 	}
 	return false
