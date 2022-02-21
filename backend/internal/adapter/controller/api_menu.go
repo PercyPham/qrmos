@@ -39,7 +39,7 @@ func (s *server) deleteMenuCat(c *gin.Context) {
 		return
 	}
 
-	catID, err := getIntParam(c, "id")
+	catID, err := getIntParam(c, "catID")
 	if err != nil {
 		response.Error(c, err)
 		return
@@ -225,7 +225,7 @@ func (s *server) deleteMenuItem(c *gin.Context) {
 		return
 	}
 
-	itemID, err := getIntParam(c, "id")
+	itemID, err := getIntParam(c, "itemID")
 	if err != nil {
 		response.Error(c, err)
 		return
@@ -235,6 +235,60 @@ func (s *server) deleteMenuItem(c *gin.Context) {
 	err = deleteMenuItemUsecase.DeleteByID(itemID)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase deletes menu item"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) createMenuAssociation(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	catID, err := getIntParam(c, "catID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	itemID, err := getIntParam(c, "itemID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	associationUsecase := menu_usecase.NewAssociationUsecase(s.menuRepo)
+	if err := associationUsecase.AssociateItemToCategory(itemID, catID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase creates association"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) deleteMenuAssociation(c *gin.Context) {
+	now := time.Now()
+	if err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	catID, err := getIntParam(c, "catID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	itemID, err := getIntParam(c, "itemID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	associationUsecase := menu_usecase.NewAssociationUsecase(s.menuRepo)
+	if err := associationUsecase.DisassociateItemFromCategory(itemID, catID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase deletes association"))
 		return
 	}
 

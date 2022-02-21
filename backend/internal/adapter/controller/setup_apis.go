@@ -21,7 +21,7 @@ func (s *server) setupAPIs() {
 	api.GET("/menu", s.getMenu)
 
 	api.POST("/menu/categories", s.createMenuCat)
-	api.DELETE("/menu/categories/:id", s.deleteMenuCat)
+	api.DELETE("/menu/categories/:catID", s.deleteMenuCat)
 
 	api.POST("/menu/items", s.createMenuItem)
 	api.GET("/menu/items/:itemID", s.getMenuItem)
@@ -29,7 +29,10 @@ func (s *server) setupAPIs() {
 	api.PUT("/menu/items/:itemID/available", s.updateItemAvail)
 	api.PUT("/menu/items/:itemID/options/:optName/available", s.updateItemOptionAvail)
 	api.PUT("/menu/items/:itemID/options/:optName/choices/:choiceName/available", s.updateItemOptionChoiceAvail)
-	api.DELETE("/menu/items/:id", s.deleteMenuItem)
+	api.DELETE("/menu/items/:itemID", s.deleteMenuItem)
+
+	api.POST("/menu/categories/:catID/items/:itemID", s.createMenuAssociation)
+	api.DELETE("/menu/categories/:catID/items/:itemID", s.deleteMenuAssociation)
 
 	api.POST("/vouchers", s.createVoucher)
 	api.DELETE("/vouchers/:code", s.deleteVoucher)

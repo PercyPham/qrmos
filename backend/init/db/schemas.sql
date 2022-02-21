@@ -38,12 +38,12 @@ CREATE TABLE menu_items (
   options BLOB
 );
 
-CREATE TABLE cat_items (
-  cat INT,
-  item INT,
-  PRIMARY KEY(cat,item),
-  FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE,
-  FOREIGN KEY (item) REFERENCES menu_items(id) ON DELETE CASCADE
+CREATE TABLE menu_associations (
+  cat_id INT,
+  item_id INT,
+  PRIMARY KEY(cat_id,item_id),
+  FOREIGN KEY (cat_id) REFERENCES menu_categories(id) ON DELETE CASCADE,
+  FOREIGN KEY (item_id) REFERENCES menu_items(id) ON DELETE CASCADE
 );
 
 CREATE TABLE vouchers (

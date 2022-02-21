@@ -7,8 +7,8 @@ type MenuCategory struct {
 }
 
 type MenuAssociation struct {
-	CatID  int `json:"catID"`
-	ItemID int `json:"itemID"`
+	ItemID     int `json:"itemId"`
+	CategoryID int `json:"catId" gorm:"column:cat_id"`
 }
 
 type MenuItem struct {
