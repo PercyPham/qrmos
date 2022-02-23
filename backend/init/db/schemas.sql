@@ -35,7 +35,7 @@ CREATE TABLE menu_items (
   image TEXT,
   available BOOLEAN DEFAULT true,
   base_unit_price BIGINT,
-  options BLOB
+  options TEXT
 );
 
 CREATE TABLE menu_associations (
@@ -61,9 +61,9 @@ CREATE TABLE orders (
   voucher VARCHAR(255),
   discount BIGINT DEFAULT 0,
   total BIGINT DEFAULT 0,
-  payment BLOB,
+  payment TEXT,
   fail_reason TEXT,
-  creator BLOB,
+  creator TEXT,
   created_at BIGINT
 );
 
@@ -73,5 +73,5 @@ CREATE TABLE order_items (
   unit_price BIGINT,
   quantity INT,
   note TEXT,
-  options BLOB
+  options TEXT
 );

@@ -28,25 +28,25 @@ type gormOrder struct {
 	Voucher             string
 	Discount            int64
 	Total               int64
-	Payment             []byte
+	Payment             string
 	FailReason          string `gorm:"column:fail_reason"`
-	Creator             []byte
+	Creator             string
 	CreatedAt           int64 `gorm:"column:created_at"`
 }
 
 func (g *gormOrder) toOrder() (*entity.Order, error) {
 	var err error
 	var payment *entity.OrderPayment
-	if g.Payment != nil {
-		err = json.Unmarshal(g.Payment, &payment)
+	if g.Payment != "" {
+		err = json.Unmarshal([]byte(g.Payment), &payment)
 		if err != nil {
 			return nil, apperror.Wrap(err, "unmarshal payment")
 		}
 	}
 
 	creator := new(entity.OrderCreator)
-	if g.Creator != nil {
-		err = json.Unmarshal(g.Creator, creator)
+	if g.Creator != "" {
+		err = json.Unmarshal([]byte(g.Creator), creator)
 		if err != nil {
 			return nil, apperror.Wrap(err, "unmarshal creator")
 		}
@@ -96,9 +96,9 @@ func convertToGormOrder(order *entity.Order) (*gormOrder, error) {
 		Voucher:             order.Voucher,
 		Discount:            order.Discount,
 		Total:               order.Total,
-		Payment:             payment,
+		Payment:             string(payment),
 		FailReason:          order.FailReason,
-		Creator:             creator,
+		Creator:             string(creator),
 		CreatedAt:           order.CreatedAt.UnixNano(),
 	}
 	return gOrder, nil
@@ -110,14 +110,14 @@ type gormOrderItem struct {
 	UnitPrice int64 `gorm:"column:unit_price"`
 	Quantity  int
 	Note      string
-	Options   []byte
+	Options   string
 }
 
 func (g *gormOrderItem) toOrderItem() (*entity.OrderItem, error) {
 	var err error
 	var options map[string][]string
-	if g.Options != nil {
-		err = json.Unmarshal(g.Options, &options)
+	if g.Options != "" {
+		err = json.Unmarshal([]byte(g.Options), &options)
 		if err != nil {
 			return nil, apperror.Wrap(err, "unmarshal options")
 		}
@@ -149,7 +149,7 @@ func convertToGormOrderItem(orderID int, orderItem *entity.OrderItem) (*gormOrde
 		UnitPrice: orderItem.UnitPrice,
 		Quantity:  orderItem.Quantity,
 		Note:      orderItem.Note,
-		Options:   options,
+		Options:   string(options),
 	}, nil
 }
 
