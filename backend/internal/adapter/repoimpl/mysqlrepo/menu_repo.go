@@ -150,6 +150,7 @@ func (r *menuRepo) GetItemByID(itemID int) *entity.MenuItem {
 	item, err := gItem.toMenuItem()
 	if err != nil {
 		fmt.Println(err)
+		return nil
 	}
 	return item
 }

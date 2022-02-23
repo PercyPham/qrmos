@@ -51,3 +51,26 @@ CREATE TABLE vouchers (
   discount BIGINT,
   is_used BOOLEAN DEFAULT false
 );
+
+CREATE TABLE orders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  state VARCHAR(255) NOT NULL,
+  cus_name VARCHAR(255) NOT NULL,
+  cus_phone VARCHAR(255),
+  deliver_dest VARCHAR(255) NOT NULL,
+  voucher VARCHAR(255),
+  discount BIGINT DEFAULT 0,
+  total BIGINT DEFAULT 0,
+  payment BLOB,
+  fail_reason TEXT,
+  creator BLOB,
+  created_at BIGINT
+);
+
+CREATE TABLE order_items (
+  order_id INT REFERENCES orders(id),
+  name VARCHAR(255) NOT NULL,
+  unit_price BIGINT,
+  quantity INT,
+  options BLOB
+);

@@ -20,6 +20,7 @@ type ServerConfig struct {
 	DeliveryRepo repo.Delivery
 	MenuRepo     repo.Menu
 	VoucherRepo  repo.Voucher
+	OrderRepo    repo.Order
 }
 
 func (cfg *ServerConfig) validate() error {
@@ -34,6 +35,9 @@ func (cfg *ServerConfig) validate() error {
 	}
 	if cfg.VoucherRepo == nil {
 		return apperror.New("voucher repo must be provided")
+	}
+	if cfg.OrderRepo == nil {
+		return apperror.New("order repo must be provided")
 	}
 	return nil
 }
@@ -53,6 +57,7 @@ func NewServer(cfg ServerConfig) (*server, error) {
 		deliveryRepo: cfg.DeliveryRepo,
 		menuRepo:     cfg.MenuRepo,
 		voucherRepo:  cfg.VoucherRepo,
+		orderRepo:    cfg.OrderRepo,
 		authCheck:    authcheck.NewAuthCheck(cfg.UserRepo),
 	}, nil
 }
@@ -64,6 +69,7 @@ type server struct {
 	deliveryRepo repo.Delivery
 	menuRepo     repo.Menu
 	voucherRepo  repo.Voucher
+	orderRepo    repo.Order
 
 	authCheck *authcheck.AuthCheck
 }

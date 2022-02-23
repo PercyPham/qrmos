@@ -80,8 +80,8 @@ func (s *server) createMenuItem(c *gin.Context) {
 
 func (s *server) getMenuItem(c *gin.Context) {
 	now := time.Now()
-	if !s.authCheck.IsAuthenticated(now, c) {
-		response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+	if err := s.authCheck.IsAuthenticated(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
 		return
 	}
 
@@ -133,7 +133,7 @@ func (s *server) updateMenuItem(c *gin.Context) {
 
 func (s *server) updateItemAvail(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsStaff(now, c); err != nil {
+	if _, err := s.authCheck.IsStaff(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -161,7 +161,7 @@ func (s *server) updateItemAvail(c *gin.Context) {
 
 func (s *server) updateItemOptionAvail(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsStaff(now, c); err != nil {
+	if _, err := s.authCheck.IsStaff(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -190,7 +190,7 @@ func (s *server) updateItemOptionAvail(c *gin.Context) {
 
 func (s *server) updateItemOptionChoiceAvail(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsStaff(now, c); err != nil {
+	if _, err := s.authCheck.IsStaff(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -297,8 +297,8 @@ func (s *server) deleteMenuAssociation(c *gin.Context) {
 
 func (s *server) getMenu(c *gin.Context) {
 	now := time.Now()
-	if !s.authCheck.IsAuthenticated(now, c) {
-		response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+	if err := s.authCheck.IsAuthenticated(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
 		return
 	}
 
