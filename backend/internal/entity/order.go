@@ -65,3 +65,14 @@ type OrderItem struct {
 	/// Options is a map of {optionName : [choice]}
 	Options map[string][]string `json:"options"`
 }
+
+func (order *Order) Cancel() error {
+	if order.State == OrderStateCancelled {
+		return nil
+	}
+	if order.State != OrderStatePending {
+		return apperror.Newf("cannot cancel order with state '%s'", order.State)
+	}
+	order.State = OrderStateCancelled
+	return nil
+}

@@ -93,3 +93,41 @@ func (s *server) getOrderAsStaff(c *gin.Context, orderID int) {
 	}
 	response.Success(c, order)
 }
+
+func (s *server) cancelOrder(c *gin.Context) {
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	if cus, err := s.authCheck.IsCustomer(c); err == nil {
+		s.cancelOrderAsCustomer(c, orderID, cus)
+		return
+	}
+
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.cancelOrderAsStaff(c, orderID)
+		return
+	}
+
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) cancelOrderAsCustomer(c *gin.Context, orderID int, cus *entity.Customer) {
+	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
+	if err := cancelOrderUsecase.CancelByCustomer(orderID, cus.ID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase cancels order as customer"))
+		return
+	}
+	response.Success(c, true)
+}
+
+func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int) {
+	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
+	if err := cancelOrderUsecase.Cancel(orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase cancels order as staff"))
+		return
+	}
+	response.Success(c, true)
+}

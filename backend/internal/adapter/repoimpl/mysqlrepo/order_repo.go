@@ -217,3 +217,15 @@ func (r *orderRepo) GetByID(id int) *entity.Order {
 
 	return order
 }
+
+func (r *orderRepo) Update(order *entity.Order) error {
+	gOrder, err := convertToGormOrder(order)
+	if err != nil {
+		return apperror.Wrap(err, "convert to gorm order")
+	}
+	result := r.db.Table("orders").Save(gOrder)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm db save order")
+	}
+	return nil
+}
