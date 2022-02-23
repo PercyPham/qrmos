@@ -3,7 +3,7 @@ package entity
 type MenuCategory struct {
 	ID          int    `json:"id" grom:"primaryKey"`
 	Name        string `json:"name"`
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 }
 
 type MenuAssociation struct {
@@ -14,11 +14,11 @@ type MenuAssociation struct {
 type MenuItem struct {
 	ID            int                        `json:"id"`
 	Name          string                     `json:"name"`
-	Description   string                     `json:"description"`
-	Image         string                     `json:"image"`
+	Description   string                     `json:"description,omitempty"`
+	Image         string                     `json:"image,omitempty"`
 	Available     bool                       `json:"available"`
 	BaseUnitPrice int64                      `json:"baseUnitPrice"`
-	Options       map[string]*MenuItemOption `json:"options"`
+	Options       map[string]*MenuItemOption `json:"options,omitempty"`
 }
 
 type MenuItemOption struct {

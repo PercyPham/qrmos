@@ -68,13 +68,13 @@ type gormMenuItem struct {
 	Image         string `json:"image"`
 	Available     bool   `json:"available"`
 	BaseUnitPrice int64  `json:"baseUnitPrice"`
-	Options       []byte `json:"options"`
+	Options       string `json:"options"`
 }
 
 func (i *gormMenuItem) toMenuItem() (*entity.MenuItem, error) {
 	options := map[string]*entity.MenuItemOption{}
-	if i.Options != nil {
-		err := json.Unmarshal(i.Options, &options)
+	if i.Options != "" {
+		err := json.Unmarshal([]byte(i.Options), &options)
 		if err != nil {
 			return nil, apperror.Wrap(err, "json unmarshal item options")
 		}
@@ -107,7 +107,7 @@ func convertToGormMenuItem(i *entity.MenuItem) (*gormMenuItem, error) {
 		Image:         i.Image,
 		Available:     i.Available,
 		BaseUnitPrice: i.BaseUnitPrice,
-		Options:       options,
+		Options:       string(options),
 	}, nil
 }
 
