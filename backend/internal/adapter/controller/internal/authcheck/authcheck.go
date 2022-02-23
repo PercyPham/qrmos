@@ -28,23 +28,20 @@ func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) error {
 }
 
 // IsAuthenticated checks if the user is either customer or staff
-func (ac *AuthCheck) IsAuthenticated(t time.Time, c *gin.Context) bool {
-	if _, err := ac.IsCustomer(c); err == nil {
-		return true
+func (ac *AuthCheck) IsAuthenticated(t time.Time, c *gin.Context) error {
+	accessToken, err := extractAccessToken(c)
+	if err != nil {
+		return apperror.Wrap(err, "extract access token")
 	}
-	if err := ac.IsStaff; err == nil {
-		return true
+	authUsecase := auth_usecase.NewAuthUsecase(ac.userRepo)
+	if err := authUsecase.IsAuthenticated(t, accessToken); err != nil {
+		return apperror.Wrap(err, "usecase authenticates user")
 	}
-	return false
-}
-
-func (ac *AuthCheck) IsStaff(t time.Time, c *gin.Context) error {
-	_, err := ac.isStaff(t, c)
-	return err
+	return nil
 }
 
 func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) error {
-	staff, err := ac.isStaff(t, c)
+	staff, err := ac.IsStaff(t, c)
 	if err != nil {
 		return err
 	}
@@ -57,7 +54,7 @@ func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) error
 	return nil
 }
 
-func (ac *AuthCheck) isStaff(t time.Time, c *gin.Context) (*entity.User, error) {
+func (ac *AuthCheck) IsStaff(t time.Time, c *gin.Context) (*entity.User, error) {
 	accessToken, err := extractAccessToken(c)
 	if err != nil {
 		return nil, apperror.Wrap(err, "extract access token")

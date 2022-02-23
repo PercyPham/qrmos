@@ -72,7 +72,7 @@ type gormMenuItem struct {
 }
 
 func (i *gormMenuItem) toMenuItem() (*entity.MenuItem, error) {
-	options := []*entity.MenuItemOption{}
+	options := map[string]*entity.MenuItemOption{}
 	if i.Options != nil {
 		err := json.Unmarshal(i.Options, &options)
 		if err != nil {
@@ -150,6 +150,7 @@ func (r *menuRepo) GetItemByID(itemID int) *entity.MenuItem {
 	item, err := gItem.toMenuItem()
 	if err != nil {
 		fmt.Println(err)
+		return nil
 	}
 	return item
 }
@@ -187,55 +188,43 @@ func (r *menuRepo) DeleteItemByID(id int) error {
 	return nil
 }
 
-type gormCatItem struct {
-	CategoryID int `gorm:"column:cat"`
-	ItemID     int `gorm:"column:item"`
-}
-
-func (r *menuRepo) AssociateItemToCategory(itemID, catID int) error {
-	gCatItem := &gormCatItem{
-		CategoryID: catID,
-		ItemID:     itemID,
-	}
-	result := r.db.Table("cat_items").Create(gCatItem)
+func (r *menuRepo) CreateAssociation(association *entity.MenuAssociation) error {
+	result := r.db.Create(association)
 	if result.Error != nil {
-		return apperror.Wrap(result.Error, "gorm creates cat item")
+		return apperror.Wrapf(result.Error, "gorm creates association between cat '%d' and item '%d'", association.CategoryID, association.ItemID)
 	}
 	return nil
 }
 
-func (r *menuRepo) DisassociateItemFromCategory(itemID, catID int) error {
-	result := r.db.Table("cat_items").Where("cat = ? AND item = ?", catID, itemID).Delete(gormCatItem{})
-	if result.Error != nil {
-		return apperror.Wrapf(result.Error, "gorm deletes association between cat '%d' and item '%d'", catID, itemID)
-	}
-	return nil
+func (r *menuRepo) CheckIfAssociationExists(association *entity.MenuAssociation) bool {
+	foundAssociation := new(entity.MenuAssociation)
+	result := r.db.
+		Where("item_id = ? AND cat_id = ?", association.ItemID, association.CategoryID).
+		First(foundAssociation)
+	return result.Error == nil
 }
 
-func (r *menuRepo) GetAllCatIDsOfItem(itemID int) ([]int, error) {
-	gCatItems := []gormCatItem{}
-	result := r.db.Table("cat_items").Where("item = ?", itemID).Find(&gCatItems)
+func (r *menuRepo) DeleteAssociation(association *entity.MenuAssociation) error {
+	result := r.db.
+		Where("item_id = ? AND cat_id = ?", association.ItemID, association.CategoryID).
+		Delete(association)
 	if result.Error != nil {
-		return nil, apperror.Wrapf(result.Error, "gorm gets associations of item '%d'", itemID)
+		return apperror.Wrapf(result.Error, "gorm deletes association between cat '%d' and item '%d'", association.CategoryID, association.ItemID)
 	}
-	catIDs := []int{}
-	for _, catItem := range gCatItems {
-		catIDs = append(catIDs, catItem.CategoryID)
-	}
-	return catIDs, nil
+	return nil
 }
 
 func (r *menuRepo) GetAllAssociations() ([]*entity.MenuAssociation, error) {
-	gCatItems := []gormCatItem{}
-	result := r.db.Table("cat_items").Find(&gCatItems)
+	gCatItems := []*entity.MenuAssociation{}
+	result := r.db.Find(&gCatItems)
 	if result.Error != nil {
 		return nil, apperror.Wrapf(result.Error, "gorm gets all associations")
 	}
 	associations := []*entity.MenuAssociation{}
 	for _, catItem := range gCatItems {
 		associations = append(associations, &entity.MenuAssociation{
-			CatID:  catItem.CategoryID,
-			ItemID: catItem.ItemID,
+			CategoryID: catItem.CategoryID,
+			ItemID:     catItem.ItemID,
 		})
 	}
 	return associations, nil

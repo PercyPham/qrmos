@@ -69,6 +69,9 @@ func ValidateStaffAccessToken(t time.Time, staffAccessToken string) (*StaffAcces
 	}
 
 	if claims, ok := token.Claims.(*StaffAccessTokenClaims); ok && token.Valid {
+		if !claims.VerifyExpiresAt(t.UnixNano(), false) {
+			return nil, apperror.New("token expired")
+		}
 		if claims.Type != AccessTokenTypeStaff {
 			return nil, apperror.New("wrong token type")
 		}

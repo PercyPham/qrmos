@@ -16,8 +16,8 @@ type Menu interface {
 	UpdateItem(item *entity.MenuItem) error
 	DeleteItemByID(id int) error
 
-	AssociateItemToCategory(itemID, catID int) error
-	DisassociateItemFromCategory(itemID, catID int) error
-	GetAllCatIDsOfItem(itemID int) (catIDs []int, err error)
+	CreateAssociation(*entity.MenuAssociation) error
+	CheckIfAssociationExists(*entity.MenuAssociation) bool
 	GetAllAssociations() ([]*entity.MenuAssociation, error)
+	DeleteAssociation(*entity.MenuAssociation) error
 }

@@ -17,6 +17,26 @@ type AuthUsecase struct {
 	userRepo repo.User
 }
 
+func (u *AuthUsecase) IsAuthenticated(t time.Time, accessToken string) error {
+	accessTokenType, err := token.GetAccessTokenType(accessToken)
+	if err != nil {
+		return apperror.Wrap(err, "get access token type")
+	}
+	if accessTokenType == token.AccessTokenTypeCustomer {
+		if _, err := u.AuthenticateCustomer(accessToken); err != nil {
+			return apperror.Wrap(err, "authenticate customer")
+		}
+		return nil
+	}
+	if accessTokenType == token.AccessTokenTypeStaff {
+		if _, err := u.AuthenticateStaff(t, accessToken); err != nil {
+			return apperror.Wrap(err, "authenticate staff")
+		}
+		return nil
+	}
+	return apperror.New("should never reach this point")
+}
+
 func (u *AuthUsecase) AuthenticateStaff(t time.Time, accessToken string) (*entity.User, error) {
 	staffAccessTokenClaims, err := token.ValidateStaffAccessToken(t, accessToken)
 	if err != nil {

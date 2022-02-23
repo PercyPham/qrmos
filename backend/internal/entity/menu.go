@@ -7,30 +7,28 @@ type MenuCategory struct {
 }
 
 type MenuAssociation struct {
-	CatID  int `json:"catID"`
-	ItemID int `json:"itemID"`
+	ItemID     int `json:"itemId"`
+	CategoryID int `json:"catId" gorm:"column:cat_id"`
 }
 
 type MenuItem struct {
-	ID            int               `json:"id"`
-	Name          string            `json:"name"`
-	Description   string            `json:"description"`
-	Image         string            `json:"image"`
-	Available     bool              `json:"available"`
-	BaseUnitPrice int64             `json:"baseUnitPrice"`
-	Options       []*MenuItemOption `json:"options"`
+	ID            int                        `json:"id"`
+	Name          string                     `json:"name"`
+	Description   string                     `json:"description"`
+	Image         string                     `json:"image"`
+	Available     bool                       `json:"available"`
+	BaseUnitPrice int64                      `json:"baseUnitPrice"`
+	Options       map[string]*MenuItemOption `json:"options"`
 }
 
 type MenuItemOption struct {
-	Name      string                  `json:"name"`
-	Available bool                    `json:"available"`
-	MinChoice int                     `json:"minChoice"`
-	MaxChoice int                     `json:"maxChoice"`
-	Choices   []*MenuItemOptionChoice `json:"choices"`
+	Available bool                             `json:"available"`
+	MinChoice int                              `json:"minChoice"`
+	MaxChoice int                              `json:"maxChoice"`
+	Choices   map[string]*MenuItemOptionChoice `json:"choices"`
 }
 
 type MenuItemOptionChoice struct {
-	Name      string `json:"name"`
-	Price     int64  `json:"price"`
-	Available bool   `json:"available"`
+	Price     int64 `json:"price"`
+	Available bool  `json:"available"`
 }

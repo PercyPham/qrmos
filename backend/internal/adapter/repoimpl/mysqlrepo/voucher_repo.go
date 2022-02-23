@@ -33,6 +33,14 @@ func (r *voucherRepo) GetByCode(code string) *entity.Voucher {
 	return voucher
 }
 
+func (r *voucherRepo) Update(voucher *entity.Voucher) error {
+	result := r.db.Save(voucher)
+	if result.Error != nil {
+		return apperror.Wrap(result.Error, "gorm db save voucher")
+	}
+	return nil
+}
+
 func (r *voucherRepo) DeleteByCode(code string) error {
 	result := r.db.Where("code = ?", code).Delete(entity.Voucher{})
 	if result.Error != nil {

@@ -38,16 +38,39 @@ CREATE TABLE menu_items (
   options BLOB
 );
 
-CREATE TABLE cat_items (
-  cat INT,
-  item INT,
-  PRIMARY KEY(cat,item),
-  FOREIGN KEY (cat) REFERENCES menu_categories(id) ON DELETE CASCADE,
-  FOREIGN KEY (item) REFERENCES menu_items(id) ON DELETE CASCADE
+CREATE TABLE menu_associations (
+  cat_id INT,
+  item_id INT,
+  PRIMARY KEY(cat_id,item_id),
+  FOREIGN KEY (cat_id) REFERENCES menu_categories(id) ON DELETE CASCADE,
+  FOREIGN KEY (item_id) REFERENCES menu_items(id) ON DELETE CASCADE
 );
 
 CREATE TABLE vouchers (
   code VARCHAR(255) NOT NULL PRIMARY KEY,
   discount BIGINT,
   is_used BOOLEAN DEFAULT false
+);
+
+CREATE TABLE orders (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  state VARCHAR(255) NOT NULL,
+  cus_name VARCHAR(255) NOT NULL,
+  cus_phone VARCHAR(255),
+  deliver_dest VARCHAR(255) NOT NULL,
+  voucher VARCHAR(255),
+  discount BIGINT DEFAULT 0,
+  total BIGINT DEFAULT 0,
+  payment BLOB,
+  fail_reason TEXT,
+  creator BLOB,
+  created_at BIGINT
+);
+
+CREATE TABLE order_items (
+  order_id INT REFERENCES orders(id),
+  name VARCHAR(255) NOT NULL,
+  unit_price BIGINT,
+  quantity INT,
+  options BLOB
 );
