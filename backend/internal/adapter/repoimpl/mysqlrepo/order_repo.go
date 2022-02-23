@@ -109,6 +109,7 @@ type gormOrderItem struct {
 	Name      string
 	UnitPrice int64 `gorm:"column:unit_price"`
 	Quantity  int
+	Note      string
 	Options   []byte
 }
 
@@ -126,6 +127,7 @@ func (g *gormOrderItem) toOrderItem() (*entity.OrderItem, error) {
 		Name:      g.Name,
 		UnitPrice: g.UnitPrice,
 		Quantity:  g.Quantity,
+		Note:      g.Note,
 		Options:   options,
 	}, nil
 }
@@ -146,6 +148,7 @@ func convertToGormOrderItem(orderID int, orderItem *entity.OrderItem) (*gormOrde
 		Name:      orderItem.Name,
 		UnitPrice: orderItem.UnitPrice,
 		Quantity:  orderItem.Quantity,
+		Note:      orderItem.Note,
 		Options:   options,
 	}, nil
 }
@@ -197,7 +200,7 @@ func (r *orderRepo) GetByID(id int) *entity.Order {
 	}
 
 	gOrderItems := []*gormOrderItem{}
-	result = r.db.Table("order_items").Find(&gOrderItems)
+	result = r.db.Table("order_items").Where("order_id = ?", id).Find(&gOrderItems)
 	if result.Error != nil {
 		fmt.Println(err)
 		return nil

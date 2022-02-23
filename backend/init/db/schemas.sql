@@ -72,5 +72,6 @@ CREATE TABLE order_items (
   name VARCHAR(255) NOT NULL,
   unit_price BIGINT,
   quantity INT,
+  note TEXT,
   options BLOB
 );
