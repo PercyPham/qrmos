@@ -11,7 +11,8 @@ import (
 
 func (s *server) createVoucher(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	manager, err := s.authCheck.IsManager(now, c)
+	if err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -21,6 +22,7 @@ func (s *server) createVoucher(c *gin.Context) {
 		response.Error(c, newBindJsonReqBodyError(err))
 		return
 	}
+	body.CreatedBy = manager.Username
 
 	createVoucherUsecase := voucher_usecase.NewCreateVoucherUsecase(s.voucherRepo)
 	if err := createVoucherUsecase.Create(body); err != nil {
@@ -33,7 +35,7 @@ func (s *server) createVoucher(c *gin.Context) {
 
 func (s *server) deleteVoucher(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}

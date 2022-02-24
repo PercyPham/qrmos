@@ -49,7 +49,8 @@ CREATE TABLE menu_associations (
 CREATE TABLE vouchers (
   code VARCHAR(255) NOT NULL PRIMARY KEY,
   discount BIGINT,
-  is_used BOOLEAN DEFAULT false
+  is_used BOOLEAN DEFAULT false,
+  created_by VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE orders (

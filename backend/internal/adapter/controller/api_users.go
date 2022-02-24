@@ -10,7 +10,7 @@ import (
 )
 
 func (s *server) getAllUsers(c *gin.Context) {
-	if err := s.authCheck.IsAdmin(time.Now(), c); err != nil {
+	if _, err := s.authCheck.IsAdmin(time.Now(), c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -27,7 +27,7 @@ func (s *server) getAllUsers(c *gin.Context) {
 
 func (s *server) createUser(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsAdmin(now, c); err != nil {
+	if _, err := s.authCheck.IsAdmin(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -49,7 +49,7 @@ func (s *server) createUser(c *gin.Context) {
 
 func (s *server) updateUser(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsAdmin(now, c); err != nil {
+	if _, err := s.authCheck.IsAdmin(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
