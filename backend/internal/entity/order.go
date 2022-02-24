@@ -10,7 +10,7 @@ const OrderStateConfirmed = "confirmed"
 const OrderStateReady = "ready"
 const OrderStateDelivered = "delivered"
 const OrderStateFailed = "failed"
-const OrderStateCancelled = "cancelled"
+const OrderStateCanceled = "canceled"
 
 type Order struct {
 	ID                  int           `json:"id"`
@@ -67,12 +67,12 @@ type OrderItem struct {
 }
 
 func (order *Order) Cancel() error {
-	if order.State == OrderStateCancelled {
+	if order.State == OrderStateCanceled {
 		return nil
 	}
 	if order.State != OrderStatePending {
 		return apperror.Newf("cannot cancel order with state '%s'", order.State)
 	}
-	order.State = OrderStateCancelled
+	order.State = OrderStateCanceled
 	return nil
 }
