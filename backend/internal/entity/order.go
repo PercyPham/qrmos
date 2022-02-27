@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"net/http"
 	"qrmos/internal/common/apperror"
 	"time"
 )
@@ -71,7 +72,8 @@ func (order *Order) Cancel() error {
 		return nil
 	}
 	if order.State != OrderStatePending {
-		return apperror.Newf("cannot cancel order with state '%s'", order.State)
+		return apperror.Newf("cannot cancel order with state '%s'", order.State).
+			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateCanceled
 	return nil
@@ -82,7 +84,8 @@ func (order *Order) MarkAsReady() error {
 		return nil
 	}
 	if order.State != OrderStateConfirmed {
-		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateReady)
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateReady).
+			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateReady
 	return nil
@@ -93,8 +96,18 @@ func (order *Order) MarkAsDelivered() error {
 		return nil
 	}
 	if order.State != OrderStateReady {
-		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateDelivered)
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateDelivered).
+			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateDelivered
+	return nil
+}
+
+func (order *Order) SetDeliveryDestination(destName string) error {
+	if !(order.State == OrderStatePending || order.State == OrderStateConfirmed) {
+		return apperror.Newf("cannot set new delivery destination when order is in state '%s'", order.State).
+			WithCode(http.StatusForbidden)
+	}
+	order.DeliveryDestination = destName
 	return nil
 }

@@ -173,3 +173,50 @@ func (s *server) markOrderAsDelivered(c *gin.Context) {
 
 	response.Success(c, true)
 }
+
+func (s *server) changeOrderDeliveryDest(c *gin.Context) {
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	destName := c.Param("destName")
+
+	if cus, err := s.authCheck.IsCustomer(c); err == nil {
+		s.changeOrderDeliveryDestAsCustomer(c, cus.ID, orderID, destName)
+		return
+	}
+
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.changeOrderDeliveryDestAsStaff(c, orderID, destName)
+		return
+	}
+
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) changeOrderDeliveryDestAsCustomer(
+	c *gin.Context,
+	cusID string,
+	orderID int,
+	destName string) {
+	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
+	if err := changeDestUsecase.ChangeDeliveryDestinationByCustomer(cusID, orderID, destName); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
+		return
+	}
+	response.Success(c, true)
+}
+
+func (s *server) changeOrderDeliveryDestAsStaff(
+	c *gin.Context,
+	orderID int,
+	destName string) {
+	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
+	if err := changeDestUsecase.ChangeDeliveryDestination(orderID, destName); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
+		return
+	}
+	response.Success(c, true)
+}
