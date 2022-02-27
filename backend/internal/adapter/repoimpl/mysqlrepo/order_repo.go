@@ -30,7 +30,9 @@ type gormOrder struct {
 	Total               int64
 	Payment             string
 	FailReason          string `gorm:"column:fail_reason"`
-	Creator             string
+	CreatorType         string
+	CreatorStaff        string
+	CreatorCus          string
 	CreatedAt           int64 `gorm:"column:created_at"`
 }
 
@@ -44,12 +46,10 @@ func (g *gormOrder) toOrder() (*entity.Order, error) {
 		}
 	}
 
-	creator := new(entity.OrderCreator)
-	if g.Creator != "" {
-		err = json.Unmarshal([]byte(g.Creator), creator)
-		if err != nil {
-			return nil, apperror.Wrap(err, "unmarshal creator")
-		}
+	creator := &entity.OrderCreator{
+		Type:          g.CreatorType,
+		StaffUsername: g.CreatorStaff,
+		CustomerID:    g.CreatorCus,
 	}
 
 	return &entity.Order{
@@ -79,12 +79,8 @@ func convertToGormOrder(order *entity.Order) (*gormOrder, error) {
 		}
 	}
 
-	var creator []byte
-	if order.Creator != nil {
-		creator, err = json.Marshal(order.Creator)
-		if err != nil {
-			return nil, apperror.Wrap(err, "marshal creator")
-		}
+	if order.Creator == nil {
+		order.Creator = &entity.OrderCreator{}
 	}
 
 	gOrder := &gormOrder{
@@ -98,7 +94,9 @@ func convertToGormOrder(order *entity.Order) (*gormOrder, error) {
 		Total:               order.Total,
 		Payment:             string(payment),
 		FailReason:          order.FailReason,
-		Creator:             string(creator),
+		CreatorType:         order.Creator.Type,
+		CreatorStaff:        order.Creator.StaffUsername,
+		CreatorCus:          order.Creator.CustomerID,
 		CreatedAt:           order.CreatedAt.UnixNano(),
 	}
 	return gOrder, nil

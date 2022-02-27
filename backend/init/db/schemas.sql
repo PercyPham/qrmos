@@ -64,15 +64,22 @@ CREATE TABLE orders (
   total BIGINT DEFAULT 0,
   payment TEXT,
   fail_reason TEXT,
-  creator TEXT,
+  creator_type VARCHAR(8) NOT NULL,
+  creator_staff VARCHAR(255),
+  creator_cus VARCHAR(255),
   created_at BIGINT
 );
 
 CREATE TABLE order_items (
-  order_id INT REFERENCES orders(id),
+  order_id INT REFERENCES orders(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
   unit_price BIGINT,
   quantity INT,
   note TEXT,
   options TEXT
 );
+
+CREATE INDEX idx_order_state ON orders(state);
+CREATE INDEX idx_order_creator_cus ON orders(creator_cus);
+CREATE INDEX idx_order_created_at ON orders(created_at DESC);
+CREATE INDEX idx_order_items ON order_items (order_id);
