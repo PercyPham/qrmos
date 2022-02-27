@@ -3,6 +3,7 @@ package entity
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/common/config"
 	"time"
 )
 
@@ -29,10 +30,13 @@ type Order struct {
 	CreatedAt           time.Time     `json:"createdAt"`
 }
 
+const OrderPaymentTypeCash = "cash"
+const OrderPaymentTypeMoMo = "momo"
+
 type OrderPayment struct {
 	Type     string            `json:"type"`
 	Success  bool              `json:"success"`
-	Metadata map[string]string `json:"metadata"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 const OrderCreatorTypeStaff = "staff"
@@ -110,4 +114,33 @@ func (order *Order) SetDeliveryDestination(destName string) error {
 	}
 	order.DeliveryDestination = destName
 	return nil
+}
+
+func (order *Order) MarkPaidByCash(t time.Time) error {
+	if order.State != OrderStatePending {
+		return apperror.Newf("cannot mark '%s' order as paid by cash", order.State)
+	}
+
+	if !order.isAtSameCreationDate(t) {
+		return apperror.New("cannot mark order created from other date as paid")
+	}
+
+	order.Payment = &OrderPayment{
+		Type:    OrderPaymentTypeCash,
+		Success: true,
+	}
+	order.State = OrderStateConfirmed
+	return nil
+}
+
+func (order *Order) isAtSameCreationDate(t time.Time) bool {
+	tl := config.App().TimeLocation
+	createdAt := order.CreatedAt.In(tl)
+	t = t.In(tl)
+	if t.Year() != createdAt.Year() ||
+		t.Month() != createdAt.Month() ||
+		t.Day() != createdAt.Day() {
+		return false
+	}
+	return true
 }
