@@ -2,6 +2,7 @@ package store_cfg_usecase
 
 import (
 	"encoding/json"
+	"net/http"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
@@ -42,8 +43,45 @@ func (u *OpeningHoursCfgUsecase) Get() (*entity.StoreConfigOpeningHours, error) 
 	return openingHours, nil
 }
 
-func (u *OpeningHoursCfgUsecase) Update(cfg *entity.StoreConfigOpeningHours) error {
-	cfgJson, _ := json.Marshal(cfg)
+type UpdateStoreOpeningHoursCfgInput struct {
+	IsManual     bool                    `json:"isManual"`
+	IsManualOpen bool                    `json:"isManualOpen"`
+	Start        *entity.StoreConfigTime `json:"start"`
+	End          *entity.StoreConfigTime `json:"end"`
+}
+
+func (i *UpdateStoreOpeningHoursCfgInput) validate() (
+	*entity.StoreConfigOpeningHours,
+	error) {
+	if i.Start == nil {
+		return nil, apperror.New("start time must be provided")
+	}
+	if i.End == nil {
+		return nil, apperror.New("end time must be provided")
+	}
+	start, err := entity.NewStoreConfigTime(i.Start.Hour, i.Start.Minute, i.Start.Second)
+	if err != nil {
+		return nil, apperror.Wrap(err, "instantiate start time")
+	}
+	end, err := entity.NewStoreConfigTime(i.End.Hour, i.End.Minute, i.End.Second)
+	if err != nil {
+		return nil, apperror.Wrap(err, "instantiate end time")
+	}
+	cfg, err := entity.NewOpeningHours(start, end)
+	if err != nil {
+		return nil, apperror.Wrap(err, "instantiate store opening hours config")
+	}
+	cfg.IsManual = i.IsManual
+	cfg.IsManualOpen = i.IsManualOpen
+	return cfg, nil
+}
+
+func (u *OpeningHoursCfgUsecase) Update(input *UpdateStoreOpeningHoursCfgInput) error {
+	openingHoursCfg, err := input.validate()
+	if err != nil {
+		return apperror.Wrap(err, "validate input").WithCode(http.StatusBadRequest)
+	}
+	cfgJson, _ := json.Marshal(openingHoursCfg)
 	storeCfg := &entity.StoreConfig{
 		Key:   entity.StoreCfgKeyOpeningHours,
 		Value: string(cfgJson),
