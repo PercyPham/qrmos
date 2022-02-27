@@ -76,3 +76,25 @@ func (order *Order) Cancel() error {
 	order.State = OrderStateCanceled
 	return nil
 }
+
+func (order *Order) MarkAsReady() error {
+	if order.State == OrderStateReady {
+		return nil
+	}
+	if order.State != OrderStateConfirmed {
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateReady)
+	}
+	order.State = OrderStateReady
+	return nil
+}
+
+func (order *Order) MarkAsDelivered() error {
+	if order.State == OrderStateDelivered {
+		return nil
+	}
+	if order.State != OrderStateReady {
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateDelivered)
+	}
+	order.State = OrderStateDelivered
+	return nil
+}

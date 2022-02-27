@@ -131,3 +131,45 @@ func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int) {
 	}
 	response.Success(c, true)
 }
+
+func (s *server) markOrderAsReady(c *gin.Context) {
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	progressUsecase := order_usecase.NewProgressUsecase(s.orderRepo)
+	if err := progressUsecase.MarkAsReady(orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as ready"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) markOrderAsDelivered(c *gin.Context) {
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	progressUsecase := order_usecase.NewProgressUsecase(s.orderRepo)
+	if err := progressUsecase.MarkAsDelivered(orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as delivered"))
+		return
+	}
+
+	response.Success(c, true)
+}
