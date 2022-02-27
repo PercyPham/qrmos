@@ -16,11 +16,12 @@ import (
 )
 
 type ServerConfig struct {
-	UserRepo     repo.User
-	DeliveryRepo repo.Delivery
-	MenuRepo     repo.Menu
-	VoucherRepo  repo.Voucher
-	OrderRepo    repo.Order
+	UserRepo        repo.User
+	DeliveryRepo    repo.Delivery
+	MenuRepo        repo.Menu
+	VoucherRepo     repo.Voucher
+	OrderRepo       repo.Order
+	StoreConfigRepo repo.StoreConfig
 }
 
 func (cfg *ServerConfig) validate() error {
@@ -39,6 +40,9 @@ func (cfg *ServerConfig) validate() error {
 	if cfg.OrderRepo == nil {
 		return apperror.New("order repo must be provided")
 	}
+	if cfg.StoreConfigRepo == nil {
+		return apperror.New("store config repo must be provided")
+	}
 	return nil
 }
 
@@ -52,24 +56,26 @@ func NewServer(cfg ServerConfig) (*server, error) {
 	}
 
 	return &server{
-		r:            gin.Default(),
-		userRepo:     cfg.UserRepo,
-		deliveryRepo: cfg.DeliveryRepo,
-		menuRepo:     cfg.MenuRepo,
-		voucherRepo:  cfg.VoucherRepo,
-		orderRepo:    cfg.OrderRepo,
-		authCheck:    authcheck.NewAuthCheck(cfg.UserRepo),
+		r:               gin.Default(),
+		userRepo:        cfg.UserRepo,
+		deliveryRepo:    cfg.DeliveryRepo,
+		menuRepo:        cfg.MenuRepo,
+		voucherRepo:     cfg.VoucherRepo,
+		orderRepo:       cfg.OrderRepo,
+		storeConfigRepo: cfg.StoreConfigRepo,
+		authCheck:       authcheck.NewAuthCheck(cfg.UserRepo),
 	}, nil
 }
 
 type server struct {
 	r *gin.Engine
 
-	userRepo     repo.User
-	deliveryRepo repo.Delivery
-	menuRepo     repo.Menu
-	voucherRepo  repo.Voucher
-	orderRepo    repo.Order
+	userRepo        repo.User
+	deliveryRepo    repo.Delivery
+	menuRepo        repo.Menu
+	voucherRepo     repo.Voucher
+	orderRepo       repo.Order
+	storeConfigRepo repo.StoreConfig
 
 	authCheck *authcheck.AuthCheck
 }

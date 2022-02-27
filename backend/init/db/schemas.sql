@@ -70,6 +70,10 @@ CREATE TABLE orders (
   created_at BIGINT
 );
 
+CREATE INDEX idx_order_state ON orders(state);
+CREATE INDEX idx_order_creator_cus ON orders(creator_cus);
+CREATE INDEX idx_order_created_at ON orders(created_at DESC);
+
 CREATE TABLE order_items (
   order_id INT REFERENCES orders(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
@@ -79,7 +83,9 @@ CREATE TABLE order_items (
   options TEXT
 );
 
-CREATE INDEX idx_order_state ON orders(state);
-CREATE INDEX idx_order_creator_cus ON orders(creator_cus);
-CREATE INDEX idx_order_created_at ON orders(created_at DESC);
 CREATE INDEX idx_order_items ON order_items (order_id);
+
+CREATE TABLE store_configs (
+  cfg_key VARCHAR(255) NOT NULL PRIMARY KEY,
+  cfg_val VARCHAR(255) NOT NULL
+);
