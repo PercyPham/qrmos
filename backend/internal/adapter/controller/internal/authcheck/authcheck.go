@@ -19,11 +19,11 @@ type AuthCheck struct {
 	userRepo repo.User
 }
 
-func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) error {
+func (ac *AuthCheck) IsAdmin(t time.Time, c *gin.Context) (*entity.User, error) {
 	return ac.isStaffRole(t, c, entity.UserRoleAdmin)
 }
 
-func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) error {
+func (ac *AuthCheck) IsManager(t time.Time, c *gin.Context) (*entity.User, error) {
 	return ac.isStaffRole(t, c, entity.UserRoleManager)
 }
 
@@ -40,18 +40,18 @@ func (ac *AuthCheck) IsAuthenticated(t time.Time, c *gin.Context) error {
 	return nil
 }
 
-func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) error {
+func (ac *AuthCheck) isStaffRole(t time.Time, c *gin.Context, role string) (*entity.User, error) {
 	staff, err := ac.IsStaff(t, c)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if staff.Role != role {
-		return apperror.Newf(
+		return nil, apperror.Newf(
 			"expected role '%v', got '%v'",
 			role,
 			staff.Role)
 	}
-	return nil
+	return staff, nil
 }
 
 func (ac *AuthCheck) IsStaff(t time.Time, c *gin.Context) (*entity.User, error) {

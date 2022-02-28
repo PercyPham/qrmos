@@ -37,7 +37,7 @@ func (s *server) createOrder(c *gin.Context) {
 		}
 	}
 
-	createOrderUsecase := order_usecase.NewCreateOrderUsecase(s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo)
+	createOrderUsecase := order_usecase.NewCreateOrderUsecase(s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo, s.storeConfigRepo)
 	order, err := createOrderUsecase.Create(now, body)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase creates order"))
@@ -92,4 +92,153 @@ func (s *server) getOrderAsStaff(c *gin.Context, orderID int) {
 		return
 	}
 	response.Success(c, order)
+}
+
+func (s *server) cancelOrder(c *gin.Context) {
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	if cus, err := s.authCheck.IsCustomer(c); err == nil {
+		s.cancelOrderAsCustomer(c, orderID, cus)
+		return
+	}
+
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.cancelOrderAsStaff(c, orderID)
+		return
+	}
+
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) cancelOrderAsCustomer(c *gin.Context, orderID int, cus *entity.Customer) {
+	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
+	if err := cancelOrderUsecase.CancelByCustomer(orderID, cus.ID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase cancels order as customer"))
+		return
+	}
+	response.Success(c, true)
+}
+
+func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int) {
+	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
+	if err := cancelOrderUsecase.Cancel(orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase cancels order as staff"))
+		return
+	}
+	response.Success(c, true)
+}
+
+func (s *server) markOrderAsReady(c *gin.Context) {
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	progressUsecase := order_usecase.NewProgressUsecase(s.orderRepo)
+	if err := progressUsecase.MarkAsReady(orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as ready"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) markOrderAsDelivered(c *gin.Context) {
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	progressUsecase := order_usecase.NewProgressUsecase(s.orderRepo)
+	if err := progressUsecase.MarkAsDelivered(orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as delivered"))
+		return
+	}
+
+	response.Success(c, true)
+}
+
+func (s *server) changeOrderDeliveryDest(c *gin.Context) {
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	destName := c.Param("destName")
+
+	if cus, err := s.authCheck.IsCustomer(c); err == nil {
+		s.changeOrderDeliveryDestAsCustomer(c, cus.ID, orderID, destName)
+		return
+	}
+
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.changeOrderDeliveryDestAsStaff(c, orderID, destName)
+		return
+	}
+
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) changeOrderDeliveryDestAsCustomer(
+	c *gin.Context,
+	cusID string,
+	orderID int,
+	destName string) {
+	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
+	if err := changeDestUsecase.ChangeDeliveryDestinationByCustomer(cusID, orderID, destName); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
+		return
+	}
+	response.Success(c, true)
+}
+
+func (s *server) changeOrderDeliveryDestAsStaff(
+	c *gin.Context,
+	orderID int,
+	destName string) {
+	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
+	if err := changeDestUsecase.ChangeDeliveryDestination(orderID, destName); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
+		return
+	}
+	response.Success(c, true)
+}
+
+func (s *server) markOrderAsPaidByCash(c *gin.Context) {
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	now := time.Now()
+	if _, err := s.authCheck.IsStaff(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	cashPaymentUsecase := order_usecase.NewCashPaymentUsecase(s.orderRepo, s.storeConfigRepo)
+	if err := cashPaymentUsecase.MarkPaidByCash(now, orderID); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as paid by cash"))
+		return
+	}
+
+	response.Success(c, true)
 }

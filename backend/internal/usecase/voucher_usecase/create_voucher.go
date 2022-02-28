@@ -16,8 +16,9 @@ type CreateVoucherUsecase struct {
 }
 
 type CreateVoucherInput struct {
-	Code     string `json:"code"`
-	Discount int64  `json:"discount"`
+	Code      string `json:"code"`
+	Discount  int64  `json:"discount"`
+	CreatedBy string
 }
 
 func (i *CreateVoucherInput) validate() error {
@@ -26,6 +27,9 @@ func (i *CreateVoucherInput) validate() error {
 	}
 	if i.Discount <= 0 {
 		return apperror.New("discount must be greater than zero")
+	}
+	if i.CreatedBy == "" {
+		return apperror.New("createdBy must be provided")
 	}
 	return nil
 }
@@ -36,14 +40,16 @@ func (u *CreateVoucherUsecase) Create(input *CreateVoucherInput) error {
 			WithCode(http.StatusBadRequest).
 			WithPublicMessage(apperror.RootCause(err).Error())
 	}
+
 	voucher := u.voucherRepo.GetByCode(input.Code)
 	if voucher != nil {
 		return apperror.New("voucher already exists")
 	}
 	voucher = &entity.Voucher{
-		Code:     input.Code,
-		Discount: input.Discount,
-		IsUsed:   false,
+		Code:      input.Code,
+		Discount:  input.Discount,
+		IsUsed:    false,
+		CreatedBy: input.CreatedBy,
 	}
 	if err := u.voucherRepo.Create(voucher); err != nil {
 		return apperror.Wrap(err, "repo creates voucher")

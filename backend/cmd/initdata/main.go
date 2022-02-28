@@ -5,6 +5,7 @@ import (
 	"qrmos/internal/adapter/repoimpl/mysqlrepo"
 	"qrmos/internal/common/config"
 	"qrmos/internal/entity"
+	"qrmos/internal/usecase/store_cfg_usecase"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -32,5 +33,11 @@ func main() {
 
 	if err := userRepo.Create(admin); err != nil {
 		log.Fatal("cannot create admin user: ", err)
+	}
+
+	storeCfgRepo := mysqlrepo.NewStoreConfigRepo(db)
+	openingHoursCfgUsecase := store_cfg_usecase.NewOpeningHoursConfigUsecase(storeCfgRepo)
+	if err := openingHoursCfgUsecase.Init(); err != nil {
+		log.Fatal("cannot initialize opening hours config: ", err)
 	}
 }

@@ -20,11 +20,12 @@ func main() {
 	}
 
 	serverCfg := controller.ServerConfig{
-		UserRepo:     mysqlrepo.NewUserRepo(db),
-		DeliveryRepo: mysqlrepo.NewDeliveryRepo(db),
-		MenuRepo:     mysqlrepo.NewMenuRepo(db),
-		VoucherRepo:  mysqlrepo.NewVoucherRepo(db),
-		OrderRepo:    mysqlrepo.NewOrderRepo(db),
+		UserRepo:        mysqlrepo.NewUserRepo(db),
+		DeliveryRepo:    mysqlrepo.NewDeliveryRepo(db),
+		MenuRepo:        mysqlrepo.NewMenuRepo(db),
+		VoucherRepo:     mysqlrepo.NewVoucherRepo(db),
+		OrderRepo:       mysqlrepo.NewOrderRepo(db),
+		StoreConfigRepo: mysqlrepo.NewStoreConfigRepo(db),
 	}
 	server, err := controller.NewServer(serverCfg)
 	if err != nil {

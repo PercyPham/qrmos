@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"net/http"
 	"qrmos/internal/common/apperror"
 	"time"
 )
@@ -10,7 +11,7 @@ const OrderStateConfirmed = "confirmed"
 const OrderStateReady = "ready"
 const OrderStateDelivered = "delivered"
 const OrderStateFailed = "failed"
-const OrderStateCancelled = "cancelled"
+const OrderStateCanceled = "canceled"
 
 type Order struct {
 	ID                  int           `json:"id"`
@@ -28,10 +29,13 @@ type Order struct {
 	CreatedAt           time.Time     `json:"createdAt"`
 }
 
+const OrderPaymentTypeCash = "cash"
+const OrderPaymentTypeMoMo = "momo"
+
 type OrderPayment struct {
 	Type     string            `json:"type"`
 	Success  bool              `json:"success"`
-	Metadata map[string]string `json:"metadata"`
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 const OrderCreatorTypeStaff = "staff"
@@ -64,4 +68,62 @@ type OrderItem struct {
 
 	/// Options is a map of {optionName : [choice]}
 	Options map[string][]string `json:"options"`
+}
+
+func (order *Order) Cancel() error {
+	if order.State == OrderStateCanceled {
+		return nil
+	}
+	if order.State != OrderStatePending {
+		return apperror.Newf("cannot cancel order with state '%s'", order.State).
+			WithCode(http.StatusForbidden)
+	}
+	order.State = OrderStateCanceled
+	return nil
+}
+
+func (order *Order) MarkAsReady() error {
+	if order.State == OrderStateReady {
+		return nil
+	}
+	if order.State != OrderStateConfirmed {
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateReady).
+			WithCode(http.StatusForbidden)
+	}
+	order.State = OrderStateReady
+	return nil
+}
+
+func (order *Order) MarkAsDelivered() error {
+	if order.State == OrderStateDelivered {
+		return nil
+	}
+	if order.State != OrderStateReady {
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateDelivered).
+			WithCode(http.StatusForbidden)
+	}
+	order.State = OrderStateDelivered
+	return nil
+}
+
+func (order *Order) SetDeliveryDestination(destName string) error {
+	if !(order.State == OrderStatePending || order.State == OrderStateConfirmed) {
+		return apperror.Newf("cannot set new delivery destination when order is in state '%s'", order.State).
+			WithCode(http.StatusForbidden)
+	}
+	order.DeliveryDestination = destName
+	return nil
+}
+
+func (order *Order) MarkPaidByCash() error {
+	if order.State != OrderStatePending {
+		return apperror.Newf("cannot mark '%s' order as paid by cash", order.State)
+	}
+
+	order.Payment = &OrderPayment{
+		Type:    OrderPaymentTypeCash,
+		Success: true,
+	}
+	order.State = OrderStateConfirmed
+	return nil
 }

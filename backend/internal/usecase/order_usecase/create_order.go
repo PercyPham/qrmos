@@ -5,18 +5,26 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
+	"qrmos/internal/usecase/store_cfg_usecase"
 	"time"
 )
 
-func NewCreateOrderUsecase(or repo.Order, mr repo.Menu, dr repo.Delivery, vr repo.Voucher) *CreateOrderUsecase {
-	return &CreateOrderUsecase{or, mr, dr, vr}
+func NewCreateOrderUsecase(
+	or repo.Order,
+	mr repo.Menu,
+	dr repo.Delivery,
+	vr repo.Voucher,
+	scr repo.StoreConfig,
+) *CreateOrderUsecase {
+	return &CreateOrderUsecase{or, mr, dr, vr, scr}
 }
 
 type CreateOrderUsecase struct {
-	orderRepo    repo.Order
-	menuRepo     repo.Menu
-	deliveryRepo repo.Delivery
-	voucherRepo  repo.Voucher
+	orderRepo       repo.Order
+	menuRepo        repo.Menu
+	deliveryRepo    repo.Delivery
+	voucherRepo     repo.Voucher
+	storeConfigRepo repo.StoreConfig
 }
 
 type CreateOrderInput struct {
@@ -100,26 +108,22 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 			WithPublicMessage(err.Error())
 	}
 
-	deliveryDest := u.deliveryRepo.GetByName(input.DeliveryDest)
-	if deliveryDest == nil {
-		return nil, apperror.New("delivery destination not found").
-			WithCode(http.StatusBadRequest)
+	if err := store_cfg_usecase.CheckIsInOpeningHours(t, u.storeConfigRepo); err != nil {
+		return nil, apperror.Wrap(err, "check is in opening hours")
 	}
-	if deliveryDest.SecurityCode != input.DeliveryDestSecurityCode {
-		return nil, apperror.New("invalid delivery destination security code").
-			WithCode(http.StatusBadRequest)
+
+	if err := u.validateDeliveryDest(input.DeliveryDest, input.DeliveryDestSecurityCode); err != nil {
+		return nil, apperror.Wrap(err, "validate delivery destination").WithCode(http.StatusBadRequest)
 	}
 
 	voucher := new(entity.Voucher)
 	if input.Voucher != "" {
 		voucher = u.voucherRepo.GetByCode(input.Voucher)
 		if voucher == nil {
-			return nil, apperror.New("voucher not found").
-				WithCode(http.StatusBadRequest)
+			return nil, apperror.New("voucher not found").WithCode(http.StatusBadRequest)
 		}
 		if voucher.IsUsed {
-			return nil, apperror.New("voucher is used already").
-				WithCode(http.StatusBadRequest)
+			return nil, apperror.New("voucher is used already").WithCode(http.StatusBadRequest)
 		}
 	}
 
@@ -160,6 +164,17 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 	}
 
 	return order, nil
+}
+
+func (u *CreateOrderUsecase) validateDeliveryDest(destName, destSecurityCode string) error {
+	deliveryDest := u.deliveryRepo.GetByName(destName)
+	if deliveryDest == nil {
+		return apperror.New("delivery destination not found")
+	}
+	if deliveryDest.SecurityCode != destSecurityCode {
+		return apperror.New("invalid delivery destination security code")
+	}
+	return nil
 }
 
 func (u *CreateOrderUsecase) getAllMenuItemsFrom(

@@ -11,7 +11,7 @@ import (
 
 func (s *server) createMenuCat(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -34,7 +34,7 @@ func (s *server) createMenuCat(c *gin.Context) {
 
 func (s *server) deleteMenuCat(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -57,7 +57,7 @@ func (s *server) deleteMenuCat(c *gin.Context) {
 
 func (s *server) createMenuItem(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -103,7 +103,7 @@ func (s *server) getMenuItem(c *gin.Context) {
 
 func (s *server) updateMenuItem(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -220,7 +220,7 @@ func (s *server) updateItemOptionChoiceAvail(c *gin.Context) {
 
 func (s *server) deleteMenuItem(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -243,7 +243,7 @@ func (s *server) deleteMenuItem(c *gin.Context) {
 
 func (s *server) createMenuAssociation(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -270,7 +270,7 @@ func (s *server) createMenuAssociation(c *gin.Context) {
 
 func (s *server) deleteMenuAssociation(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}

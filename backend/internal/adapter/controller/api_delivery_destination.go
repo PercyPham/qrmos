@@ -11,7 +11,7 @@ import (
 
 func (s *server) createDeliveryDest(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -33,7 +33,7 @@ func (s *server) createDeliveryDest(c *gin.Context) {
 
 func (s *server) refreshDeliveryDestSecurityCode(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -52,7 +52,7 @@ func (s *server) refreshDeliveryDestSecurityCode(c *gin.Context) {
 
 func (s *server) deleteDeliveryDest(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsManager(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
