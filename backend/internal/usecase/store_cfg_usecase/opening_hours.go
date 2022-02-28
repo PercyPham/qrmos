@@ -6,7 +6,21 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
+	"time"
 )
+
+func CheckIsInOpeningHours(t time.Time, storeCfgRepo repo.StoreConfig) error {
+	openingHoursUsecase := NewOpeningHoursConfigUsecase(storeCfgRepo)
+	openingHours, err := openingHoursUsecase.Get()
+	if err != nil {
+		return apperror.Wrap(err, "usecase gets opening hours config")
+	}
+	if !openingHours.IsInOpeningHours(t) {
+		return apperror.New("not in opening hours").WithCode(http.StatusForbidden)
+	}
+
+	return nil
+}
 
 func NewOpeningHoursConfigUsecase(scr repo.StoreConfig) *OpeningHoursCfgUsecase {
 	return &OpeningHoursCfgUsecase{scr}

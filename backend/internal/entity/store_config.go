@@ -34,8 +34,8 @@ type StoreConfigOpeningHours struct {
 }
 
 func (c *StoreConfigOpeningHours) IsInOpeningHours(t time.Time) bool {
-	if c.IsManual && c.IsManualOpen {
-		return true
+	if c.IsManual {
+		return c.IsManualOpen
 	}
 
 	t = t.In(config.App().TimeLocation)

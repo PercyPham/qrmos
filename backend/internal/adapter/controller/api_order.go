@@ -37,7 +37,7 @@ func (s *server) createOrder(c *gin.Context) {
 		}
 	}
 
-	createOrderUsecase := order_usecase.NewCreateOrderUsecase(s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo)
+	createOrderUsecase := order_usecase.NewCreateOrderUsecase(s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo, s.storeConfigRepo)
 	order, err := createOrderUsecase.Create(now, body)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase creates order"))
@@ -234,7 +234,7 @@ func (s *server) markOrderAsPaidByCash(c *gin.Context) {
 		return
 	}
 
-	cashPaymentUsecase := order_usecase.NewCashPaymentUsecase(s.orderRepo)
+	cashPaymentUsecase := order_usecase.NewCashPaymentUsecase(s.orderRepo, s.storeConfigRepo)
 	if err := cashPaymentUsecase.MarkPaidByCash(now, orderID); err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase marks order as paid by cash"))
 		return
