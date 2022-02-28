@@ -3,6 +3,7 @@ package entity
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/common/config"
 	"time"
 )
 
@@ -126,4 +127,24 @@ func (order *Order) MarkPaidByCash() error {
 	}
 	order.State = OrderStateConfirmed
 	return nil
+}
+
+func CheckIfOrderUpdatableAt(t time.Time, order *Order, openingHours *StoreConfigOpeningHours) error {
+	if !isInSameDate(t, order.CreatedAt) {
+		return apperror.New("not in same creation date")
+	}
+	if !openingHours.IsInOpeningHours(t) {
+		return apperror.New("not in opening hours")
+	}
+	return nil
+}
+
+func isInSameDate(t1, t2 time.Time) bool {
+	tl := config.App().TimeLocation
+	t1 = t1.In(tl)
+	t2 = t2.In(tl)
+	if t1.Year() != t2.Year() || t1.Month() != t2.Month() || t1.Day() != t2.Day() {
+		return false
+	}
+	return true
 }

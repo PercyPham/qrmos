@@ -3,7 +3,6 @@ package order_usecase
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
-	"qrmos/internal/common/config"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
 	"qrmos/internal/usecase/store_cfg_usecase"
@@ -25,8 +24,8 @@ func (u *CashPaymentUsecase) MarkPaidByCash(t time.Time, orderID int) error {
 		return apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
-	if err := u.validateTime(t, order); err != nil {
-		return apperror.Wrap(err, "validate time")
+	if err := u.validatePaymentTime(t, order); err != nil {
+		return apperror.Wrap(err, "validate payment time")
 	}
 
 	if err := order.MarkPaidByCash(); err != nil {
@@ -40,22 +39,13 @@ func (u *CashPaymentUsecase) MarkPaidByCash(t time.Time, orderID int) error {
 	return nil
 }
 
-func (u *CashPaymentUsecase) validateTime(t time.Time, order *entity.Order) error {
-	if !isInSameDate(t, order.CreatedAt) {
-		return apperror.New("not in the same creation date").WithCode(http.StatusForbidden)
+func (u *CashPaymentUsecase) validatePaymentTime(t time.Time, order *entity.Order) error {
+	openingHours, err := store_cfg_usecase.GetOpeningHoursCfg(u.storeConfigRepo)
+	if err != nil {
+		return apperror.Wrap(err, "repo gets store opening hours config")
 	}
-	if err := store_cfg_usecase.CheckIsInOpeningHours(t, u.storeConfigRepo); err != nil {
-		return apperror.Wrap(err, "check is in opening hours")
+	if err := entity.CheckIfOrderUpdatableAt(t, order, openingHours); err != nil {
+		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusBadRequest)
 	}
 	return nil
-}
-
-func isInSameDate(t1, t2 time.Time) bool {
-	tl := config.App().TimeLocation
-	t1 = t1.In(tl)
-	t2 = t2.In(tl)
-	if t1.Year() != t2.Year() || t1.Month() != t2.Month() || t1.Day() != t2.Day() {
-		return false
-	}
-	return true
 }
