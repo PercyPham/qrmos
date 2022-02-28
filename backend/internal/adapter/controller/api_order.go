@@ -242,3 +242,32 @@ func (s *server) markOrderAsPaidByCash(c *gin.Context) {
 
 	response.Success(c, true)
 }
+
+func (s *server) markOrderAsFailed(c *gin.Context) {
+	orderID, err := getIntParam(c, "orderID")
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+
+	now := time.Now()
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	body := new(order_usecase.FailOrderInput)
+	if err := c.ShouldBindJSON(body); err != nil {
+		response.Error(c, newBindJsonReqBodyError(err))
+		return
+	}
+	body.OrderID = orderID
+
+	failOrderUsecase := order_usecase.NewFailOrderUsecase(s.orderRepo)
+	if err := failOrderUsecase.MarkAsFailed(now, body); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as failed"))
+		return
+	}
+
+	response.Success(c, true)
+}

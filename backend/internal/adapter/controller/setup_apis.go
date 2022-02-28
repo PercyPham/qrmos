@@ -44,6 +44,7 @@ func (s *server) setupAPIs() {
 	api.PATCH("/orders/:orderID/delivered", s.markOrderAsDelivered)
 	api.PATCH("/orders/:orderID/delivery-destination/:destName", s.changeOrderDeliveryDest)
 	api.PATCH("/orders/:orderID/payment/cash", s.markOrderAsPaidByCash)
+	api.PATCH("/orders/:orderID/failed", s.markOrderAsFailed)
 
 	api.GET("/store-configs/opening-hours", s.getStoreOpeningHoursConfig)
 	api.PUT("/store-configs/opening-hours", s.updateStoreOpeningHoursConfig)

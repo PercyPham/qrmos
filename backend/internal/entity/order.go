@@ -36,6 +36,7 @@ const OrderPaymentTypeMoMo = "momo"
 type OrderPayment struct {
 	Type     string            `json:"type"`
 	Success  bool              `json:"success"`
+	Refund   bool              `json:"refund,omitempty"`
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
@@ -120,12 +121,26 @@ func (order *Order) MarkPaidByCash() error {
 	if order.State != OrderStatePending {
 		return apperror.Newf("cannot mark '%s' order as paid by cash", order.State)
 	}
-
 	order.Payment = &OrderPayment{
 		Type:    OrderPaymentTypeCash,
 		Success: true,
 	}
 	order.State = OrderStateConfirmed
+	return nil
+}
+
+func (order *Order) MarkAsFailed(failReason string) error {
+	if failReason == "" {
+		return apperror.New("fail reason must be provided")
+	}
+	if !(order.State == OrderStateConfirmed ||
+		order.State == OrderStateReady ||
+		order.State == OrderStateDelivered) {
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateFailed)
+	}
+	order.State = OrderStateFailed
+	order.FailReason = failReason
+	order.Payment.Refund = true
 	return nil
 }
 
