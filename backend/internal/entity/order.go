@@ -34,10 +34,15 @@ const OrderPaymentTypeCash = "cash"
 const OrderPaymentTypeMoMo = "momo"
 
 type OrderPayment struct {
-	Type     string            `json:"type"`
-	Success  bool              `json:"success"`
-	Refund   bool              `json:"refund,omitempty"`
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Type        string            `json:"type"`
+	Success     bool              `json:"success"`
+	Refund      bool              `json:"refund,omitempty"`
+	MoMoPayment *OrderMoMoPayment `json:"momoPayment,omitempty"`
+}
+
+type OrderMoMoPayment struct {
+	PaymentLink          string    `json:"paymentLink,omitempty"`
+	PaymentLinkCreatedAt time.Time `json:"paymentLinkCreatedAt,omitempty"`
 }
 
 const OrderCreatorTypeStaff = "staff"
@@ -162,4 +167,16 @@ func isInSameDate(t1, t2 time.Time) bool {
 		return false
 	}
 	return true
+}
+
+// GetCachedMoMoPaymentLink returns cached payment link if the link is
+// created in less than 5 minutes input time (now).
+func (order *Order) GetCachedMoMoPaymentLink(t time.Time) string {
+	if order.Payment == nil ||
+		order.Payment.Type != OrderPaymentTypeMoMo ||
+		order.Payment.MoMoPayment == nil ||
+		order.Payment.MoMoPayment.PaymentLinkCreatedAt.Add(5*time.Minute).Before(t) {
+		return ""
+	}
+	return order.Payment.MoMoPayment.PaymentLink
 }
