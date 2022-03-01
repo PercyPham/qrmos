@@ -28,7 +28,7 @@ func (u *CashPaymentUsecase) MarkPaidByCash(t time.Time, orderID int) error {
 		return apperror.Wrap(err, "validate payment time")
 	}
 
-	if err := order.MarkPaidByCash(); err != nil {
+	if err := order.MarkPaidByCash(t); err != nil {
 		return apperror.Wrap(err, "mark order as paid by cash")
 	}
 
