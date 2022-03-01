@@ -16,6 +16,7 @@ import (
 )
 
 type ServerConfig struct {
+	DBRepo          repo.DB
 	UserRepo        repo.User
 	DeliveryRepo    repo.Delivery
 	MenuRepo        repo.Menu
@@ -25,6 +26,9 @@ type ServerConfig struct {
 }
 
 func (cfg *ServerConfig) validate() error {
+	if cfg.DBRepo == nil {
+		return apperror.New("db repo must be provided")
+	}
 	if cfg.UserRepo == nil {
 		return apperror.New("user repo must be provided")
 	}
@@ -57,6 +61,7 @@ func NewServer(cfg ServerConfig) (*server, error) {
 
 	return &server{
 		r:               gin.Default(),
+		dbRepo:          cfg.DBRepo,
 		userRepo:        cfg.UserRepo,
 		deliveryRepo:    cfg.DeliveryRepo,
 		menuRepo:        cfg.MenuRepo,
@@ -70,6 +75,7 @@ func NewServer(cfg ServerConfig) (*server, error) {
 type server struct {
 	r *gin.Engine
 
+	dbRepo          repo.DB
 	userRepo        repo.User
 	deliveryRepo    repo.Delivery
 	menuRepo        repo.Menu

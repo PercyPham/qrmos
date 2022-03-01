@@ -20,6 +20,7 @@ func main() {
 	}
 
 	serverCfg := controller.ServerConfig{
+		DBRepo:          mysqlrepo.NewDBRepo(db),
 		UserRepo:        mysqlrepo.NewUserRepo(db),
 		DeliveryRepo:    mysqlrepo.NewDeliveryRepo(db),
 		MenuRepo:        mysqlrepo.NewMenuRepo(db),
