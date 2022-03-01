@@ -44,6 +44,7 @@ type OrderPayment struct {
 
 type OrderMoMoPayment struct {
 	RequestID            string     `json:"requestID,omitempty"`
+	TransID              int64      `json:"transID,omitempty"`
 	PaymentLink          string     `json:"paymentLink,omitempty"`
 	PaymentLinkCreatedAt *time.Time `json:"paymentLinkCreatedAt,omitempty"`
 }
@@ -138,7 +139,7 @@ func (order *Order) MarkPaidByCash(t time.Time) error {
 	return nil
 }
 
-func (order *Order) MarkPaidByMoMo(t time.Time, momoPaymentReqId string) error {
+func (order *Order) MarkPaidByMoMo(t time.Time, momoPaymentReqId string, momoPaymentTransID int64) error {
 	if order.State != OrderStatePending {
 		return apperror.Newf("cannot mark '%s' order as paid by momo", order.State)
 	}
@@ -149,12 +150,13 @@ func (order *Order) MarkPaidByMoMo(t time.Time, momoPaymentReqId string) error {
 		SuccessAt: &t,
 		MoMoPayment: &OrderMoMoPayment{
 			RequestID: momoPaymentReqId,
+			TransID:   momoPaymentTransID,
 		},
 	}
 	return nil
 }
 
-func (order *Order) MarkAsFailed(failReason string) error {
+func (order *Order) MarkAsFailed(t time.Time, failReason string) error {
 	if failReason == "" {
 		return apperror.New("fail reason must be provided")
 	}
@@ -165,7 +167,6 @@ func (order *Order) MarkAsFailed(failReason string) error {
 	}
 	order.State = OrderStateFailed
 	order.FailReason = failReason
-	order.Payment.Refund = true
 	return nil
 }
 

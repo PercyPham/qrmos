@@ -39,7 +39,7 @@ func (u *MoMoPaymentCallbackUsecase) HandleCallback(t time.Time, data *momo.Paym
 		return apperror.Newf("unexpected payment for '%s' order '%d' with momo payment request id '%s'", order.State, order.ID, data.RequestID)
 	}
 
-	if err := order.MarkPaidByMoMo(t, data.RequestID); err != nil {
+	if err := order.MarkPaidByMoMo(t, data.RequestID, data.TransID); err != nil {
 		return apperror.Wrap(err, "mark order as paid by momo")
 	}
 	if err := u.orderRepo.Update(order); err != nil {

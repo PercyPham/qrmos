@@ -3,6 +3,8 @@ package order_usecase
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/entity"
+	"qrmos/internal/usecase/order_usecase/momo"
 	"qrmos/internal/usecase/repo"
 	"time"
 )
@@ -37,13 +39,26 @@ func (u *FailOrderUsecase) MarkAsFailed(t time.Time, input *FailOrderInput) erro
 		return apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
-	if err := order.MarkAsFailed(input.FailReason); err != nil {
+	if err := order.MarkAsFailed(t, input.FailReason); err != nil {
 		return apperror.Wrap(err, "mark order as failed")
 	}
+
+	// TODO: MoMo refund is now Access Denied, ask MoMo for help
+	if order.Payment.Type == entity.OrderPaymentTypeMoMo {
+		if err := u.refundOrderViaMoMo(order, input.FailReason); err != nil {
+			return apperror.Wrap(err, "refund order via momo")
+		}
+	}
+	order.Payment.Refund = true
+	order.Payment.RefundAt = &t
 
 	if err := u.orderRepo.Update(order); err != nil {
 		return apperror.Wrap(err, "repo updates order")
 	}
 
 	return nil
+}
+
+func (u *FailOrderUsecase) refundOrderViaMoMo(order *entity.Order, failReason string) error {
+	return momo.Refund(order.Payment.MoMoPayment.RequestID, failReason, order.Total, order.Payment.MoMoPayment.TransID)
 }
