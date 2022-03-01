@@ -42,7 +42,7 @@ func (u *CashPaymentUsecase) MarkPaidByCash(t time.Time, orderID int) error {
 func (u *CashPaymentUsecase) validatePaymentTime(t time.Time, order *entity.Order) error {
 	openingHours, err := store_cfg_usecase.GetOpeningHoursCfg(u.storeConfigRepo)
 	if err != nil {
-		return apperror.Wrap(err, "repo gets store opening hours config")
+		return apperror.Wrap(err, "usecase gets store opening hours config")
 	}
 	if err := entity.CheckIfOrderUpdatableAt(t, order, openingHours); err != nil {
 		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusBadRequest)

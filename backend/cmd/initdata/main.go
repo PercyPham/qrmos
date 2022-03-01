@@ -18,7 +18,7 @@ func main() {
 
 	db, err := mysqlrepo.Connect()
 	if err != nil {
-		panic(err)
+		log.Fatal("cannot connect mysql db: ", err)
 	}
 
 	userRepo := mysqlrepo.NewUserRepo(db)
