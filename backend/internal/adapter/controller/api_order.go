@@ -221,7 +221,7 @@ func (s *server) changeOrderDeliveryDestAsStaff(
 	response.Success(c, true)
 }
 
-func (s *server) markOrderAsPaidByCash(c *gin.Context) {
+func (s *server) markOrderAsFailed(c *gin.Context) {
 	orderID, err := getIntParam(c, "orderID")
 	if err != nil {
 		response.Error(c, err)
@@ -229,14 +229,21 @@ func (s *server) markOrderAsPaidByCash(c *gin.Context) {
 	}
 
 	now := time.Now()
-	if _, err := s.authCheck.IsStaff(now, c); err != nil {
+	if _, err := s.authCheck.IsManager(now, c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
 
-	cashPaymentUsecase := order_usecase.NewCashPaymentUsecase(s.orderRepo, s.storeConfigRepo)
-	if err := cashPaymentUsecase.MarkPaidByCash(now, orderID); err != nil {
-		response.Error(c, apperror.Wrap(err, "usecase marks order as paid by cash"))
+	body := new(order_usecase.FailOrderInput)
+	if err := c.ShouldBindJSON(body); err != nil {
+		response.Error(c, newBindJsonReqBodyError(err))
+		return
+	}
+	body.OrderID = orderID
+
+	failOrderUsecase := order_usecase.NewFailOrderUsecase(s.orderRepo)
+	if err := failOrderUsecase.MarkAsFailed(now, body); err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase marks order as failed"))
 		return
 	}
 

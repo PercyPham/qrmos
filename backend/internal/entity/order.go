@@ -3,6 +3,7 @@ package entity
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/common/config"
 	"time"
 )
 
@@ -33,9 +34,15 @@ const OrderPaymentTypeCash = "cash"
 const OrderPaymentTypeMoMo = "momo"
 
 type OrderPayment struct {
-	Type     string            `json:"type"`
-	Success  bool              `json:"success"`
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Type        string            `json:"type"`
+	Success     bool              `json:"success"`
+	Refund      bool              `json:"refund,omitempty"`
+	MoMoPayment *OrderMoMoPayment `json:"momoPayment,omitempty"`
+}
+
+type OrderMoMoPayment struct {
+	PaymentLink          string    `json:"paymentLink,omitempty"`
+	PaymentLinkCreatedAt time.Time `json:"paymentLinkCreatedAt,omitempty"`
 }
 
 const OrderCreatorTypeStaff = "staff"
@@ -119,11 +126,57 @@ func (order *Order) MarkPaidByCash() error {
 	if order.State != OrderStatePending {
 		return apperror.Newf("cannot mark '%s' order as paid by cash", order.State)
 	}
-
 	order.Payment = &OrderPayment{
 		Type:    OrderPaymentTypeCash,
 		Success: true,
 	}
 	order.State = OrderStateConfirmed
 	return nil
+}
+
+func (order *Order) MarkAsFailed(failReason string) error {
+	if failReason == "" {
+		return apperror.New("fail reason must be provided")
+	}
+	if !(order.State == OrderStateConfirmed ||
+		order.State == OrderStateReady ||
+		order.State == OrderStateDelivered) {
+		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateFailed)
+	}
+	order.State = OrderStateFailed
+	order.FailReason = failReason
+	order.Payment.Refund = true
+	return nil
+}
+
+func CheckIfOrderUpdatableAt(t time.Time, order *Order, openingHours *StoreConfigOpeningHours) error {
+	if !isInSameDate(t, order.CreatedAt) {
+		return apperror.New("not in same creation date")
+	}
+	if !openingHours.IsInOpeningHours(t) {
+		return apperror.New("not in opening hours")
+	}
+	return nil
+}
+
+func isInSameDate(t1, t2 time.Time) bool {
+	tl := config.App().TimeLocation
+	t1 = t1.In(tl)
+	t2 = t2.In(tl)
+	if t1.Year() != t2.Year() || t1.Month() != t2.Month() || t1.Day() != t2.Day() {
+		return false
+	}
+	return true
+}
+
+// GetCachedMoMoPaymentLink returns cached payment link if the link is
+// created in less than 5 minutes input time (now).
+func (order *Order) GetCachedMoMoPaymentLink(t time.Time) string {
+	if order.Payment == nil ||
+		order.Payment.Type != OrderPaymentTypeMoMo ||
+		order.Payment.MoMoPayment == nil ||
+		order.Payment.MoMoPayment.PaymentLinkCreatedAt.Add(5*time.Minute).Before(t) {
+		return ""
+	}
+	return order.Payment.MoMoPayment.PaymentLink
 }

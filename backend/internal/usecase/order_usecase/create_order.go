@@ -108,8 +108,8 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 			WithPublicMessage(err.Error())
 	}
 
-	if err := store_cfg_usecase.CheckIsInOpeningHours(t, u.storeConfigRepo); err != nil {
-		return nil, apperror.Wrap(err, "check is in opening hours")
+	if err := u.validateCreationTime(t); err != nil {
+		return nil, apperror.Wrap(err, "validate creation time")
 	}
 
 	if err := u.validateDeliveryDest(input.DeliveryDest, input.DeliveryDestSecurityCode); err != nil {
@@ -164,6 +164,17 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 	}
 
 	return order, nil
+}
+
+func (u *CreateOrderUsecase) validateCreationTime(t time.Time) error {
+	openingHours, err := store_cfg_usecase.GetOpeningHoursCfg(u.storeConfigRepo)
+	if err != nil {
+		return apperror.Wrap(err, "repo get store opening hours config")
+	}
+	if !openingHours.IsInOpeningHours(t) {
+		return apperror.Wrap(err, "not in opening hours").WithCode(http.StatusBadRequest)
+	}
+	return nil
 }
 
 func (u *CreateOrderUsecase) validateDeliveryDest(destName, destSecurityCode string) error {

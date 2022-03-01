@@ -29,14 +29,21 @@ func loadAppConfig() {
 		Secret:  getENV("APP_SECRET"),
 	}
 
+	if !(app.ENV == "dev" || app.ENV == "staging" || app.ENV == "prod") {
+		panic(fmt.Sprintf("Expected env with key 'APP_ENV' to be 'dev' or 'staging' or 'prod', found '%v'", app.ENV))
+	}
+
+	if app.Domains == nil || len(app.Domains) == 0 {
+		if app.ENV == "prod" {
+			panic("APP_DOMAINS env variable must be set")
+		}
+		app.Domains = []string{"localhost"}
+	}
+
 	appTimeLocation := getENV("APP_TIME_LOCATION")
 	timeLocation, err := time.LoadLocation(appTimeLocation)
 	if err != nil {
 		panic(fmt.Sprintf("Expected valid APP_TIME_LOCATION, got '%s'\nReference: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones", appTimeLocation))
 	}
 	app.TimeLocation = timeLocation
-
-	if !(app.ENV == "dev" || app.ENV == "staging" || app.ENV == "prod") {
-		panic(fmt.Sprintf("Expected env with key 'APP_ENV' to be 'dev' or 'staging' or 'prod', found '%v'", app.ENV))
-	}
 }

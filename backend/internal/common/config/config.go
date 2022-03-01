@@ -13,6 +13,7 @@ import (
 func Load() {
 	loadAppConfig()
 	loadMySQLConfig()
+	loadMoMoConfig()
 
 	hasConfigLoaded = true
 }
