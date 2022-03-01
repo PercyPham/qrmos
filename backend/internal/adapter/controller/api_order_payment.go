@@ -1,15 +1,12 @@
 package controller
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/order_usecase"
 	"qrmos/internal/usecase/order_usecase/momo"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -86,7 +83,7 @@ func (s *server) handleMoMoIpnCallback(c *gin.Context) {
 		return
 	}
 	momoPaymentCallbackUsecase := order_usecase.NewMoMoPaymentCallbackUsecase(s.orderRepo)
-	if err := momoPaymentCallbackUsecase.HandleIpnCallback(time.Now(), body); err != nil {
+	if err := momoPaymentCallbackUsecase.HandleCallback(time.Now(), body); err != nil {
 		// TODO: special log for MoMo related apis
 		response.Error(c, apperror.Wrap(err, "usecase handle momo ipn callback"))
 		return
@@ -95,29 +92,41 @@ func (s *server) handleMoMoIpnCallback(c *gin.Context) {
 }
 
 func (s *server) handleMoMoPaymentCallback(c *gin.Context) {
-	printReqInfo(c, "handleMoMoPaymentCallback")
+	data := getMoMoPaymentCallbackFromQueries(c)
+	momoPaymentCallbackUsecase := order_usecase.NewMoMoPaymentCallbackUsecase(s.orderRepo)
+	if err := momoPaymentCallbackUsecase.HandleCallback(time.Now(), data); err != nil {
+		// TODO: special log for MoMo related apis
+		response.Error(c, apperror.Wrap(err, "usecase handle momo website callback"))
+		return
+	}
+	// TODO: redirect to Order Success page on front-end
 	response.Success(c, true)
 }
 
-// TODO: this one is for testing MoMo callback. Should be deleted later.
-func printReqInfo(c *gin.Context, handlerName string) {
-	m := map[string]interface{}{}
-
-	m["requestor"] = c.Request.RemoteAddr
-	m["method"] = c.Request.Method
-	m["host"] = c.Request.URL.Host
-	m["rawPath"] = c.Request.URL.RawPath
-	m["path"] = c.Request.URL.Path
-	m["queries"] = c.Request.URL.Query()
-	if c.Request.Method == http.MethodPost {
-		bodyAsByteArray, _ := ioutil.ReadAll(c.Request.Body)
-		jsonMapBody := map[string]interface{}{}
-		_ = json.Unmarshal(bodyAsByteArray, &jsonMapBody)
-		m["body"] = jsonMapBody
+func getMoMoPaymentCallbackFromQueries(c *gin.Context) *momo.PaymentCallbackData {
+	data := &momo.PaymentCallbackData{
+		Amount:       getQueryInt64(c, "amount"),
+		ExtraData:    c.Query("extraData"),
+		Message:      c.Query("message"),
+		OrderID:      c.Query("orderId"),
+		OrderInfo:    c.Query("orderInfo"),
+		OrderType:    c.Query("orderType"),
+		PartnerCode:  c.Query("partnerCode"),
+		PayType:      c.Query("payType"),
+		RequestID:    c.Query("requestId"),
+		ResponseTime: getQueryInt64(c, "responseTime"),
+		ResultCode:   getQueryInt64(c, "resultCode"),
+		Signature:    c.Query("signature"),
+		TransID:      getQueryInt64(c, "transId"),
 	}
+	return data
+}
 
-	jsonResult, _ := json.Marshal(m)
-	fmt.Println(">>>>>>>")
-	fmt.Println(string(jsonResult))
-	fmt.Println(">>>>>>>")
+func getQueryInt64(c *gin.Context, name string) int64 {
+	val := c.Query(name)
+	if val == "" {
+		return 0
+	}
+	num, _ := strconv.ParseInt(val, 10, 64)
+	return num
 }

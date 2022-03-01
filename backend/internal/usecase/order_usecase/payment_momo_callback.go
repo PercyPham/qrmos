@@ -16,7 +16,7 @@ type MoMoPaymentCallbackUsecase struct {
 	orderRepo repo.Order
 }
 
-func (u *MoMoPaymentCallbackUsecase) HandleIpnCallback(t time.Time, data *momo.PaymentCallbackData) error {
+func (u *MoMoPaymentCallbackUsecase) HandleCallback(t time.Time, data *momo.PaymentCallbackData) error {
 	if err := data.Verify(); err != nil {
 		return apperror.Wrap(err, "verify momo ipn callback data")
 	}

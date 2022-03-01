@@ -33,12 +33,6 @@ func CreatePaymentLink(orderID int, amount int64) (string, error) {
 	var result map[string]interface{}
 	json.NewDecoder(resp.Body).Decode(&result)
 
-	// TODO: this is for dev, delete these later
-	if config.App().ENV == "dev" {
-		jsonResult, _ := json.Marshal(result)
-		fmt.Println("Response from Momo: ", string(jsonResult))
-	}
-
 	resultCode, ok := result["resultCode"]
 	if !ok {
 		return "", apperror.New("cannot retrieve resultCode")
