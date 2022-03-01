@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
-	"qrmos/internal/usecase/order_usecase/internal/momo"
+	"qrmos/internal/usecase/order_usecase/momo"
 	"qrmos/internal/usecase/repo"
 	"qrmos/internal/usecase/store_cfg_usecase"
 	"time"
@@ -66,7 +66,7 @@ func (u *MoMoPaymentUsecase) createPaymentLink(t time.Time, order *entity.Order)
 		Type: entity.OrderPaymentTypeMoMo,
 		MoMoPayment: &entity.OrderMoMoPayment{
 			PaymentLink:          paymentLink,
-			PaymentLinkCreatedAt: t,
+			PaymentLinkCreatedAt: &t,
 		},
 	}
 	_ = u.orderRepo.Update(order)

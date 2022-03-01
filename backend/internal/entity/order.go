@@ -36,13 +36,16 @@ const OrderPaymentTypeMoMo = "momo"
 type OrderPayment struct {
 	Type        string            `json:"type"`
 	Success     bool              `json:"success"`
+	SuccessAt   *time.Time        `json:"successAt,omitempty"`
 	Refund      bool              `json:"refund,omitempty"`
+	RefundAt    *time.Time        `json:"refundAt,omitempty"`
 	MoMoPayment *OrderMoMoPayment `json:"momoPayment,omitempty"`
 }
 
 type OrderMoMoPayment struct {
-	PaymentLink          string    `json:"paymentLink,omitempty"`
-	PaymentLinkCreatedAt time.Time `json:"paymentLinkCreatedAt,omitempty"`
+	RequestID            string     `json:"requestID,omitempty"`
+	PaymentLink          string     `json:"paymentLink,omitempty"`
+	PaymentLinkCreatedAt *time.Time `json:"paymentLinkCreatedAt,omitempty"`
 }
 
 const OrderCreatorTypeStaff = "staff"
@@ -122,15 +125,32 @@ func (order *Order) SetDeliveryDestination(destName string) error {
 	return nil
 }
 
-func (order *Order) MarkPaidByCash() error {
+func (order *Order) MarkPaidByCash(t time.Time) error {
 	if order.State != OrderStatePending {
 		return apperror.Newf("cannot mark '%s' order as paid by cash", order.State)
 	}
+	order.State = OrderStateConfirmed
 	order.Payment = &OrderPayment{
-		Type:    OrderPaymentTypeCash,
-		Success: true,
+		Type:      OrderPaymentTypeCash,
+		Success:   true,
+		SuccessAt: &t,
+	}
+	return nil
+}
+
+func (order *Order) MarkPaidByMoMo(t time.Time, momoPaymentReqId string) error {
+	if order.State != OrderStatePending {
+		return apperror.Newf("cannot mark '%s' order as paid by momo", order.State)
 	}
 	order.State = OrderStateConfirmed
+	order.Payment = &OrderPayment{
+		Type:      OrderPaymentTypeMoMo,
+		Success:   true,
+		SuccessAt: &t,
+		MoMoPayment: &OrderMoMoPayment{
+			RequestID: momoPaymentReqId,
+		},
+	}
 	return nil
 }
 

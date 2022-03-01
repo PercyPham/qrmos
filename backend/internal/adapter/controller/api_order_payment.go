@@ -9,6 +9,7 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/order_usecase"
+	"qrmos/internal/usecase/order_usecase/momo"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -78,7 +79,18 @@ func (s *server) createMoMoPaymentLinkAsStaff(t time.Time, c *gin.Context, order
 }
 
 func (s *server) handleMoMoIpnCallback(c *gin.Context) {
-	printReqInfo(c, "handleMoMoIpnCallback")
+	body := new(momo.PaymentCallbackData)
+	if err := c.ShouldBindJSON(body); err != nil {
+		// TODO: special log for MoMo related apis
+		response.Error(c, newBindJsonReqBodyError(err))
+		return
+	}
+	momoPaymentCallbackUsecase := order_usecase.NewMoMoPaymentCallbackUsecase(s.orderRepo)
+	if err := momoPaymentCallbackUsecase.HandleIpnCallback(time.Now(), body); err != nil {
+		// TODO: special log for MoMo related apis
+		response.Error(c, apperror.Wrap(err, "usecase handle momo ipn callback"))
+		return
+	}
 	response.Success(c, true)
 }
 
