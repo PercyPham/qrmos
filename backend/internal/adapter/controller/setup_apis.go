@@ -39,6 +39,7 @@ func (s *server) setupAPIs() {
 
 	api.POST("/orders", s.createOrder)
 	api.GET("/orders/:orderID", s.getOrder)
+	api.GET("/orders/:orderID/logs", s.getOrderLogs)
 	api.PATCH("/orders/:orderID/cancel", s.cancelOrder)
 	api.PATCH("/orders/:orderID/ready", s.markOrderAsReady)
 	api.PATCH("/orders/:orderID/delivered", s.markOrderAsDelivered)
