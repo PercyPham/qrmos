@@ -26,6 +26,7 @@ func main() {
 		MenuRepo:        mysqlrepo.NewMenuRepo(db),
 		VoucherRepo:     mysqlrepo.NewVoucherRepo(db),
 		OrderRepo:       mysqlrepo.NewOrderRepo(db),
+		OrderLogRepo:    mysqlrepo.NewOrderLogRepo(db),
 		StoreConfigRepo: mysqlrepo.NewStoreConfigRepo(db),
 	}
 	server, err := controller.NewServer(serverCfg)

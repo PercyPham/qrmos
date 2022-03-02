@@ -1,9 +1,11 @@
 package controller
 
 import (
+	"fmt"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
+	"qrmos/internal/usecase/order_log_usecase"
 	"qrmos/internal/usecase/order_usecase"
 	"time"
 
@@ -12,10 +14,6 @@ import (
 
 func (s *server) createOrder(c *gin.Context) {
 	now := time.Now()
-	if err := s.authCheck.IsAuthenticated(now, c); err != nil {
-		response.Error(c, newUnauthorizedError(err))
-		return
-	}
 
 	body := new(order_usecase.CreateOrderInput)
 	if err := c.ShouldBindJSON(body); err != nil {
@@ -24,25 +22,52 @@ func (s *server) createOrder(c *gin.Context) {
 	}
 
 	if cus, err := s.authCheck.IsCustomer(c); err == nil {
-		body.CustomerName = cus.FullName
-		body.CustomerPhone = cus.PhoneNumber
-		body.Creator = &entity.OrderCreator{
-			Type:       entity.OrderCreatorTypeCustomer,
-			CustomerID: cus.ID,
-		}
+		s.createOrderAsCustomer(c, now, body, cus)
+		return
 	} else if staff, err := s.authCheck.IsStaff(now, c); err == nil {
-		body.Creator = &entity.OrderCreator{
-			Type:          entity.OrderCreatorTypeStaff,
-			StaffUsername: staff.Username,
-		}
+		s.createOrderAsStaff(c, now, body, staff)
+		return
 	}
 
-	createOrderUsecase := order_usecase.NewCreateOrderUsecase(s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo, s.storeConfigRepo)
-	order, err := createOrderUsecase.Create(now, body)
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) createOrderAsCustomer(c *gin.Context, t time.Time, input *order_usecase.CreateOrderInput, cus *entity.Customer) {
+	input.CustomerName = cus.FullName
+	input.CustomerPhone = cus.PhoneNumber
+	input.Creator = &entity.OrderCreator{
+		Type:       entity.OrderCreatorTypeCustomer,
+		CustomerID: cus.ID,
+	}
+
+	createOrderUsecase := order_usecase.NewCreateOrderUsecase(
+		s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo, s.storeConfigRepo)
+	order, err := createOrderUsecase.Create(t, input)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase creates order"))
 		return
 	}
+
+	s.logOrderActionByCus(t, order.ID, entity.OrderActionTypeCreate, cus)
+
+	response.Success(c, order)
+}
+
+func (s *server) createOrderAsStaff(c *gin.Context, t time.Time, input *order_usecase.CreateOrderInput, staff *entity.User) {
+	input.Creator = &entity.OrderCreator{
+		Type:          entity.OrderCreatorTypeStaff,
+		StaffUsername: staff.Username,
+	}
+
+	createOrderUsecase := order_usecase.NewCreateOrderUsecase(
+		s.orderRepo, s.menuRepo, s.deliveryRepo, s.voucherRepo, s.storeConfigRepo)
+	order, err := createOrderUsecase.Create(t, input)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase creates order"))
+		return
+	}
+
+	s.logOrderActionByStaff(t, order.ID, entity.OrderActionTypeCreate, staff)
 
 	response.Success(c, order)
 }
@@ -106,8 +131,8 @@ func (s *server) cancelOrder(c *gin.Context) {
 		return
 	}
 
-	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
-		s.cancelOrderAsStaff(c, orderID)
+	if staff, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.cancelOrderAsStaff(c, orderID, staff)
 		return
 	}
 
@@ -120,20 +145,25 @@ func (s *server) cancelOrderAsCustomer(c *gin.Context, orderID int, cus *entity.
 		response.Error(c, apperror.Wrap(err, "usecase cancels order as customer"))
 		return
 	}
+	s.logOrderActionByCus(time.Now(), orderID, entity.OrderActionTypeCancel, cus)
 	response.Success(c, true)
 }
 
-func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int) {
+func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int, staff *entity.User) {
 	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
 	if err := cancelOrderUsecase.Cancel(orderID); err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase cancels order as staff"))
 		return
 	}
+	s.logOrderActionByStaff(time.Now(), orderID, entity.OrderActionTypeCancel, staff)
 	response.Success(c, true)
 }
 
 func (s *server) markOrderAsReady(c *gin.Context) {
-	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+	now := time.Now()
+
+	staff, err := s.authCheck.IsStaff(now, c)
+	if err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -150,11 +180,15 @@ func (s *server) markOrderAsReady(c *gin.Context) {
 		return
 	}
 
+	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeReady, staff)
 	response.Success(c, true)
 }
 
 func (s *server) markOrderAsDelivered(c *gin.Context) {
-	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+	now := time.Now()
+
+	staff, err := s.authCheck.IsStaff(now, c)
+	if err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -171,6 +205,7 @@ func (s *server) markOrderAsDelivered(c *gin.Context) {
 		return
 	}
 
+	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeDeliver, staff)
 	response.Success(c, true)
 }
 
@@ -229,7 +264,8 @@ func (s *server) markOrderAsFailed(c *gin.Context) {
 	}
 
 	now := time.Now()
-	if _, err := s.authCheck.IsManager(now, c); err != nil {
+	manager, err := s.authCheck.IsManager(now, c)
+	if err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -247,5 +283,27 @@ func (s *server) markOrderAsFailed(c *gin.Context) {
 		return
 	}
 
+	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeFail, manager)
 	response.Success(c, true)
+}
+
+func (s *server) logOrderActionByCus(t time.Time, orderID int, action string, cus *entity.Customer) {
+	orderLogUsecase := order_log_usecase.NewOrderLogUsecase(s.orderLogRepo)
+	if err := orderLogUsecase.LogActionByCus(t, orderID, action, cus); err != nil {
+		s.printOrderLogErr(apperror.Wrap(err, "log order action by customer"))
+	}
+}
+
+func (s *server) logOrderActionByStaff(t time.Time, orderID int, action string, staff *entity.User) {
+	orderLogUsecase := order_log_usecase.NewOrderLogUsecase(s.orderLogRepo)
+	if err := orderLogUsecase.LogActionByStaff(t, orderID, action, staff); err != nil {
+		s.printOrderLogErr(apperror.Wrap(err, "log order action by staff"))
+	}
+}
+
+func (s *server) printOrderLogErr(err apperror.AppError) {
+	errMsg := fmt.Sprintf("[Warning] [OrderLog] %v", err)
+	redStrFormat := "\033[1;38;2;252;172;6m%s\033[0m"
+	errMsg = fmt.Sprintf(redStrFormat, errMsg)
+	fmt.Println(errMsg)
 }

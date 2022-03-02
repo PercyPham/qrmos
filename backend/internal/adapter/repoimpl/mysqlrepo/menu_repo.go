@@ -215,17 +215,10 @@ func (r *menuRepo) DeleteAssociation(association *entity.MenuAssociation) error 
 }
 
 func (r *menuRepo) GetAllAssociations() ([]*entity.MenuAssociation, error) {
-	gCatItems := []*entity.MenuAssociation{}
-	result := r.db.Find(&gCatItems)
+	associations := []*entity.MenuAssociation{}
+	result := r.db.Find(&associations)
 	if result.Error != nil {
 		return nil, apperror.Wrapf(result.Error, "gorm gets all associations")
-	}
-	associations := []*entity.MenuAssociation{}
-	for _, catItem := range gCatItems {
-		associations = append(associations, &entity.MenuAssociation{
-			CategoryID: catItem.CategoryID,
-			ItemID:     catItem.ItemID,
-		})
 	}
 	return associations, nil
 }
