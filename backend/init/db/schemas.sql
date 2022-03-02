@@ -92,9 +92,10 @@ CREATE TABLE store_configs (
 
 CREATE TABLE order_logs (
   order_id INT REFERENCES orders(id),
-  action VARCHAR(10) NOT NULL,
+  action VARCHAR(20) NOT NULL,
   actor TEXT NOT NULL,
   created_at BIGINT
 );
 
 CREATE INDEX idx_order_log_order_id ON order_logs(order_id);
+CREATE UNIQUE INDEX idx_order_log_order_id_action ON order_logs(order_id, action);

@@ -3,12 +3,13 @@ package entity
 import "time"
 
 const (
-	OrderActionTypeCreate  = "CREATE"
-	OrderActionTypeCancel  = "CANCEL"
-	OrderActionTypePay     = "PAY"
-	OrderActionTypeReady   = "READY"
-	OrderActionTypeDeliver = "DELIVER"
-	OrderActionTypeFail    = "FAIL"
+	OrderActionTypeCreate             = "CREATE"
+	OrderActionTypeCancel             = "CANCEL"
+	OrderActionTypePayViaMoMo         = "PAY_VIA_MOMO"
+	OrderActionTypeReceiveCashPayment = "RECEIVE_CASH_PAYMENT"
+	OrderActionTypeReady              = "READY"
+	OrderActionTypeDeliver            = "DELIVER"
+	OrderActionTypeFail               = "FAIL"
 )
 
 type OrderLog struct {
@@ -20,6 +21,6 @@ type OrderLog struct {
 
 type OrderLogActor struct {
 	Type          string `json:"type"`
-	CustomerID    string `json:"customerId"`
-	StaffUsername string `json:"staffUsername"`
+	CustomerID    string `json:"customerId,omitempty"`
+	StaffUsername string `json:"staffUsername,omitempty"`
 }

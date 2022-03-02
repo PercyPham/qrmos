@@ -66,7 +66,7 @@ func (r *orderLogRepo) Create(orderLog *entity.OrderLog) error {
 
 func (r *orderLogRepo) GetAllByOrderID(orderID int) ([]*entity.OrderLog, error) {
 	gLogs := []*gormOrderLog{}
-	result := r.db.Find(&gLogs)
+	result := r.db.Table("order_logs").Where("order_id = ?", orderID).Find(&gLogs)
 	if result.Error != nil {
 		return nil, apperror.Wrapf(result.Error, "gorm gets all order logs")
 	}

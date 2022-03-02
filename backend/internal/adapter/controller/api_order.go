@@ -302,8 +302,8 @@ func (s *server) logOrderActionByStaff(t time.Time, orderID int, action string, 
 }
 
 func (s *server) printOrderLogErr(err apperror.AppError) {
-	errMsg := fmt.Sprintf("[Error] [OrderLog] %v", err)
-	redStrFormat := "\033[1;31m%s\033[0m"
+	errMsg := fmt.Sprintf("[Warning] [OrderLog] %v", err)
+	redStrFormat := "\033[1;38;2;252;172;6m%s\033[0m"
 	errMsg = fmt.Sprintf(redStrFormat, errMsg)
 	fmt.Println(errMsg)
 }

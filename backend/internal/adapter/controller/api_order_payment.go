@@ -20,7 +20,8 @@ func (s *server) markOrderAsPaidByCash(c *gin.Context) {
 	}
 
 	now := time.Now()
-	if _, err := s.authCheck.IsStaff(now, c); err != nil {
+	staff, err := s.authCheck.IsStaff(now, c)
+	if err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}
@@ -31,6 +32,7 @@ func (s *server) markOrderAsPaidByCash(c *gin.Context) {
 		return
 	}
 
+	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeReceiveCashPayment, staff)
 	response.Success(c, true)
 }
 
@@ -83,24 +85,37 @@ func (s *server) handleMoMoIpnCallback(c *gin.Context) {
 		return
 	}
 	momoPaymentCallbackUsecase := order_usecase.NewMoMoPaymentCallbackUsecase(s.orderRepo)
-	if err := momoPaymentCallbackUsecase.HandleCallback(time.Now(), body); err != nil {
+	order, err := momoPaymentCallbackUsecase.HandleCallback(time.Now(), body)
+	if err != nil {
 		// TODO: special log for MoMo related apis
 		response.Error(c, apperror.Wrap(err, "usecase handle momo ipn callback"))
 		return
 	}
+	s.logOrderMoMoPayActionByCus(order)
 	response.Success(c, true)
 }
 
 func (s *server) handleMoMoPaymentCallback(c *gin.Context) {
 	data := getMoMoPaymentCallbackFromQueries(c)
 	momoPaymentCallbackUsecase := order_usecase.NewMoMoPaymentCallbackUsecase(s.orderRepo)
-	if err := momoPaymentCallbackUsecase.HandleCallback(time.Now(), data); err != nil {
+	order, err := momoPaymentCallbackUsecase.HandleCallback(time.Now(), data)
+	if err != nil {
 		// TODO: special log for MoMo related apis
 		response.Error(c, apperror.Wrap(err, "usecase handle momo website callback"))
 		return
 	}
+	s.logOrderMoMoPayActionByCus(order)
 	// TODO: redirect to Order Success page on front-end
 	response.Success(c, true)
+}
+
+func (s *server) logOrderMoMoPayActionByCus(order *entity.Order) {
+	s.logOrderActionByCus(
+		*order.Payment.SuccessAt,
+		order.ID,
+		entity.OrderActionTypePayViaMoMo,
+		&entity.Customer{ID: "unknown"},
+	)
 }
 
 func getMoMoPaymentCallbackFromQueries(c *gin.Context) *momo.PaymentCallbackData {

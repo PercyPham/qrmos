@@ -4,6 +4,7 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
+	"sort"
 	"time"
 )
 
@@ -52,5 +53,8 @@ func (u *OrderLogUsecase) GetLogsOfOrder(orderID int) ([]*entity.OrderLog, error
 	if err != nil {
 		return nil, apperror.Wrapf(err, "repo get all logs of order '%d'", orderID)
 	}
+	sort.Slice(logs, func(i, j int) bool {
+		return logs[i].CreatedAt.Before(logs[j].CreatedAt)
+	})
 	return logs, nil
 }
