@@ -5,7 +5,6 @@ import (
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
-	"qrmos/internal/usecase/order_log_usecase"
 	"qrmos/internal/usecase/order_usecase"
 	"time"
 
@@ -48,7 +47,7 @@ func (s *server) createOrderAsCustomer(c *gin.Context, t time.Time, input *order
 		return
 	}
 
-	s.logOrderActionByCus(t, order.ID, entity.OrderActionTypeCreate, cus)
+	s.logOrderActionByCus(cus, t, order.ID, entity.OrderActionTypeCreate, "")
 
 	response.Success(c, order)
 }
@@ -67,7 +66,7 @@ func (s *server) createOrderAsStaff(c *gin.Context, t time.Time, input *order_us
 		return
 	}
 
-	s.logOrderActionByStaff(t, order.ID, entity.OrderActionTypeCreate, staff)
+	s.logOrderActionByStaff(staff, t, order.ID, entity.OrderActionTypeCreate, "")
 
 	response.Success(c, order)
 }
@@ -145,7 +144,7 @@ func (s *server) cancelOrderAsCustomer(c *gin.Context, orderID int, cus *entity.
 		response.Error(c, apperror.Wrap(err, "usecase cancels order as customer"))
 		return
 	}
-	s.logOrderActionByCus(time.Now(), orderID, entity.OrderActionTypeCancel, cus)
+	s.logOrderActionByCus(cus, time.Now(), orderID, entity.OrderActionTypeCancel, "")
 	response.Success(c, true)
 }
 
@@ -155,7 +154,7 @@ func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int, staff *entity.U
 		response.Error(c, apperror.Wrap(err, "usecase cancels order as staff"))
 		return
 	}
-	s.logOrderActionByStaff(time.Now(), orderID, entity.OrderActionTypeCancel, staff)
+	s.logOrderActionByStaff(staff, time.Now(), orderID, entity.OrderActionTypeCancel, "")
 	response.Success(c, true)
 }
 
@@ -180,7 +179,7 @@ func (s *server) markOrderAsReady(c *gin.Context) {
 		return
 	}
 
-	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeReady, staff)
+	s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeReady, "")
 	response.Success(c, true)
 }
 
@@ -205,7 +204,7 @@ func (s *server) markOrderAsDelivered(c *gin.Context) {
 		return
 	}
 
-	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeDeliver, staff)
+	s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeDeliver, "")
 	response.Success(c, true)
 }
 
@@ -219,12 +218,12 @@ func (s *server) changeOrderDeliveryDest(c *gin.Context) {
 	destName := c.Param("destName")
 
 	if cus, err := s.authCheck.IsCustomer(c); err == nil {
-		s.changeOrderDeliveryDestAsCustomer(c, cus.ID, orderID, destName)
+		s.changeOrderDeliveryDestAsCustomer(c, cus, orderID, destName)
 		return
 	}
 
-	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
-		s.changeOrderDeliveryDestAsStaff(c, orderID, destName)
+	if staff, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.changeOrderDeliveryDestAsStaff(c, staff, orderID, destName)
 		return
 	}
 
@@ -233,26 +232,41 @@ func (s *server) changeOrderDeliveryDest(c *gin.Context) {
 
 func (s *server) changeOrderDeliveryDestAsCustomer(
 	c *gin.Context,
-	cusID string,
+	cus *entity.Customer,
 	orderID int,
 	destName string) {
 	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
-	if err := changeDestUsecase.ChangeDeliveryDestinationByCustomer(cusID, orderID, destName); err != nil {
+	oldDest, err := changeDestUsecase.ChangeDeliveryDestinationByCustomer(cus.ID, orderID, destName)
+	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
 		return
 	}
+	s.logOrderActionByCus(
+		cus,
+		time.Now(),
+		orderID,
+		entity.OrderActionTypeChangeDestination,
+		fmt.Sprintf("from '%s' to '%s'", oldDest, destName))
 	response.Success(c, true)
 }
 
 func (s *server) changeOrderDeliveryDestAsStaff(
 	c *gin.Context,
+	staff *entity.User,
 	orderID int,
 	destName string) {
 	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
-	if err := changeDestUsecase.ChangeDeliveryDestination(orderID, destName); err != nil {
+	oldDest, err := changeDestUsecase.ChangeDeliveryDestination(orderID, destName)
+	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
 		return
 	}
+	s.logOrderActionByStaff(
+		staff,
+		time.Now(),
+		orderID,
+		entity.OrderActionTypeChangeDestination,
+		fmt.Sprintf("from '%s' to '%s'", oldDest, destName))
 	response.Success(c, true)
 }
 
@@ -283,27 +297,6 @@ func (s *server) markOrderAsFailed(c *gin.Context) {
 		return
 	}
 
-	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeFail, manager)
+	s.logOrderActionByStaff(manager, now, orderID, entity.OrderActionTypeFail, "")
 	response.Success(c, true)
-}
-
-func (s *server) logOrderActionByCus(t time.Time, orderID int, action string, cus *entity.Customer) {
-	orderLogUsecase := order_log_usecase.NewOrderLogUsecase(s.orderLogRepo)
-	if err := orderLogUsecase.LogActionByCus(t, orderID, action, cus); err != nil {
-		s.printOrderLogErr(apperror.Wrap(err, "log order action by customer"))
-	}
-}
-
-func (s *server) logOrderActionByStaff(t time.Time, orderID int, action string, staff *entity.User) {
-	orderLogUsecase := order_log_usecase.NewOrderLogUsecase(s.orderLogRepo)
-	if err := orderLogUsecase.LogActionByStaff(t, orderID, action, staff); err != nil {
-		s.printOrderLogErr(apperror.Wrap(err, "log order action by staff"))
-	}
-}
-
-func (s *server) printOrderLogErr(err apperror.AppError) {
-	errMsg := fmt.Sprintf("[Warning] [OrderLog] %v", err)
-	redStrFormat := "\033[1;38;2;252;172;6m%s\033[0m"
-	errMsg = fmt.Sprintf(redStrFormat, errMsg)
-	fmt.Println(errMsg)
 }

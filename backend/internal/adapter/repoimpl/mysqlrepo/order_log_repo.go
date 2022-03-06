@@ -22,6 +22,7 @@ type gormOrderLog struct {
 	OrderID   int `gorm:"column:order_id"`
 	Action    string
 	Actor     string
+	Extra     string
 	CreatedAt int64
 }
 
@@ -34,6 +35,7 @@ func convertToGormOrderLog(orderLog *entity.OrderLog) (*gormOrderLog, error) {
 		OrderID:   orderLog.OrderID,
 		Action:    orderLog.Action,
 		Actor:     string(actorJson),
+		Extra:     orderLog.Extra,
 		CreatedAt: orderLog.CreatedAt.UnixNano(),
 	}, nil
 }
@@ -48,6 +50,7 @@ func (g *gormOrderLog) toOrderLog() (*entity.OrderLog, error) {
 		OrderID:   g.OrderID,
 		Action:    g.Action,
 		Actor:     actor,
+		Extra:     g.Extra,
 		CreatedAt: time.Unix(0, g.CreatedAt),
 	}, nil
 }

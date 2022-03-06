@@ -32,7 +32,7 @@ func (s *server) markOrderAsPaidByCash(c *gin.Context) {
 		return
 	}
 
-	s.logOrderActionByStaff(now, orderID, entity.OrderActionTypeReceiveCashPayment, staff)
+	s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeReceiveCashPayment, "")
 	response.Success(c, true)
 }
 
@@ -111,10 +111,11 @@ func (s *server) handleMoMoPaymentCallback(c *gin.Context) {
 
 func (s *server) logOrderMoMoPayActionByCus(order *entity.Order) {
 	s.logOrderActionByCus(
+		&entity.Customer{ID: "unknown"},
 		*order.Payment.SuccessAt,
 		order.ID,
 		entity.OrderActionTypePayViaMoMo,
-		&entity.Customer{ID: "unknown"},
+		"",
 	)
 }
 
