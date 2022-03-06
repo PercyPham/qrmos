@@ -15,42 +15,48 @@ type CancelOrderUsecase struct {
 	orderRepo repo.Order
 }
 
-func (u *CancelOrderUsecase) CancelByCustomer(orderID int, cusID string) error {
+func (u *CancelOrderUsecase) CancelByCustomer(orderID int, cusID string) (hasUpdated bool, err error) {
 	order := u.orderRepo.GetByID(orderID)
 	if order == nil {
-		return apperror.New("order not found").WithCode(http.StatusNotFound)
+		return false, apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
 	if !(order.Creator != nil &&
 		order.Creator.Type == entity.OrderCreatorTypeCustomer &&
 		order.Creator.CustomerID == cusID) {
-		return apperror.New("unauthorized").WithCode(http.StatusUnauthorized)
+		return false, apperror.New("unauthorized").WithCode(http.StatusUnauthorized)
 	}
 
-	if err := order.Cancel(); err != nil {
-		return apperror.Wrap(err, "cancel order")
+	hasUpdated, err = order.Cancel()
+	if err != nil {
+		return false, apperror.Wrap(err, "cancel order")
 	}
 
-	if err := u.orderRepo.Update(order); err != nil {
-		return apperror.Wrap(err, "repo updates order")
+	if hasUpdated {
+		if err := u.orderRepo.Update(order); err != nil {
+			return false, apperror.Wrap(err, "repo updates order")
+		}
 	}
 
-	return nil
+	return hasUpdated, nil
 }
 
-func (u *CancelOrderUsecase) Cancel(orderID int) error {
+func (u *CancelOrderUsecase) Cancel(orderID int) (hasUpdated bool, err error) {
 	order := u.orderRepo.GetByID(orderID)
 	if order == nil {
-		return apperror.New("order not found").WithCode(http.StatusNotFound)
+		return false, apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
-	if err := order.Cancel(); err != nil {
-		return apperror.Wrap(err, "cancel order")
+	hasUpdated, err = order.Cancel()
+	if err != nil {
+		return false, apperror.Wrap(err, "cancel order")
 	}
 
-	if err := u.orderRepo.Update(order); err != nil {
-		return apperror.Wrap(err, "repo updates order")
+	if hasUpdated {
+		if err := u.orderRepo.Update(order); err != nil {
+			return false, apperror.Wrap(err, "repo updates order")
+		}
 	}
 
-	return nil
+	return hasUpdated, nil
 }

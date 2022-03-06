@@ -140,21 +140,27 @@ func (s *server) cancelOrder(c *gin.Context) {
 
 func (s *server) cancelOrderAsCustomer(c *gin.Context, orderID int, cus *entity.Customer) {
 	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
-	if err := cancelOrderUsecase.CancelByCustomer(orderID, cus.ID); err != nil {
+	hasUpdated, err := cancelOrderUsecase.CancelByCustomer(orderID, cus.ID)
+	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase cancels order as customer"))
 		return
 	}
-	s.logOrderActionByCus(cus, time.Now(), orderID, entity.OrderActionTypeCancel, "")
+	if hasUpdated {
+		s.logOrderActionByCus(cus, time.Now(), orderID, entity.OrderActionTypeCancel, "")
+	}
 	response.Success(c, true)
 }
 
 func (s *server) cancelOrderAsStaff(c *gin.Context, orderID int, staff *entity.User) {
 	cancelOrderUsecase := order_usecase.NewCancelOrderUsecase(s.orderRepo)
-	if err := cancelOrderUsecase.Cancel(orderID); err != nil {
+	hasUpdated, err := cancelOrderUsecase.Cancel(orderID)
+	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase cancels order as staff"))
 		return
 	}
-	s.logOrderActionByStaff(staff, time.Now(), orderID, entity.OrderActionTypeCancel, "")
+	if hasUpdated {
+		s.logOrderActionByStaff(staff, time.Now(), orderID, entity.OrderActionTypeCancel, "")
+	}
 	response.Success(c, true)
 }
 
@@ -174,12 +180,15 @@ func (s *server) markOrderAsReady(c *gin.Context) {
 	}
 
 	progressUsecase := order_usecase.NewProgressUsecase(s.orderRepo)
-	if err := progressUsecase.MarkAsReady(orderID); err != nil {
+	hasUpdated, err := progressUsecase.MarkAsReady(orderID)
+	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase marks order as ready"))
 		return
 	}
 
-	s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeReady, "")
+	if hasUpdated {
+		s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeReady, "")
+	}
 	response.Success(c, true)
 }
 
@@ -199,12 +208,15 @@ func (s *server) markOrderAsDelivered(c *gin.Context) {
 	}
 
 	progressUsecase := order_usecase.NewProgressUsecase(s.orderRepo)
-	if err := progressUsecase.MarkAsDelivered(orderID); err != nil {
+	hasUpdated, err := progressUsecase.MarkAsDelivered(orderID)
+	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase marks order as delivered"))
 		return
 	}
 
-	s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeDeliver, "")
+	if hasUpdated {
+		s.logOrderActionByStaff(staff, now, orderID, entity.OrderActionTypeDeliver, "")
+	}
 	response.Success(c, true)
 }
 
@@ -236,17 +248,19 @@ func (s *server) changeOrderDeliveryDestAsCustomer(
 	orderID int,
 	destName string) {
 	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
-	oldDest, err := changeDestUsecase.ChangeDeliveryDestinationByCustomer(cus.ID, orderID, destName)
+	hasUpdated, oldDest, err := changeDestUsecase.ChangeDeliveryDestinationByCustomer(cus.ID, orderID, destName)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
 		return
 	}
-	s.logOrderActionByCus(
-		cus,
-		time.Now(),
-		orderID,
-		entity.OrderActionTypeChangeDestination,
-		fmt.Sprintf("from '%s' to '%s'", oldDest, destName))
+	if hasUpdated {
+		s.logOrderActionByCus(
+			cus,
+			time.Now(),
+			orderID,
+			entity.OrderActionTypeChangeDestination,
+			fmt.Sprintf("from '%s' to '%s'", oldDest, destName))
+	}
 	response.Success(c, true)
 }
 
@@ -256,17 +270,19 @@ func (s *server) changeOrderDeliveryDestAsStaff(
 	orderID int,
 	destName string) {
 	changeDestUsecase := order_usecase.NewChangeDeliveryDestUsecase(s.orderRepo, s.deliveryRepo)
-	oldDest, err := changeDestUsecase.ChangeDeliveryDestination(orderID, destName)
+	hasUpdated, oldDest, err := changeDestUsecase.ChangeDeliveryDestination(orderID, destName)
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase changes order's delivery destination"))
 		return
 	}
-	s.logOrderActionByStaff(
-		staff,
-		time.Now(),
-		orderID,
-		entity.OrderActionTypeChangeDestination,
-		fmt.Sprintf("from '%s' to '%s'", oldDest, destName))
+	if hasUpdated {
+		s.logOrderActionByStaff(
+			staff,
+			time.Now(),
+			orderID,
+			entity.OrderActionTypeChangeDestination,
+			fmt.Sprintf("from '%s' to '%s'", oldDest, destName))
+	}
 	response.Success(c, true)
 }
 
