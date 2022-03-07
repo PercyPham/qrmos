@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
 )
@@ -106,11 +105,23 @@ func (s *server) Run() {
 }
 
 func (s *server) runDev() {
-	s.r.Use(cors.Default())
+	s.r.Use(CORSMiddleware())
 	s.setupAPIs()
 
 	port := strconv.Itoa(config.App().Port)
 	s.r.Run(":" + port)
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Headers", "*")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+		c.Next()
+	}
 }
 
 func (s *server) runStaging() {

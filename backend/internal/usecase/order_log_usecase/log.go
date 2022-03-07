@@ -16,7 +16,7 @@ type OrderLogUsecase struct {
 	orderLogRepo repo.OrderLog
 }
 
-func (u *OrderLogUsecase) LogActionByCus(t time.Time, orderID int, action string, cus *entity.Customer) error {
+func (u *OrderLogUsecase) LogActionByCus(cus *entity.Customer, t time.Time, orderID int, action, extra string) error {
 	log := &entity.OrderLog{
 		OrderID: orderID,
 		Action:  action,
@@ -24,6 +24,7 @@ func (u *OrderLogUsecase) LogActionByCus(t time.Time, orderID int, action string
 			Type:       entity.OrderCreatorTypeCustomer,
 			CustomerID: cus.ID,
 		},
+		Extra:     extra,
 		CreatedAt: t,
 	}
 	if err := u.orderLogRepo.Create(log); err != nil {
@@ -32,7 +33,7 @@ func (u *OrderLogUsecase) LogActionByCus(t time.Time, orderID int, action string
 	return nil
 }
 
-func (u *OrderLogUsecase) LogActionByStaff(t time.Time, orderID int, action string, staff *entity.User) error {
+func (u *OrderLogUsecase) LogActionByStaff(staff *entity.User, t time.Time, orderID int, action, extra string) error {
 	log := &entity.OrderLog{
 		OrderID: orderID,
 		Action:  action,
@@ -40,6 +41,7 @@ func (u *OrderLogUsecase) LogActionByStaff(t time.Time, orderID int, action stri
 			Type:          entity.OrderCreatorTypeStaff,
 			StaffUsername: staff.Username,
 		},
+		Extra:     extra,
 		CreatedAt: t,
 	}
 	if err := u.orderLogRepo.Create(log); err != nil {

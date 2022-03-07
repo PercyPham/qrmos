@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/entity"
 	"qrmos/internal/usecase/order_log_usecase"
 	"time"
 
@@ -29,4 +31,25 @@ func (s *server) getOrderLogs(c *gin.Context) {
 	}
 
 	response.Success(c, logs)
+}
+
+func (s *server) logOrderActionByCus(cus *entity.Customer, t time.Time, orderID int, action, extra string) {
+	orderLogUsecase := order_log_usecase.NewOrderLogUsecase(s.orderLogRepo)
+	if err := orderLogUsecase.LogActionByCus(cus, t, orderID, action, extra); err != nil {
+		s.printOrderLogErr(apperror.Wrap(err, "log order action by customer"))
+	}
+}
+
+func (s *server) logOrderActionByStaff(staff *entity.User, t time.Time, orderID int, action, extra string) {
+	orderLogUsecase := order_log_usecase.NewOrderLogUsecase(s.orderLogRepo)
+	if err := orderLogUsecase.LogActionByStaff(staff, t, orderID, action, extra); err != nil {
+		s.printOrderLogErr(apperror.Wrap(err, "log order action by staff"))
+	}
+}
+
+func (s *server) printOrderLogErr(err apperror.AppError) {
+	errMsg := fmt.Sprintf("[Warning] [OrderLog] %v", err)
+	redStrFormat := "\033[1;38;2;252;172;6m%s\033[0m"
+	errMsg = fmt.Sprintf(redStrFormat, errMsg)
+	fmt.Println(errMsg)
 }

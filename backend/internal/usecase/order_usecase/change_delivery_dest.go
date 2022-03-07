@@ -16,43 +16,48 @@ type ChangeDeliveryDestUsecase struct {
 	deliveryRepo repo.Delivery
 }
 
-func (u *ChangeDeliveryDestUsecase) ChangeDeliveryDestinationByCustomer(cusID string, orderID int, destName string) error {
+func (u *ChangeDeliveryDestUsecase) ChangeDeliveryDestinationByCustomer(cusID string, orderID int, destName string) (hasUpdated bool, oldDest string, err error) {
 	order := u.orderRepo.GetByID(orderID)
 	if order == nil {
-		return apperror.New("order not found").WithCode(http.StatusNotFound)
+		return false, "", apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
 	if !(order.Creator != nil &&
 		order.Creator.Type == entity.OrderCreatorTypeCustomer &&
 		order.Creator.CustomerID == cusID) {
-		return apperror.New("invalid creator").WithCode(http.StatusForbidden)
+		return false, "", apperror.New("invalid creator").WithCode(http.StatusForbidden)
 	}
 
 	return u.changeDeliveryDest(order, destName)
 }
 
-func (u *ChangeDeliveryDestUsecase) ChangeDeliveryDestination(orderID int, destName string) error {
+func (u *ChangeDeliveryDestUsecase) ChangeDeliveryDestination(orderID int, destName string) (hasUpdated bool, oldDest string, err error) {
 	order := u.orderRepo.GetByID(orderID)
 	if order == nil {
-		return apperror.New("order not found").WithCode(http.StatusNotFound)
+		return false, "", apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
 	return u.changeDeliveryDest(order, destName)
 }
 
-func (u *ChangeDeliveryDestUsecase) changeDeliveryDest(order *entity.Order, destName string) error {
+func (u *ChangeDeliveryDestUsecase) changeDeliveryDest(order *entity.Order, destName string) (hasUpdated bool, oldDest string, err error) {
+	oldDest = order.DeliveryDestination
+
 	dest := u.deliveryRepo.GetByName(destName)
 	if dest == nil {
-		return apperror.New("delivery destination not found").WithCode(http.StatusNotFound)
+		return false, "", apperror.New("delivery destination not found").WithCode(http.StatusNotFound)
 	}
 
-	if err := order.SetDeliveryDestination(destName); err != nil {
-		return apperror.Wrap(err, "order sets new delivery destination")
+	hasUpdated, err = order.SetDeliveryDestination(destName)
+	if err != nil {
+		return false, "", apperror.Wrap(err, "order sets new delivery destination")
 	}
 
-	if err := u.orderRepo.Update(order); err != nil {
-		return apperror.Wrap(err, "repo updates order")
+	if hasUpdated {
+		if err := u.orderRepo.Update(order); err != nil {
+			return false, "", apperror.Wrap(err, "repo updates order")
+		}
 	}
 
-	return nil
+	return hasUpdated, oldDest, nil
 }

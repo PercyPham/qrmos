@@ -1,4 +1,6 @@
 import "package:flutter/material.dart";
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos_api;
 
 class LoginScreen extends StatefulWidget {
@@ -31,7 +33,10 @@ class _LoginScreenState extends State<LoginScreen> {
             onChanged: _onPasswordChanges,
             obscureText: true,
           ),
-          Text(_errMsg, style: TextStyle(color: Theme.of(context).errorColor)),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
+            child: Text(_errMsg, style: TextStyle(color: Theme.of(context).errorColor)),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton(
@@ -67,14 +72,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void Function() _onLoginButtonPressed(BuildContext context) {
     return () async {
-      var loginResp = await qrmos_api.login(_username, _password);
-      if (loginResp.error != null) {
+      if (_username == "") {
         setState(() {
-          _errMsg = "Error: " + loginResp.error!.message;
+          _errMsg = "Tên đăng nhập không được để trống";
         });
         return;
       }
-      Navigator.of(context).pop();
+      if (_password == "") {
+        setState(() {
+          _errMsg = "Mật khẩu không được để trống";
+        });
+        return;
+      }
+
+      var errMsg = await Provider.of<AuthModel>(context, listen: false).login(_username, _password);
+      setState(() {
+        _errMsg = errMsg;
+      });
+      if (errMsg != "") {
+        return;
+      }
+      await Navigator.of(context).pushReplacementNamed("/dashboard");
     };
   }
 }

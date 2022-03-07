@@ -16,6 +16,8 @@ const AccessTokenTypeStaff = "staff"
 type StaffAccessTokenClaims struct {
 	Type     string `json:"type"`
 	Username string `json:"username"`
+	FullName string `json:"fullName"`
+	Role     string `json:"role"`
 	Key      string `json:"key"`
 	jwt.StandardClaims
 }
@@ -24,6 +26,8 @@ func GenStaffAccessToken(t time.Time, user *entity.User) (string, error) {
 	claims := &StaffAccessTokenClaims{
 		Type:     AccessTokenTypeStaff,
 		Username: user.Username,
+		FullName: user.FullName,
+		Role:     user.Role,
 		Key:      genStaffTokenKey(t, user.Password),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: t.UnixNano() + int64(8*time.Hour),

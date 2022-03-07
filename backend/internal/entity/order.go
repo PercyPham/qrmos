@@ -81,49 +81,52 @@ type OrderItem struct {
 	Options map[string][]string `json:"options"`
 }
 
-func (order *Order) Cancel() error {
+func (order *Order) Cancel() (hasUpdated bool, err error) {
 	if order.State == OrderStateCanceled {
-		return nil
+		return false, nil
 	}
 	if order.State != OrderStatePending {
-		return apperror.Newf("cannot cancel order with state '%s'", order.State).
+		return false, apperror.Newf("cannot cancel order with state '%s'", order.State).
 			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateCanceled
-	return nil
+	return true, nil
 }
 
-func (order *Order) MarkAsReady() error {
+func (order *Order) MarkAsReady() (hasUpdated bool, err error) {
 	if order.State == OrderStateReady {
-		return nil
+		return false, nil
 	}
 	if order.State != OrderStateConfirmed {
-		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateReady).
+		return false, apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateReady).
 			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateReady
-	return nil
+	return true, nil
 }
 
-func (order *Order) MarkAsDelivered() error {
+func (order *Order) MarkAsDelivered() (hasUpdated bool, err error) {
 	if order.State == OrderStateDelivered {
-		return nil
+		return false, nil
 	}
 	if order.State != OrderStateReady {
-		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateDelivered).
+		return false, apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateDelivered).
 			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateDelivered
-	return nil
+	return true, nil
 }
 
-func (order *Order) SetDeliveryDestination(destName string) error {
+func (order *Order) SetDeliveryDestination(destName string) (hasUpdated bool, err error) {
 	if !(order.State == OrderStatePending || order.State == OrderStateConfirmed) {
-		return apperror.Newf("cannot set new delivery destination when order is in state '%s'", order.State).
+		return false, apperror.Newf("cannot set new delivery destination when order is in state '%s'", order.State).
 			WithCode(http.StatusForbidden)
 	}
-	order.DeliveryDestination = destName
-	return nil
+	if order.DeliveryDestination != destName {
+		order.DeliveryDestination = destName
+		hasUpdated = true
+	}
+	return hasUpdated, nil
 }
 
 func (order *Order) MarkPaidByCash(t time.Time) error {

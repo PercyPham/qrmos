@@ -14,36 +14,42 @@ type ProgressUsecase struct {
 	orderRepo repo.Order
 }
 
-func (u *ProgressUsecase) MarkAsReady(orderID int) error {
+func (u *ProgressUsecase) MarkAsReady(orderID int) (hasUpdated bool, err error) {
 	order := u.orderRepo.GetByID(orderID)
 	if order == nil {
-		return apperror.New("order not found").WithCode(http.StatusNotFound)
+		return false, apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
-	if err := order.MarkAsReady(); err != nil {
-		return apperror.Wrap(err, "marks order as ready")
+	hasUpdated, err = order.MarkAsReady()
+	if err != nil {
+		return false, apperror.Wrap(err, "marks order as ready")
 	}
 
-	if err := u.orderRepo.Update(order); err != nil {
-		return apperror.Wrap(err, "repo updates order")
+	if hasUpdated {
+		if err := u.orderRepo.Update(order); err != nil {
+			return false, apperror.Wrap(err, "repo updates order")
+		}
 	}
 
-	return nil
+	return hasUpdated, nil
 }
 
-func (u *ProgressUsecase) MarkAsDelivered(orderID int) error {
+func (u *ProgressUsecase) MarkAsDelivered(orderID int) (hasUpdated bool, err error) {
 	order := u.orderRepo.GetByID(orderID)
 	if order == nil {
-		return apperror.New("order not found").WithCode(http.StatusNotFound)
+		return false, apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
-	if err := order.MarkAsDelivered(); err != nil {
-		return apperror.Wrap(err, "marks order as delivered")
+	hasUpdated, err = order.MarkAsDelivered()
+	if err != nil {
+		return false, apperror.Wrap(err, "marks order as delivered")
 	}
 
-	if err := u.orderRepo.Update(order); err != nil {
-		return apperror.Wrap(err, "repo updates order")
+	if hasUpdated {
+		if err := u.orderRepo.Update(order); err != nil {
+			return false, apperror.Wrap(err, "repo updates order")
+		}
 	}
 
-	return nil
+	return hasUpdated, nil
 }
