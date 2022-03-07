@@ -25,6 +25,24 @@ func (s *server) getAllUsers(c *gin.Context) {
 	response.Success(c, users)
 }
 
+func (s *server) getUser(c *gin.Context) {
+	username := c.Param("username")
+
+	if _, err := s.authCheck.IsAdmin(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	userUsecase := user_usecase.NewGetUsersUsecase(s.userRepo)
+	user, err := userUsecase.GetUserByUsername(username)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets user by username"))
+		return
+	}
+
+	response.Success(c, user)
+}
+
 func (s *server) createUser(c *gin.Context) {
 	now := time.Now()
 	if _, err := s.authCheck.IsAdmin(now, c); err != nil {

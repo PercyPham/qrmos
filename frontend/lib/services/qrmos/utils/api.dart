@@ -40,8 +40,8 @@ Future<Map<String, String>> _prepHeaders(Map<String, String>? headers) async {
   headers ??= HashMap<String, String>();
   headers.putIfAbsent("Content-Type", () => "application/json");
   var accessToken = await getAccessToken();
-  if (accessToken != null) {
-    headers.putIfAbsent("Authorization", () => accessToken);
+  if (accessToken != "") {
+    headers.putIfAbsent("Authorization", () => "Bearer " + accessToken);
   }
   return headers;
 }
