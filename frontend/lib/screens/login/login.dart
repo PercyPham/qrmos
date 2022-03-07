@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 
 class LoginScreen extends StatefulWidget {
+  static const routeName = "/login";
+
   const LoginScreen({Key? key}) : super(key: key);
 
   @override

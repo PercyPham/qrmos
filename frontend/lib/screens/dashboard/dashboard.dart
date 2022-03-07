@@ -12,6 +12,8 @@ const screenOrderManagement = "Quản Lý Đơn Hàng";
 const screenNone = "none";
 
 class DashboardScreen extends StatefulWidget {
+  static const routeName = "/dashboard";
+
   const DashboardScreen({Key? key}) : super(key: key);
 
   @override
@@ -104,7 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           return _emptyScreenWithLoginButton(context);
         }
         if (currentScreen == screenUserManagement) {
-          return const UserManagement();
+          return const UserManagementScreen();
         }
         return Center(child: Text("Hello " + auth.userFullName));
       },

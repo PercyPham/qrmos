@@ -7,6 +7,7 @@ func (s *server) setupAPIs() {
 
 	api.POST("/users", s.createUser)
 	api.GET("/users", s.getAllUsers)
+	api.GET("users/:username", s.getUser)
 	api.PUT("users/:username", s.updateUser)
 
 	api.POST("/login", s.login)

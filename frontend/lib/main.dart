@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/screens/login/login.dart';
 import 'package:qrmos/screens/dashboard/dashboard.dart';
+import 'package:qrmos/screens/create_user/create_user.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -27,8 +28,9 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       routes: {
         "/": (context) => const DashboardScreen(),
-        "/login": (context) => const LoginScreen(),
-        "/dashboard": (context) => const DashboardScreen(),
+        LoginScreen.routeName: (context) => const LoginScreen(),
+        DashboardScreen.routeName: (context) => const DashboardScreen(),
+        CreateUserScreen.routeName: (context) => const CreateUserScreen(),
       },
     );
   }

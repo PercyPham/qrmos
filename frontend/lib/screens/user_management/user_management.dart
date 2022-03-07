@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos;
+import 'package:qrmos/screens/create_user/create_user.dart';
 
-class UserManagement extends StatefulWidget {
-  const UserManagement({Key? key}) : super(key: key);
+import '../user_detail/user_detail.dart';
+
+class UserManagementScreen extends StatefulWidget {
+  const UserManagementScreen({Key? key}) : super(key: key);
 
   @override
-  State<UserManagement> createState() => _UserManagementState();
+  State<UserManagementScreen> createState() => _UserManagementScreenState();
 }
 
-class _UserManagementState extends State<UserManagement> {
+class _UserManagementScreenState extends State<UserManagementScreen> {
   bool _isLoading = true;
   List<qrmos.User> _users = [];
 
@@ -56,10 +59,12 @@ class _UserManagementState extends State<UserManagement> {
             defaultColumnWidth: const FixedColumnWidth(150.0),
             children: [
               _tableHeaders(),
-              ..._userRows(),
+              ..._userRows(context),
             ],
           ),
           if (_isLoading) const Text("Loading ..."),
+          Container(height: 20),
+          _createUserButton(context),
         ],
       ),
     );
@@ -93,14 +98,17 @@ class _UserManagementState extends State<UserManagement> {
     );
   }
 
-  List<TableRow> _userRows() {
-    return _users.map((user) => _userRow(user)).toList();
+  List<TableRow> _userRows(BuildContext context) {
+    return _users.map((user) => _userRow(user, context)).toList();
   }
 
-  TableRow _userRow(qrmos.User user) {
-    var onTap = () {
-      print("tapped on " + user.username);
-    };
+  TableRow _userRow(qrmos.User user, BuildContext context) {
+    onTap() async {
+      await Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => UserDetailScreen(user.username)));
+      await _loadUsers();
+    }
+
     return TableRow(
       children: [
         _userRowText(user.username, onTap),
@@ -123,6 +131,16 @@ class _UserManagementState extends State<UserManagement> {
           ),
         ),
       ),
+    );
+  }
+
+  ElevatedButton _createUserButton(BuildContext context) {
+    return ElevatedButton(
+      child: const Text("Tạo mới"),
+      onPressed: () async {
+        await Navigator.of(context).pushNamed(CreateUserScreen.routeName);
+        await _loadUsers();
+      },
     );
   }
 }
