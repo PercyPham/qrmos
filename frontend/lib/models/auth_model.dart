@@ -54,6 +54,19 @@ class AuthModel extends ChangeNotifier {
     }
   }
 
+  Future<String> login(String username, String password) async {
+    var loginResp = await qrmos.login(username, password);
+    if (loginResp.error != null) {
+      return qrmos.getErrorMessageFrom(loginResp.error!);
+    }
+    return "";
+  }
+
+  Future<void> logout() async {
+    await qrmos.logout();
+    await loadAccessTokenFromLocal();
+  }
+
   Future<void> loadAccessTokenFromLocal() async {
     var accessTokenInfo = await qrmos.loadAccessTokenFromLocal();
     userType = accessTokenInfo.userType;
@@ -63,11 +76,6 @@ class AuthModel extends ChangeNotifier {
     staffUsername = accessTokenInfo.staffUsername;
     staffRole = accessTokenInfo.staffRole;
     notifyListeners();
-  }
-
-  Future<void> logout() async {
-    await qrmos.logout();
-    await loadAccessTokenFromLocal();
   }
 }
 
