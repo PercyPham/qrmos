@@ -4,11 +4,11 @@ import 'package:qrmos/models/auth_model.dart';
 import './widgets/drawer/drawer.dart';
 import '../user_management/user_management.dart';
 
-const screenUserManagement = "Quản lý người dùng";
-const screenDeliveryManagement = "Quản lý điểm giao";
-const screenMenuManagement = "Quản lý menu";
-const screenVoucherManagement = "Quản lý voucher";
-const screenOrderManagement = "Quản lý đơn hàng";
+const screenUserManagement = "Quản Lý Người Dùng";
+const screenDeliveryManagement = "Quản Lý Điểm Giao";
+const screenMenuManagement = "Quản Lý Menu";
+const screenVoucherManagement = "Quản Lý Voucher";
+const screenOrderManagement = "Quản Lý Đơn Hàng";
 const screenNone = "none";
 
 class DashboardScreen extends StatefulWidget {

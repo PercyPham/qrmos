@@ -15,17 +15,21 @@ class _UserManagementState extends State<UserManagement> {
   @override
   void initState() {
     super.initState();
+    _loadUsers();
+  }
 
-    () async {
-      var resp = await qrmos.getAllUsers();
-      setState(() {
-        _isLoading = false;
-        if (resp.error == null) {
-          _users = resp.data!;
-          _users.sort((u1, u2) => (u1.role + u1.username).compareTo(u2.role + u2.username));
-        }
-      });
-    }();
+  Future<void> _loadUsers() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var resp = await qrmos.getAllUsers();
+    setState(() {
+      _isLoading = false;
+      if (resp.error == null) {
+        _users = resp.data!;
+        _users.sort((u1, u2) => (u1.role + u1.username).compareTo(u2.role + u2.username));
+      }
+    });
   }
 
   @override
@@ -90,33 +94,33 @@ class _UserManagementState extends State<UserManagement> {
   }
 
   List<TableRow> _userRows() {
-    List<TableRow> rows = [];
-
-    for (var i = 0; i < _users.length; i++) {
-      rows.add(_userRow(_users[i]));
-    }
-
-    return rows;
+    return _users.map((user) => _userRow(user)).toList();
   }
 
   TableRow _userRow(qrmos.User user) {
+    var onTap = () {
+      print("tapped on " + user.username);
+    };
     return TableRow(
       children: [
-        _userRowText(user.username),
-        _userRowText(user.fullName),
-        _userRowText(user.role),
-        _userRowText(user.isActive ? "Có" : "Không"),
+        _userRowText(user.username, onTap),
+        _userRowText(user.fullName, onTap),
+        _userRowText(user.role, onTap),
+        _userRowText(user.active ? "Có" : "Không", onTap),
       ],
     );
   }
 
-  Widget _userRowText(String text) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
+  Widget _userRowText(String text, void Function() onTap) {
+    return TableRowInkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );

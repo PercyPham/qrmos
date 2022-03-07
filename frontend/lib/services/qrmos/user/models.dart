@@ -2,18 +2,18 @@ class User {
   final String username;
   final String fullName;
   final String role;
-  final bool isActive;
+  final bool active;
 
   User({
     required this.username,
     required this.fullName,
     required this.role,
-    required this.isActive,
+    required this.active,
   });
 
   User.fromJson(Map<String, dynamic> data)
       : username = data["username"],
         fullName = data["fullName"],
         role = data["role"],
-        isActive = data["isActive"] == true ? true : false;
+        active = data["active"] == true ? true : false;
 }
