@@ -1,4 +1,6 @@
 import "package:flutter/material.dart";
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos_api;
 
 class LoginScreen extends StatefulWidget {
@@ -74,7 +76,8 @@ class _LoginScreenState extends State<LoginScreen> {
         });
         return;
       }
-      Navigator.of(context).pop();
+      await Provider.of<AuthModel>(context, listen: false).loadAccessTokenFromLocal();
+      await Navigator.of(context).pushReplacementNamed("/dashboard");
     };
   }
 }

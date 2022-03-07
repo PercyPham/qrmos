@@ -7,11 +7,11 @@ Future<bool> saveAccessToken(String accessToken) async {
   return prefs.setString(_accessTokenKey, accessToken);
 }
 
-Future<String?> getAccessToken() async {
+Future<String> getAccessToken() async {
   final prefs = await SharedPreferences.getInstance();
   var accessToken = prefs.getString(_accessTokenKey);
   if (accessToken == null || accessToken.isEmpty) {
-    return null;
+    return "";
   }
   return accessToken;
 }

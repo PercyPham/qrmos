@@ -17,6 +17,7 @@ Future<LoginResponse> login(String username, String password) async {
 class LoginResponse {
   AccessToken? data;
   ApiError? error;
+
   LoginResponse.fromApiResponse(ApiResponse apiResp)
       : data = apiResp.dataJson != null ? AccessToken.fromJson(apiResp.dataJson) : null,
         error = apiResp.error;
@@ -24,5 +25,6 @@ class LoginResponse {
 
 class AccessToken {
   final String accessToken;
+
   AccessToken.fromJson(Map<String, dynamic> dataJson) : accessToken = dataJson['accessToken'];
 }
