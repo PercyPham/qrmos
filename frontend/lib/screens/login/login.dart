@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos_api;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

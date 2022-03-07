@@ -19,12 +19,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String currentScreen = screenNone;
 
   @override
   Widget build(BuildContext context) {
     Provider.of<AuthModel>(context).loadAccessTokenFromLocal();
     return Scaffold(
+      key: _scaffoldKey,
       appBar: _appBar(context),
       drawer: _drawer(context),
       body: _body(),
@@ -87,6 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       navList: navList,
       activeScreen: currentScreen,
       onTap: (tappedNav) {
+        _scaffoldKey.currentState?.openEndDrawer();
         setState(() {
           currentScreen = tappedNav;
         });
