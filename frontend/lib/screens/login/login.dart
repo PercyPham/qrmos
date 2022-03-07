@@ -19,17 +19,17 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
+        title: const Text("Đăng nhập"),
       ),
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
           TextFormField(
-            decoration: _inputDecor("Username"),
+            decoration: _inputDecor("Tên đăng nhập"),
             onChanged: _onUsernameChanged,
             keyboardType: TextInputType.text,
           ),
           TextFormField(
-            decoration: _inputDecor("Password"),
+            decoration: _inputDecor("Mật khẩu"),
             onChanged: _onPasswordChanges,
             obscureText: true,
           ),
@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: ElevatedButton(
               onPressed: _onLoginButtonPressed(context),
-              child: const Text("Login"),
+              child: const Text("Đăng nhập"),
             ),
           ),
         ]),
