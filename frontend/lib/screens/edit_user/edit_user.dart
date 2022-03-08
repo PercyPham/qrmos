@@ -26,7 +26,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
     _fullName = widget.user.fullName;
     _password = "";
     _role = widget.user.role;
-    _active = widget.user.active;
+    _active = widget.user.active!;
   }
 
   @override

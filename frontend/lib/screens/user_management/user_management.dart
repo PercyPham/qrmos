@@ -115,7 +115,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         _userRowText(user.username, onTap),
         _userRowText(user.fullName, onTap),
         _userRowText(user.role, onTap),
-        _userRowText(user.active ? "Có" : "Không", onTap),
+        _userRowText(user.active == true ? "Có" : "Không", onTap),
       ],
     );
   }
@@ -139,7 +139,8 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     return ElevatedButton(
       child: const Text("Tạo mới"),
       onPressed: () async {
-        await Navigator.of(context).pushNamed(CreateUserScreen.routeName);
+        await Navigator.of(context)
+            .push(MaterialPageRoute(builder: (context) => const CreateUserScreen()));
         await _loadUsers();
       },
     );
