@@ -24,9 +24,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   String currentScreen = screenNone;
 
+  bool _isAccessTokenLoaded = false;
+
   @override
   Widget build(BuildContext context) {
-    Provider.of<AuthModel>(context).loadAccessTokenFromLocal();
+    if (!_isAccessTokenLoaded) {
+      Provider.of<AuthModel>(context).loadAccessTokenFromLocal();
+      _isAccessTokenLoaded = true;
+    }
     return Scaffold(
       key: _scaffoldKey,
       appBar: _appBar(context),

@@ -36,8 +36,8 @@ AccessTokenInfo _extractAccessTokenInfo(String accessToken) {
     return AccessTokenInfo(userType: UserType.unauthenticated);
   }
 
-  var expireAt = decodedJson['exp'];
-  var now = DateTime.now().microsecondsSinceEpoch;
+  var expireAt = decodedJson['exp'] as int;
+  var now = DateTime.now().microsecondsSinceEpoch * 1000;
   if (expireAt < now) {
     return AccessTokenInfo(userType: UserType.unauthenticated);
   }
