@@ -24,6 +24,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
   Future<void> _loadUsers() async {
     setState(() {
       _isLoading = true;
+      _users = [];
     });
     var resp = await qrmos.getAllUsers();
     setState(() {

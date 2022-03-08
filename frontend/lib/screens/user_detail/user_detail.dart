@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qrmos/screens/edit_user/edit_user.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show User, getUserByUsername;
 
 class UserDetailScreen extends StatefulWidget {
@@ -22,8 +23,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
   @override
   void initState() {
     super.initState();
-    var username = widget.username;
-    _loadUserDetail(username);
+    _loadUserDetail(widget.username);
   }
 
   Future<void> _loadUserDetail(String username) async {
@@ -58,10 +58,23 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
                   Text('Tên đăng nhập: ${_user!.username}'),
                   Text('Họ và Tên: ${_user!.fullName}'),
                   Text('Chức vụ: ${_user!.role}'),
-                  Text('Hoạt động: ${_user!.active}'),
+                  Text('Hoạt động: ${_user!.active == true ? "Có" : "Không"}'),
+                  Container(height: 20),
+                  ElevatedButton(
+                    child: const Text('Chỉnh sửa'),
+                    onPressed: () {
+                      _onEditButtonPress(context);
+                    },
+                  ),
                 ],
               ),
             ),
     );
+  }
+
+  void _onEditButtonPress(BuildContext context) async {
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => EditUserScreen(_user!)));
+    await _loadUserDetail(widget.username);
   }
 }

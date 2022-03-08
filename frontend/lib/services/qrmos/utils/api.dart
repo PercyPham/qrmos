@@ -32,6 +32,19 @@ Future<ApiResponse> post(
   return ApiResponse.fromHttpResponse(response);
 }
 
+Future<ApiResponse> put(
+  String apiRelativePath, {
+  Map<String, String>? headers,
+  Object? body,
+}) async {
+  var response = await http.put(
+    _prepFullUrl(apiRelativePath),
+    headers: await _prepHeaders(headers),
+    body: json.encode(body),
+  );
+  return ApiResponse.fromHttpResponse(response);
+}
+
 Uri _prepFullUrl(String url) {
   return Uri.parse(_apiBaseUrl + url);
 }
