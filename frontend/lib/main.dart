@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
         "/": (context) => const DashboardScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         DashboardScreen.routeName: (context) => const DashboardScreen(),
-        CreateUserScreen.routeName: (context) => const CreateUserScreen(),
       },
     );
   }
