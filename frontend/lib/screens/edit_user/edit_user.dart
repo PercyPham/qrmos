@@ -127,7 +127,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
 
   Row _roleInputRow() {
     return Row(children: [
-      const Text("Họ và Tên: "),
+      const Text("Chức Vụ: "),
       Container(width: 20),
       DropdownButton<String>(
         value: _role,
@@ -159,6 +159,10 @@ class _EditUserScreenState extends State<EditUserScreen> {
   }
 
   void _onSaveButtonClicked() async {
+    if (!_validateFormInputs()) {
+      return;
+    }
+
     var resp = await updateUser(User(
       username: widget.user.username,
       fullName: _fullName,
@@ -177,5 +181,27 @@ class _EditUserScreenState extends State<EditUserScreen> {
     setState(() {
       _successMsg = "Lưu thành công!";
     });
+  }
+
+  bool _validateFormInputs() {
+    if (_fullName == "") {
+      setState(() {
+        _errMsg = "Họ và tên không được để trống";
+      });
+      return false;
+    }
+    if (_password == "") {
+      setState(() {
+        _errMsg = "Mật khẩu không được để trống";
+      });
+      return false;
+    }
+    if (_password.length < 8) {
+      setState(() {
+        _errMsg = "Mật khẩu phải có ít nhất 8 ký tự";
+      });
+      return false;
+    }
+    return true;
   }
 }

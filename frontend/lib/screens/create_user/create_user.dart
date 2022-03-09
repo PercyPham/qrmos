@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' show User, createUser;
+import 'package:qrmos/services/qrmos/qrmos.dart' show User, createUser, getErrorMessageFrom;
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({Key? key}) : super(key: key);
@@ -130,6 +130,10 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   }
 
   void _onCreateButtonClicked() async {
+    if (!_validateFormFields()) {
+      return;
+    }
+
     var resp = await createUser(User(
       username: _username,
       fullName: _fullName,
@@ -139,7 +143,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
     if (resp.error != null) {
       setState(() {
-        _errMsg = resp.error!.message;
+        _errMsg = getErrorMessageFrom(resp.error);
       });
       return;
     }
@@ -147,5 +151,33 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     setState(() {
       _successMsg = "Tạo thành công!";
     });
+  }
+
+  bool _validateFormFields() {
+    if (_username == "") {
+      setState(() {
+        _errMsg = "Tên đăng nhập không được để trống";
+      });
+      return false;
+    }
+    if (_fullName == "") {
+      setState(() {
+        _errMsg = "Họ và tên không được để trống";
+      });
+      return false;
+    }
+    if (_password == "") {
+      setState(() {
+        _errMsg = "Mật khẩu không được để trống";
+      });
+      return false;
+    }
+    if (_password.length < 8) {
+      setState(() {
+        _errMsg = "Mật khẩu phải có ít nhất 8 ký tự";
+      });
+      return false;
+    }
+    return true;
   }
 }
