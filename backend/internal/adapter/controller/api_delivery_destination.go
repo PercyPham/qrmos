@@ -31,6 +31,58 @@ func (s *server) createDeliveryDest(c *gin.Context) {
 	response.Success(c, true)
 }
 
+func (s *server) getDestByName(c *gin.Context) {
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
+	destName := c.Param("name")
+
+	destUsecase := delivery_usecase.NewGetDeliveryDestUsecase(s.deliveryRepo)
+	dest, err := destUsecase.GetDeliveryDestByName(destName)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets delivery destination by name"))
+		return
+	}
+	response.Success(c, dest)
+
+}
+
+func (s *server) getAllDests(c *gin.Context) {
+	if _, err := s.authCheck.IsCustomer(c); err == nil {
+		s.getAllDestsAsCus(c)
+		return
+	}
+
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.getAllDestsAsStaff(c)
+		return
+	}
+
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) getAllDestsAsStaff(c *gin.Context) {
+	destUsecase := delivery_usecase.NewGetDeliveryDestUsecase(s.deliveryRepo)
+	dests, err := destUsecase.GetDeliveryDestionations()
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets delivery destinations"))
+		return
+	}
+	response.Success(c, dests)
+}
+
+func (s *server) getAllDestsAsCus(c *gin.Context) {
+	destUsecase := delivery_usecase.NewGetDeliveryDestUsecase(s.deliveryRepo)
+	dests, err := destUsecase.GetDeliveryDestionationsAsCustomer()
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets delivery destinations as customer"))
+		return
+	}
+	response.Success(c, dests)
+}
+
 func (s *server) refreshDeliveryDestSecurityCode(c *gin.Context) {
 	now := time.Now()
 	if _, err := s.authCheck.IsManager(now, c); err != nil {

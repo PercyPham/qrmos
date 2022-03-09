@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos;
 import 'package:qrmos/screens/create_user/create_user.dart';
 
+import 'package:qrmos/widgets/table/table.dart';
+import 'package:qrmos/widgets/screen_name.dart';
+
 import '../user_detail/user_detail.dart';
 
 class UserManagementScreen extends StatefulWidget {
@@ -43,21 +46,15 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Quản lý người dùng",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20.0,
-            ),
-          ),
+          const ScreenNameText("Quản lý người dùng"),
           Container(height: 20),
-          Table(
-            border: TableBorder.all(
-              color: Colors.black,
-              style: BorderStyle.solid,
-              width: 2,
-            ),
-            defaultColumnWidth: const FixedColumnWidth(150.0),
+          CustomTable(
+            columnWidths: const {
+              0: FixedColumnWidth(150.0),
+              1: FixedColumnWidth(180.0),
+              2: FixedColumnWidth(100.0),
+              3: FixedColumnWidth(100.0),
+            },
             children: [
               _tableHeaders(),
               ..._userRows(context),
@@ -76,26 +73,12 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       decoration: BoxDecoration(
         color: Colors.lightBlue[100],
       ),
-      children: [
-        _tableHeaderText("Username"),
-        _tableHeaderText("Họ và Tên"),
-        _tableHeaderText("Chức vụ"),
-        _tableHeaderText("Hoạt động"),
+      children: const [
+        TableHeaderText("Username"),
+        TableHeaderText("Họ và Tên"),
+        TableHeaderText("Chức vụ"),
+        TableHeaderText("Hoạt động"),
       ],
-    );
-  }
-
-  Widget _tableHeaderText(String text) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
     );
   }
 
