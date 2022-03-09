@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 import 'package:qrmos/widgets/table/table.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' show DeliveryDestination, getAllDests;
+import 'package:qrmos/services/qrmos/qrmos.dart' show DeliveryDestination, getAllDests, deleteDest;
 
 import 'widgets/create_dest_dialog.dart';
 import 'widgets/dest_qr_dialog.dart';
@@ -51,6 +51,7 @@ class _DeliveryManagementScreenState extends State<DeliveryManagementScreen> {
             columnWidths: const {
               0: FixedColumnWidth(100.0),
               1: FixedColumnWidth(200.0),
+              2: FixedColumnWidth(100.0),
             },
             children: [
               TableRow(
@@ -60,6 +61,7 @@ class _DeliveryManagementScreenState extends State<DeliveryManagementScreen> {
                 children: const [
                   TableHeaderText("Tên"),
                   TableHeaderText("Mã bảo vệ"),
+                  TableHeaderText("Xoá"),
                 ],
               ),
               ..._dests.map((dest) => _destRow(dest, context)).toList(),
@@ -89,10 +91,56 @@ class _DeliveryManagementScreenState extends State<DeliveryManagementScreen> {
       await _loadDests();
     }
 
+    onDeleteTap() async {
+      bool? result = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text("Xoá ${dest.name}?"),
+            children: [
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text('Huỷ'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('Xoá'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (result != true) {
+        return;
+      }
+
+      var resp = await deleteDest(dest.name);
+      if (resp.error != null) {
+        // ignore: avoid_print
+        print(resp.error);
+        return;
+      }
+
+      await _loadDests();
+    }
+
     return TableRow(
       children: [
         _destRowText(dest.name, onTap),
         _destRowText(dest.securityCode!, onTap),
+        Container(
+          padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+          child: ElevatedButton(
+              child: const Text("Xoá"),
+              onPressed: () {
+                onDeleteTap();
+              }),
+        ),
       ],
     );
   }
