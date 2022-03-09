@@ -3,6 +3,7 @@ package delivery_usecase
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
+	"qrmos/internal/common/errcode"
 	"qrmos/internal/common/security"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
@@ -36,7 +37,7 @@ func (u *CreateDestUsecase) Create(t time.Time, input *CreateDestInput) error {
 	}
 	deliverDest := u.DeliveryRepo.GetByName(input.Name)
 	if deliverDest != nil {
-		return apperror.New("delivery destination already exists")
+		return apperror.New("delivery destination already exists").WithCode(errcode.Err4000)
 	}
 	deliverDest = &entity.DeliveryDestination{
 		Name:         input.Name,

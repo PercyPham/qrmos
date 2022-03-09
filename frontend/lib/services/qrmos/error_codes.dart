@@ -17,4 +17,7 @@ const errorCodes = {
 
   // Create user
   3000: "Tên đăng nhập đã tồn tại",
+
+  // Create delivery destination
+  4000: "Điểm giao nhận đã tồn tại",
 };

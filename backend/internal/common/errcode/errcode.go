@@ -12,3 +12,9 @@ const (
 const (
 	Err3000 = 3000 // Username already exists
 )
+
+// Create delivery destination
+
+const (
+	Err4000 = 4000
+)

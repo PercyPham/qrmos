@@ -3,6 +3,7 @@ import 'package:qrmos/widgets/screen_name.dart';
 import 'package:qrmos/widgets/table/table.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show DeliveryDestination, getAllDests;
 
+import 'widgets/create_dest_dialog.dart';
 import 'widgets/dest_qr_dialog.dart';
 
 class DeliveryManagementScreen extends StatefulWidget {
@@ -65,6 +66,12 @@ class _DeliveryManagementScreenState extends State<DeliveryManagementScreen> {
             ],
           ),
           if (_isLoading) const Text("Loading..."),
+          Container(height: 10),
+          ElevatedButton(
+              child: const Text("Tạo"),
+              onPressed: () {
+                _onCreateButtonPressed(context);
+              }),
         ],
       ),
     );
@@ -103,5 +110,13 @@ class _DeliveryManagementScreenState extends State<DeliveryManagementScreen> {
         ),
       ),
     );
+  }
+
+  _onCreateButtonPressed(BuildContext context) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (_) => const CreateDestDialog(),
+    );
+    if (result == true) await _loadDests();
   }
 }
