@@ -45,6 +45,17 @@ Future<ApiResponse> put(
   return ApiResponse.fromHttpResponse(response);
 }
 
+Future<ApiResponse> delete(
+  String apiRelativePath, {
+  Map<String, String>? headers,
+}) async {
+  var response = await http.delete(
+    _prepFullUrl(apiRelativePath),
+    headers: await _prepHeaders(headers),
+  );
+  return ApiResponse.fromHttpResponse(response);
+}
+
 Uri _prepFullUrl(String url) {
   return Uri.parse(_apiBaseUrl + url);
 }

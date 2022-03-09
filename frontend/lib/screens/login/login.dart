@@ -23,29 +23,28 @@ class _LoginScreenState extends State<LoginScreen> {
         title: const Text("Đăng nhập"),
       ),
       body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-          TextFormField(
-            decoration: _inputDecor("Tên đăng nhập"),
-            onChanged: _onUsernameChanged,
-            keyboardType: TextInputType.text,
-          ),
-          TextFormField(
-            decoration: _inputDecor("Mật khẩu"),
-            onChanged: _onPasswordChanges,
-            obscureText: true,
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 15, 0, 0),
-            child: Text(_errMsg, style: TextStyle(color: Theme.of(context).errorColor)),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: ElevatedButton(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            TextFormField(
+              decoration: _inputDecor("Tên đăng nhập"),
+              onChanged: _onUsernameChanged,
+              keyboardType: TextInputType.text,
+            ),
+            TextFormField(
+              decoration: _inputDecor("Mật khẩu"),
+              onChanged: _onPasswordChanges,
+              obscureText: true,
+            ),
+            Container(height: 10),
+            Text(_errMsg, style: const TextStyle(color: Colors.red)),
+            Container(height: 10),
+            ElevatedButton(
               onPressed: _onLoginButtonPressed(context),
               child: const Text("Đăng nhập"),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
