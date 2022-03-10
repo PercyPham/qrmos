@@ -27,11 +27,15 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             TextFormField(
+              autofocus: true,
               decoration: _inputDecor("Tên đăng nhập"),
               onChanged: _onUsernameChanged,
               keyboardType: TextInputType.text,
             ),
             TextFormField(
+              onFieldSubmitted: (_) {
+                _onLoginButtonPressed(context)();
+              },
               decoration: _inputDecor("Mật khẩu"),
               onChanged: _onPasswordChanges,
               obscureText: true,

@@ -57,7 +57,7 @@ class AuthModel extends ChangeNotifier {
   Future<String> login(String username, String password) async {
     var loginResp = await qrmos.login(username, password);
     if (loginResp.error != null) {
-      return qrmos.getErrorMessageFrom(loginResp.error!);
+      return qrmos.translateErrMsg(loginResp.error!);
     }
     return "";
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' show createVoucher, getErrorMessageFrom;
+import 'package:qrmos/services/qrmos/qrmos.dart' show createVoucher, translateErrMsg;
 
 class CreateVoucherDialog extends StatefulWidget {
   const CreateVoucherDialog({Key? key}) : super(key: key);
@@ -94,7 +94,7 @@ class _CreateVoucherDialogState extends State<CreateVoucherDialog> {
     var resp = await createVoucher(_code, _discount);
     if (resp.error != null) {
       setState(() {
-        _errMsg = getErrorMessageFrom(resp.error);
+        _errMsg = translateErrMsg(resp.error);
       });
       return;
     }

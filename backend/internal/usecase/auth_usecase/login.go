@@ -3,7 +3,6 @@ package auth_usecase
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
-	"qrmos/internal/common/errcode"
 	"qrmos/internal/usecase/internal/token"
 	"qrmos/internal/usecase/repo"
 	"time"
@@ -42,18 +41,18 @@ func (u *LoginUsecase) Login(t time.Time, input *LoginInput) (staffAccessToken s
 	user := u.userRepo.GetByUsername(input.Username)
 	if user == nil {
 		return "", apperror.Newf("username '%v' not found", input.Username).
-			WithCode(errcode.Err2000).
+			WithCode(http.StatusBadRequest).
 			WithPublicMessage("invalid username or password")
 	}
 
 	if !user.CheckPassword(input.Password) {
 		return "", apperror.New("invalid password").
-			WithCode(errcode.Err2000).
+			WithCode(http.StatusBadRequest).
 			WithPublicMessage("invalid username or password")
 	}
 
 	if !user.Active {
-		return "", apperror.New("user is not active").WithCode(errcode.Err2001)
+		return "", apperror.New("user is not active").WithCode(http.StatusForbidden)
 	}
 
 	staffAccessToken, err = token.GenStaffAccessToken(t, user)

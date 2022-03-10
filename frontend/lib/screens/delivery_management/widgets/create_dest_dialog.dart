@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' show createDest, getErrorMessageFrom;
+import 'package:qrmos/services/qrmos/qrmos.dart' show createDest, translateErrMsg;
 
 class CreateDestDialog extends StatefulWidget {
   const CreateDestDialog({Key? key}) : super(key: key);
@@ -68,7 +68,7 @@ class _CreateDestDialogState extends State<CreateDestDialog> {
     var resp = await createDest(_name);
     if (resp.error != null) {
       setState(() {
-        _errMsg = getErrorMessageFrom(resp.error);
+        _errMsg = translateErrMsg(resp.error);
       });
       return;
     }
