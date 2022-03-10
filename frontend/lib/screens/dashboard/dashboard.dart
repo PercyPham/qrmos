@@ -4,6 +4,7 @@ import 'package:qrmos/models/auth_model.dart';
 import './widgets/drawer/drawer.dart';
 import '../user_management/user_management.dart';
 import '../delivery_management/delivery_management.dart';
+import '../voucher_management/voucher_management.dart';
 
 const screenUserManagement = "Quản Lý Người Dùng";
 const screenDeliveryManagement = "Quản Lý Điểm Giao Nhận";
@@ -116,6 +117,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
         if (currentScreen == screenDeliveryManagement) {
           return const DeliveryManagementScreen();
+        }
+        if (currentScreen == screenVoucherManagement) {
+          return const VoucherManagementScreen();
         }
         return Center(child: Text("Hello " + auth.userFullName));
       },

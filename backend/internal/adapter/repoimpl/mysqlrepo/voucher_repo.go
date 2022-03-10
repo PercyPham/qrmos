@@ -24,6 +24,17 @@ func (r *voucherRepo) Create(voucher *entity.Voucher) error {
 	return nil
 }
 
+func (r *voucherRepo) GetMany() ([]*entity.Voucher, error) {
+	vouchers := []*entity.Voucher{}
+
+	result := r.db.Find(&vouchers)
+	if result.Error != nil {
+		return nil, apperror.Wrap(result.Error, "gorm db find vouchers")
+	}
+
+	return vouchers, nil
+}
+
 func (r *voucherRepo) GetByCode(code string) *entity.Voucher {
 	voucher := new(entity.Voucher)
 	result := r.db.Where("code = ?", code).First(voucher)
