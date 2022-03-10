@@ -3,7 +3,6 @@ package user_usecase
 import (
 	"net/http"
 	"qrmos/internal/common/apperror"
-	"qrmos/internal/common/errcode"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/repo"
 	"time"
@@ -54,7 +53,7 @@ func (u *CreateUserUsecase) CreateUser(t time.Time, input *CreateUserInput) erro
 	}
 	user := u.userRepo.GetByUsername(input.Username)
 	if user != nil {
-		return apperror.New("username already exists").WithCode(errcode.Err3000)
+		return apperror.New("username already exists").WithCode(http.StatusBadRequest)
 	}
 	user = &entity.User{
 		Username: input.Username,

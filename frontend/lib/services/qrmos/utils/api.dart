@@ -70,6 +70,15 @@ Future<Map<String, String>> _prepHeaders(Map<String, String>? headers) async {
   return headers;
 }
 
+class ApiBoolResponse {
+  bool? data;
+  ApiError? error;
+
+  ApiBoolResponse.fromJson(ApiResponse apiResp)
+      : error = apiResp.error,
+        data = apiResp.dataJson == true ? true : false;
+}
+
 class ApiResponse {
   dynamic dataJson;
   ApiError? error;

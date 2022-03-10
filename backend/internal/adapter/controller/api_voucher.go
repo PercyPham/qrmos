@@ -9,6 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (s *server) getVouchers(c *gin.Context) {
+	if _, err := s.authCheck.IsManager(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+	getVouchersUsecase := voucher_usecase.NewGetVouchersUsecase(s.voucherRepo)
+	vouchers, err := getVouchersUsecase.GetVouchers()
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets vouchers"))
+		return
+	}
+	response.Success(c, vouchers)
+}
+
 func (s *server) createVoucher(c *gin.Context) {
 	now := time.Now()
 	manager, err := s.authCheck.IsManager(now, c)

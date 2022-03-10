@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' show User, createUser, getErrorMessageFrom;
+import 'package:qrmos/services/qrmos/qrmos.dart' show User, createUser, translateErrMsg;
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({Key? key}) : super(key: key);
@@ -143,7 +143,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
     if (resp.error != null) {
       setState(() {
-        _errMsg = getErrorMessageFrom(resp.error);
+        _errMsg = translateErrMsg(resp.error);
       });
       return;
     }
