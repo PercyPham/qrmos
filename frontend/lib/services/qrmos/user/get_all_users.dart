@@ -14,8 +14,8 @@ class GetAllUsersResponse {
     error = apiResp.error;
     if (apiResp.dataJson != null) {
       var dataList = apiResp.dataJson as List<dynamic>;
+      data = [];
       for (var i = 0; i < dataList.length; i++) {
-        data ??= [];
         data!.add(User.fromJson(dataList[i]));
       }
     }
