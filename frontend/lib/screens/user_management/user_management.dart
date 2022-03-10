@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos;
-import 'package:qrmos/screens/create_user/create_user.dart';
 
 import 'package:qrmos/widgets/table/table.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 
-import '../user_detail/user_detail.dart';
+import 'create_user/create_user.dart';
+import 'user_detail/user_detail.dart';
 
 class UserManagementScreen extends StatefulWidget {
   const UserManagementScreen({Key? key}) : super(key: key);
