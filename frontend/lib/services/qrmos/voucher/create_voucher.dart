@@ -5,6 +5,5 @@ Future<ApiBoolResponse> createVoucher(String voucherCode, int voucherDiscount) a
     'code': voucherCode,
     'discount': voucherDiscount,
   });
-  var resp = ApiBoolResponse.fromJson(apiRawResp);
-  return resp;
+  return ApiBoolResponse.fromJson(apiRawResp);
 }

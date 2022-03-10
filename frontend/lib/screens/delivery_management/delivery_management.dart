@@ -47,6 +47,8 @@ class _DeliveryManagementScreenState extends State<DeliveryManagementScreen> {
         children: [
           const ScreenNameText("Quản lý điểm giao nhận"),
           Container(height: 20),
+          const Text("Ghi chú: click vào tên điểm giao nhận để xem QR code và làm mới mã bảo vệ."),
+          Container(height: 10),
           CustomTable(
             columnWidths: const {
               0: FixedColumnWidth(100.0),

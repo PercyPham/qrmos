@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/screens/edit_user/edit_user.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show User, getUserByUsername;
+import '../edit_user/edit_user.dart';
 
 class UserDetailScreen extends StatefulWidget {
   static const routeName = "/user-detail";

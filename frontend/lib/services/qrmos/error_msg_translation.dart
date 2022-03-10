@@ -16,4 +16,5 @@ final _errMsgTrans = {
       "Tài khoản đã bị vô hiệu hóa, vui lòng liên hệ quản trị viên để được hỗ trợ",
   "username already exists": "Tên đăng nhập đã tồn tại",
   "delivery destination already exists": "Điểm giao nhận đã tồn tại",
+  "voucher already exists": "Mã code đã tồn tại",
 };

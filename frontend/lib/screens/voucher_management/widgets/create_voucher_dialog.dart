@@ -54,7 +54,9 @@ class _CreateVoucherDialogState extends State<CreateVoucherDialog> {
                 },
               ),
             ),
+            const SizedBox(height: 10, width: 5),
             Text(_errMsg, style: const TextStyle(color: Colors.red)),
+            const SizedBox(height: 10, width: 5),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [

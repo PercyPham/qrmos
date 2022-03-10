@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart' show createDest, translateErrMsg;
+import 'package:qrmos/services/qrmos/qrmos.dart';
 
-class CreateDestDialog extends StatefulWidget {
-  const CreateDestDialog({Key? key}) : super(key: key);
+class CreateAssociationDialog extends StatefulWidget {
+  final int catId;
+  final List<MenuItem> items;
+  const CreateAssociationDialog({Key? key, required this.catId, required this.items})
+      : super(key: key);
 
   @override
-  State<CreateDestDialog> createState() => _CreateDestDialogState();
+  State<CreateAssociationDialog> createState() => _CreateAssociationDialogState();
 }
 
-class _CreateDestDialogState extends State<CreateDestDialog> {
-  String _name = "";
+class _CreateAssociationDialogState extends State<CreateAssociationDialog> {
+  int? _pickedItemId;
   String _errMsg = "";
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.items.isNotEmpty) {
+      _pickedItemId = widget.items[0].id;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,21 +32,22 @@ class _CreateDestDialogState extends State<CreateDestDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(
-              width: 150,
-              child: TextFormField(
-                decoration: const InputDecoration(
-                  labelText: "Tên",
-                  constraints: BoxConstraints(maxWidth: 300),
-                ),
-                autofocus: true,
-                onChanged: (val) {
+            DropdownButton<int>(
+              value: _pickedItemId,
+              onChanged: (val) {
+                if (val != null) {
                   setState(() {
-                    _name = val;
+                    _pickedItemId = val;
                     _errMsg = "";
                   });
-                },
-              ),
+                }
+              },
+              items: widget.items
+                  .map((item) => DropdownMenuItem(
+                        value: item.id,
+                        child: Text(item.name),
+                      ))
+                  .toList(),
             ),
             Text(_errMsg, style: const TextStyle(color: Colors.red)),
             Row(
@@ -49,7 +61,7 @@ class _CreateDestDialogState extends State<CreateDestDialog> {
                 ),
                 Container(width: 10),
                 ElevatedButton(
-                    child: const Text("Tạo"),
+                    child: const Text("Thêm"),
                     onPressed: () {
                       _onCreateButtonPressed(context);
                     }),
@@ -62,14 +74,14 @@ class _CreateDestDialogState extends State<CreateDestDialog> {
   }
 
   _onCreateButtonPressed(BuildContext context) async {
-    if (_name == "") {
+    if (_pickedItemId == null) {
       setState(() {
-        _errMsg = "Tên điểm giao nhận không được để trống";
+        _errMsg = "Phải chọn item";
       });
       return;
     }
 
-    var resp = await createDest(_name);
+    var resp = await createMenuAssociation(widget.catId, _pickedItemId!);
     if (resp.error != null) {
       setState(() {
         _errMsg = translateErrMsg(resp.error);

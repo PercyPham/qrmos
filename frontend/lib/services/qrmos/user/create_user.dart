@@ -8,6 +8,5 @@ Future<ApiBoolResponse> createUser(User user) async {
     "fullName": user.fullName,
     "role": user.role,
   });
-  var resp = ApiBoolResponse.fromJson(apiRawResp);
-  return resp;
+  return ApiBoolResponse.fromJson(apiRawResp);
 }

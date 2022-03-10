@@ -129,10 +129,9 @@ class _VoucherManagementScreenState extends State<VoucherManagementScreen> {
         Container(
           padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
           child: ElevatedButton(
-              child: const Text("Xoá"),
-              onPressed: () {
-                onDeleteTap();
-              }),
+            child: const Text("Xoá"),
+            onPressed: voucher.isUsed ? null : onDeleteTap,
+          ),
         ),
       ],
     );

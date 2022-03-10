@@ -9,6 +9,5 @@ Future<ApiBoolResponse> updateUser(User user) async {
     "role": user.role,
     "active": user.active,
   });
-  var resp = ApiBoolResponse.fromJson(apiRawResp);
-  return resp;
+  return ApiBoolResponse.fromJson(apiRawResp);
 }

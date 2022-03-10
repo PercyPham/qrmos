@@ -76,7 +76,7 @@ class ApiBoolResponse {
 
   ApiBoolResponse.fromJson(ApiResponse apiResp)
       : error = apiResp.error,
-        data = apiResp.dataJson == true ? true : false;
+        data = apiResp.dataJson == true;
 }
 
 class ApiResponse {
