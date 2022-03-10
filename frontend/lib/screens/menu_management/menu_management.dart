@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
-import 'package:qrmos/widgets/screen_name.dart';
 
-import 'widgets/category_table.dart';
+import 'association_management.dart';
+import 'cat_management.dart';
+import 'widgets/create_association_dialog.dart';
 import 'widgets/create_menu_cat_dialog.dart';
 
 class MenuManagementScreen extends StatefulWidget {
@@ -43,6 +44,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     var menu = apiResp.data!;
     setState(() {
       _isLoading = false;
+      menu.categories.sort((a, b) => a.name.compareTo(b.name));
       _categories = menu.categories;
       _items = menu.items;
       _associations = menu.associations;
@@ -51,34 +53,37 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const ScreenNameText("Quản lý danh mục"),
-          Container(height: 20),
-          CategoryTable(
-            isLoading: _isLoading,
-            categories: _categories,
-            onCatDeleteButtonPressed: (catId) {
-              _onCatDeleteButtonPressed(catId);
-            },
-          ),
-          Container(height: 10),
-          ElevatedButton(
-            child: const Text("Tạo danh mục"),
-            onPressed: () {
-              _onCreateNewCatPressed(context);
-            },
-          ),
-        ],
+    return SingleChildScrollView(
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CategoryManagementSection(
+              isLoading: _isLoading,
+              categories: _categories,
+              onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
+              onCreateNewCatPressed: () {
+                _onCreateNewCatPressed(context);
+              },
+            ),
+            Container(height: 50),
+            AssociationManagementSection(
+              isLoading: _isLoading,
+              categories: _categories,
+              items: _items,
+              associations: _associations,
+              onDeleteAssociationButtonPressed: _onDeleteAssociationButtonPressed,
+              onCreateNewAssociationPressed: _onCreateNewAssociationPressed,
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _onCatDeleteButtonPressed(int catId) async {
+  void _onDeleteCatButtonPressed(int catId) async {
     var apiResp = await deleteMenuCat(catId);
     if (apiResp.error != null) {
       // ignore: avoid_print
@@ -94,5 +99,35 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
       builder: (_) => const CreateMenuCatDialog(),
     );
     if (result == true) await _loadMenu();
+  }
+
+  void _onDeleteAssociationButtonPressed(int catId, int itemId) async {
+    var apiResp = await deleteMenuAssociation(catId, itemId);
+    if (apiResp.error != null) {
+      // ignore: avoid_print
+      print(apiResp.error!.message);
+      return;
+    }
+    _loadMenu();
+  }
+
+  void _onCreateNewAssociationPressed(int catId) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (_) => CreateAssociationDialog(
+        catId: catId,
+        items: _items.where((item) => !_checkIfAlreadyAssociated(catId, item.id)).toList(),
+      ),
+    );
+    if (result == true) await _loadMenu();
+  }
+
+  bool _checkIfAlreadyAssociated(int catId, int itemId) {
+    for (var a in _associations) {
+      if (a.catId == catId && a.itemId == itemId) {
+        return true;
+      }
+    }
+    return false;
   }
 }

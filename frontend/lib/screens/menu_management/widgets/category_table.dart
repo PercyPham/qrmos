@@ -5,13 +5,13 @@ import 'package:qrmos/widgets/table/table.dart';
 class CategoryTable extends StatelessWidget {
   final bool isLoading;
   final List<MenuCategory> categories;
-  final void Function(int) onCatDeleteButtonPressed;
+  final void Function(int) onDeleteCatButtonPressed;
 
   const CategoryTable({
     Key? key,
     required this.isLoading,
     required this.categories,
-    required this.onCatDeleteButtonPressed,
+    required this.onDeleteCatButtonPressed,
   }) : super(key: key);
 
   @override
@@ -57,7 +57,7 @@ class CategoryTable extends StatelessWidget {
         child: ElevatedButton(
           child: const Text("Xoá"),
           onPressed: () {
-            onCatDeleteButtonPressed(cat.id);
+            onDeleteCatButtonPressed(cat.id);
           },
         ),
       ),
