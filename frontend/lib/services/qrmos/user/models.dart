@@ -18,5 +18,5 @@ class User {
         password = data["password"] ?? "",
         fullName = data["fullName"],
         role = data["role"],
-        active = data["active"] == true ? true : false;
+        active = data["active"] == true;
 }

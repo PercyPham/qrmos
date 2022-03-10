@@ -3,8 +3,7 @@ import './models.dart';
 
 Future<GetDestByNameResponse> getDestByName(String destName) async {
   var apiRawResp = await get('/delivery-destinations/$destName');
-  var resp = GetDestByNameResponse.fromJson(apiRawResp);
-  return resp;
+  return GetDestByNameResponse.fromJson(apiRawResp);
 }
 
 class GetDestByNameResponse {

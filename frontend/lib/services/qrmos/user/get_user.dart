@@ -3,8 +3,7 @@ import './models.dart';
 
 Future<GetUserByUsernameResponse> getUserByUsername(String username) async {
   var apiRawResp = await get("/users/" + username);
-  var resp = GetUserByUsernameResponse.fromJson(apiRawResp);
-  return resp;
+  return GetUserByUsernameResponse.fromJson(apiRawResp);
 }
 
 class GetUserByUsernameResponse {

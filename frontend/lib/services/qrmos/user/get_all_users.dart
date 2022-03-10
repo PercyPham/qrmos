@@ -3,8 +3,7 @@ import './models.dart';
 
 Future<GetAllUsersResponse> getAllUsers() async {
   var apiRawResp = await get("/users");
-  var resp = GetAllUsersResponse.fromJson(apiRawResp);
-  return resp;
+  return GetAllUsersResponse.fromJson(apiRawResp);
 }
 
 class GetAllUsersResponse {
