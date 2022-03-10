@@ -23,7 +23,11 @@ class _CreateDestDialogState extends State<CreateDestDialog> {
           children: [
             SizedBox(
               width: 150,
-              child: TextField(
+              child: TextFormField(
+                decoration: const InputDecoration(
+                  labelText: "Tên",
+                  constraints: BoxConstraints(maxWidth: 300),
+                ),
                 autofocus: true,
                 onChanged: (val) {
                   setState(() {
