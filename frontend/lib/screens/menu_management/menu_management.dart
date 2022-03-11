@@ -5,6 +5,8 @@ import 'association_section/association_management.dart';
 import 'cat_section/cat_management.dart';
 import 'association_section/widgets/create_association_dialog.dart';
 import 'cat_section/widgets/create_menu_cat_dialog.dart';
+import 'item_section/create_item.dart';
+import 'item_section/item_detail.dart';
 import 'item_section/item_management.dart';
 
 class MenuManagementScreen extends StatefulWidget {
@@ -63,17 +65,18 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           ItemManagementSection(
             isLoading: _isLoading,
             items: _items,
+            onItemDetailButtonPressed: (itemId) {
+              _openItemDetailScreen(context, itemId);
+            },
             onToggleItemAvailabilityPressed: _setItemAvailability,
-            onCreateItemButtonPressed: () {},
+            onCreateItemButtonPressed: _openCreateItemScreen(context),
           ),
           Container(height: 50),
           CategoryManagementSection(
             isLoading: _isLoading,
             categories: _categories,
             onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
-            onCreateNewCatPressed: () {
-              _onCreateNewCatPressed(context);
-            },
+            onCreateNewCatPressed: _onCreateNewCatPressed(context),
           ),
           Container(height: 50),
           AssociationManagementSection(
@@ -99,6 +102,20 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     _loadMenu();
   }
 
+  _openItemDetailScreen(BuildContext context, int itemId) async {
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => MenuItemDetailScreen(itemId)));
+    _loadMenu();
+  }
+
+  _openCreateItemScreen(BuildContext context) {
+    return () async {
+      await Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const CreateMenuItemScreen()));
+      _loadMenu();
+    };
+  }
+
   void _onDeleteCatButtonPressed(int catId) async {
     var apiResp = await deleteMenuCat(catId);
     if (apiResp.error != null) {
@@ -109,12 +126,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     _loadMenu();
   }
 
-  void _onCreateNewCatPressed(BuildContext context) async {
-    bool? result = await showDialog<bool>(
-      context: context,
-      builder: (_) => const CreateMenuCatDialog(),
-    );
-    if (result == true) await _loadMenu();
+  _onCreateNewCatPressed(BuildContext context) {
+    return () async {
+      bool? result = await showDialog<bool>(
+        context: context,
+        builder: (_) => const CreateMenuCatDialog(),
+      );
+      if (result == true) await _loadMenu();
+    };
   }
 
   void _onDeleteAssociationButtonPressed(int catId, int itemId) async {

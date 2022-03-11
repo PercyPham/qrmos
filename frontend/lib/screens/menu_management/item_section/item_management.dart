@@ -7,6 +7,7 @@ import 'widgets/item_table.dart';
 class ItemManagementSection extends StatelessWidget {
   final bool isLoading;
   final List<MenuItem> items;
+  final void Function(int) onItemDetailButtonPressed;
   final void Function(int, bool) onToggleItemAvailabilityPressed;
   final void Function() onCreateItemButtonPressed;
 
@@ -14,6 +15,7 @@ class ItemManagementSection extends StatelessWidget {
     Key? key,
     required this.isLoading,
     required this.items,
+    required this.onItemDetailButtonPressed,
     required this.onToggleItemAvailabilityPressed,
     required this.onCreateItemButtonPressed,
   }) : super(key: key);
@@ -30,7 +32,7 @@ class ItemManagementSection extends StatelessWidget {
           isLoading: isLoading,
           items: items,
           onToggleItemAvailabilityPressed: onToggleItemAvailabilityPressed,
-          onItemDetailButtonPressed: (_) {},
+          onItemDetailButtonPressed: onItemDetailButtonPressed,
         ),
         Container(height: 10),
         ElevatedButton(
