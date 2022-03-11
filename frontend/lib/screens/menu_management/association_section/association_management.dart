@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/screens/menu_management/widgets/association_table.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 
-import 'widgets/category_table.dart';
+import 'widgets/association_table.dart';
 
 class AssociationManagementSection extends StatelessWidget {
   final bool isLoading;

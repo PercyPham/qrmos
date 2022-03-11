@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 
-import 'association_management.dart';
-import 'cat_management.dart';
-import 'widgets/create_association_dialog.dart';
-import 'widgets/create_menu_cat_dialog.dart';
+import 'association_section/association_management.dart';
+import 'cat_section/cat_management.dart';
+import 'association_section/widgets/create_association_dialog.dart';
+import 'cat_section/widgets/create_menu_cat_dialog.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({Key? key}) : super(key: key);
