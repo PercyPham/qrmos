@@ -5,6 +5,7 @@ import 'association_section/association_management.dart';
 import 'cat_section/cat_management.dart';
 import 'association_section/widgets/create_association_dialog.dart';
 import 'cat_section/widgets/create_menu_cat_dialog.dart';
+import 'item_section/item_management.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({Key? key}) : super(key: key);
@@ -60,6 +61,20 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            ItemManagementSection(
+              isLoading: _isLoading,
+              items: _items,
+              onToggleItemAvailabilityPressed: (itemId, available) async {
+                var resp = await setItemAvailable(itemId, available);
+                if (resp.error != null) {
+                  print(resp.error);
+                  return;
+                }
+                _loadMenu();
+              },
+              onCreateItemButtonPressed: () {},
+            ),
+            Container(height: 50),
             CategoryManagementSection(
               isLoading: _isLoading,
               categories: _categories,
