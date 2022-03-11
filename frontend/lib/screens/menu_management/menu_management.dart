@@ -55,47 +55,48 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ItemManagementSection(
-              isLoading: _isLoading,
-              items: _items,
-              onToggleItemAvailabilityPressed: (itemId, available) async {
-                var resp = await setItemAvailable(itemId, available);
-                if (resp.error != null) {
-                  print(resp.error);
-                  return;
-                }
-                _loadMenu();
-              },
-              onCreateItemButtonPressed: () {},
-            ),
-            Container(height: 50),
-            CategoryManagementSection(
-              isLoading: _isLoading,
-              categories: _categories,
-              onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
-              onCreateNewCatPressed: () {
-                _onCreateNewCatPressed(context);
-              },
-            ),
-            Container(height: 50),
-            AssociationManagementSection(
-              isLoading: _isLoading,
-              categories: _categories,
-              items: _items,
-              associations: _associations,
-              onDeleteAssociationButtonPressed: _onDeleteAssociationButtonPressed,
-              onCreateNewAssociationPressed: _onCreateNewAssociationPressed,
-            ),
-          ],
-        ),
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ItemManagementSection(
+            isLoading: _isLoading,
+            items: _items,
+            onToggleItemAvailabilityPressed: _setItemAvailability,
+            onCreateItemButtonPressed: () {},
+          ),
+          Container(height: 50),
+          CategoryManagementSection(
+            isLoading: _isLoading,
+            categories: _categories,
+            onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
+            onCreateNewCatPressed: () {
+              _onCreateNewCatPressed(context);
+            },
+          ),
+          Container(height: 50),
+          AssociationManagementSection(
+            isLoading: _isLoading,
+            categories: _categories,
+            items: _items,
+            associations: _associations,
+            onDeleteAssociationButtonPressed: _onDeleteAssociationButtonPressed,
+            onCreateNewAssociationPressed: _onCreateNewAssociationPressed,
+          ),
+        ],
       ),
     );
+  }
+
+  void _setItemAvailability(int itemId, bool available) async {
+    var resp = await setItemAvailable(itemId, available);
+    if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
+      return;
+    }
+    _loadMenu();
   }
 
   void _onDeleteCatButtonPressed(int catId) async {

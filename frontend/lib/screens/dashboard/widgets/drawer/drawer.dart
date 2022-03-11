@@ -22,6 +22,7 @@ class AppDrawer extends StatelessWidget {
       }
       return Drawer(
         child: SingleChildScrollView(
+          controller: ScrollController(),
           child: Column(
             children: [
               AppBar(
