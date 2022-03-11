@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 
 import 'association_section/association_management.dart';
@@ -56,6 +58,9 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<AuthModel>(context).staffRole;
+    var isManager = auth == StaffRole.manager;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(15),
       child: Column(
@@ -71,22 +76,24 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
             onToggleItemAvailabilityPressed: _setItemAvailability,
             onCreateItemButtonPressed: _openCreateItemScreen(context),
           ),
-          Container(height: 50),
-          CategoryManagementSection(
-            isLoading: _isLoading,
-            categories: _categories,
-            onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
-            onCreateNewCatPressed: _onCreateNewCatPressed(context),
-          ),
-          Container(height: 50),
-          AssociationManagementSection(
-            isLoading: _isLoading,
-            categories: _categories,
-            items: _items,
-            associations: _associations,
-            onDeleteAssociationButtonPressed: _onDeleteAssociationButtonPressed,
-            onCreateNewAssociationPressed: _onCreateNewAssociationPressed,
-          ),
+          if (isManager) Container(height: 50),
+          if (isManager)
+            CategoryManagementSection(
+              isLoading: _isLoading,
+              categories: _categories,
+              onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
+              onCreateNewCatPressed: _onCreateNewCatPressed(context),
+            ),
+          if (isManager) Container(height: 50),
+          if (isManager)
+            AssociationManagementSection(
+              isLoading: _isLoading,
+              categories: _categories,
+              items: _items,
+              associations: _associations,
+              onDeleteAssociationButtonPressed: _onDeleteAssociationButtonPressed,
+              onCreateNewAssociationPressed: _onCreateNewAssociationPressed,
+            ),
         ],
       ),
     );

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 
@@ -22,6 +24,9 @@ class ItemManagementSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<AuthModel>(context).staffRole;
+    var isManager = auth == StaffRole.manager;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,11 +39,12 @@ class ItemManagementSection extends StatelessWidget {
           onToggleItemAvailabilityPressed: onToggleItemAvailabilityPressed,
           onItemDetailButtonPressed: onItemDetailButtonPressed,
         ),
-        Container(height: 10),
-        ElevatedButton(
-          child: const Text("Tạo món"),
-          onPressed: onCreateItemButtonPressed,
-        ),
+        if (isManager) Container(height: 10),
+        if (isManager)
+          ElevatedButton(
+            child: const Text("Tạo món"),
+            onPressed: onCreateItemButtonPressed,
+          ),
       ],
     );
   }

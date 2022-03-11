@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/table/table.dart';
 
@@ -41,6 +43,9 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<AuthModel>(context).staffRole;
+    var isManager = auth == StaffRole.manager;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Chi tiết món"),
@@ -71,14 +76,15 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                   Image.network(_item!.image, height: 200, width: 200),
                   const Text("Lựa chọn:"),
                   _itemOptions(),
-                  Container(height: 10),
-                  ElevatedButton(
-                    child: const Text('Chỉnh sửa'),
-                    onPressed: () async {
-                      await _openEditPage(context);
-                      _loadItem();
-                    },
-                  ),
+                  if (isManager) Container(height: 10),
+                  if (isManager)
+                    ElevatedButton(
+                      child: const Text('Chỉnh sửa'),
+                      onPressed: () async {
+                        await _openEditPage(context);
+                        _loadItem();
+                      },
+                    ),
                 ],
               ),
       ),
