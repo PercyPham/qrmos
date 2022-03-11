@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 
-import 'association_management.dart';
-import 'cat_management.dart';
-import 'widgets/create_association_dialog.dart';
-import 'widgets/create_menu_cat_dialog.dart';
+import 'association_section/association_management.dart';
+import 'cat_section/cat_management.dart';
+import 'association_section/widgets/create_association_dialog.dart';
+import 'cat_section/widgets/create_menu_cat_dialog.dart';
+import 'item_section/create_item.dart';
+import 'item_section/item_detail.dart';
+import 'item_section/item_management.dart';
 
 class MenuManagementScreen extends StatefulWidget {
   const MenuManagementScreen({Key? key}) : super(key: key);
@@ -53,22 +58,34 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var auth = Provider.of<AuthModel>(context).staffRole;
+    var isManager = auth == StaffRole.manager;
+
     return SingleChildScrollView(
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ItemManagementSection(
+            isLoading: _isLoading,
+            items: _items,
+            onItemDetailButtonPressed: (itemId) {
+              _openItemDetailScreen(context, itemId);
+            },
+            onToggleItemAvailabilityPressed: _setItemAvailability,
+            onCreateItemButtonPressed: _openCreateItemScreen(context),
+          ),
+          if (isManager) Container(height: 50),
+          if (isManager)
             CategoryManagementSection(
               isLoading: _isLoading,
               categories: _categories,
               onDeleteCatButtonPressed: _onDeleteCatButtonPressed,
-              onCreateNewCatPressed: () {
-                _onCreateNewCatPressed(context);
-              },
+              onCreateNewCatPressed: _onCreateNewCatPressed(context),
             ),
-            Container(height: 50),
+          if (isManager) Container(height: 50),
+          if (isManager)
             AssociationManagementSection(
               isLoading: _isLoading,
               categories: _categories,
@@ -77,10 +94,33 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
               onDeleteAssociationButtonPressed: _onDeleteAssociationButtonPressed,
               onCreateNewAssociationPressed: _onCreateNewAssociationPressed,
             ),
-          ],
-        ),
+        ],
       ),
     );
+  }
+
+  void _setItemAvailability(int itemId, bool available) async {
+    var resp = await setItemAvailable(itemId, available);
+    if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
+      return;
+    }
+    _loadMenu();
+  }
+
+  _openItemDetailScreen(BuildContext context, int itemId) async {
+    await Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => MenuItemDetailScreen(itemId)));
+    _loadMenu();
+  }
+
+  _openCreateItemScreen(BuildContext context) {
+    return () async {
+      await Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => const CreateMenuItemScreen()));
+      _loadMenu();
+    };
   }
 
   void _onDeleteCatButtonPressed(int catId) async {
@@ -93,12 +133,14 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     _loadMenu();
   }
 
-  void _onCreateNewCatPressed(BuildContext context) async {
-    bool? result = await showDialog<bool>(
-      context: context,
-      builder: (_) => const CreateMenuCatDialog(),
-    );
-    if (result == true) await _loadMenu();
+  _onCreateNewCatPressed(BuildContext context) {
+    return () async {
+      bool? result = await showDialog<bool>(
+        context: context,
+        builder: (_) => const CreateMenuCatDialog(),
+      );
+      if (result == true) await _loadMenu();
+    };
   }
 
   void _onDeleteAssociationButtonPressed(int catId, int itemId) async {

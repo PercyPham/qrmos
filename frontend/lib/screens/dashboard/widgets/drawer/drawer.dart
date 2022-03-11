@@ -21,18 +21,21 @@ class AppDrawer extends StatelessWidget {
         return const Drawer();
       }
       return Drawer(
-        child: Column(
-          children: [
-            AppBar(
-              title: Column(
-                children: [
-                  Text(authModel.userFullName),
-                  Text('(${authModel.staffRoleStr})'),
-                ],
+        child: SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column(
+            children: [
+              AppBar(
+                title: Column(
+                  children: [
+                    Text(authModel.userFullName),
+                    Text('(${authModel.staffRoleStr})'),
+                  ],
+                ),
               ),
-            ),
-            ..._listTiles(),
-          ],
+              ..._listTiles(),
+            ],
+          ),
         ),
       );
     });
