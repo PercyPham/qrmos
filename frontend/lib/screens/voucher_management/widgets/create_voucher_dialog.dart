@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show createVoucher, translateErrMsg;
+import 'package:qrmos/widgets/input/number_input_field.dart';
 
 class CreateVoucherDialog extends StatefulWidget {
   const CreateVoucherDialog({Key? key}) : super(key: key);
@@ -40,15 +41,14 @@ class _CreateVoucherDialogState extends State<CreateVoucherDialog> {
             ),
             SizedBox(
               width: 150,
-              child: TextFormField(
+              child: NumberInputField(
                 decoration: const InputDecoration(
                   labelText: "Giá trị",
                   constraints: BoxConstraints(maxWidth: 300),
                 ),
-                keyboardType: TextInputType.number,
                 onChanged: (val) {
                   setState(() {
-                    _discount = int.parse(val);
+                    _discount = val;
                     _errMsg = "";
                   });
                 },
