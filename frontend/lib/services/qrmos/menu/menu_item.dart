@@ -7,7 +7,7 @@ Future<ApiBoolResponse> createMenuItem(MenuItem item) async {
 }
 
 Future<ApiBoolResponse> updateMenuItem(MenuItem item) async {
-  var apiRawResp = await post("/menu/items/${item.id}", body: item.toJson());
+  var apiRawResp = await put("/menu/items/${item.id}", body: item.toJson());
   return ApiBoolResponse.fromJson(apiRawResp);
 }
 
