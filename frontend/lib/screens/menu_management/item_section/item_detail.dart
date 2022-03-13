@@ -73,7 +73,11 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                           }),
                     ],
                   ),
-                  Image.network(_item!.image, height: 200, width: 200),
+                  SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Image.network(_item!.image, fit: BoxFit.cover),
+                  ),
                   const Text("Lựa chọn:"),
                   _itemOptions(),
                   if (isManager) Container(height: 10),

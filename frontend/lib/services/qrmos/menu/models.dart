@@ -99,9 +99,9 @@ class MenuItemOption {
   Map<String, MenuItemOptionChoice> choices;
 
   MenuItemOption({
-    required this.available,
-    required this.maxChoice,
-    required this.minChoice,
+    this.available = false,
+    this.maxChoice = 0,
+    this.minChoice = 0,
     this.choices = const {},
   });
   MenuItemOption.fromJson(Map<String, dynamic> dataJson)
@@ -123,7 +123,7 @@ class MenuItemOptionChoice {
   int price;
   bool available;
 
-  MenuItemOptionChoice(this.price, this.available);
+  MenuItemOptionChoice({this.price = 0, this.available = false});
   MenuItemOptionChoice.fromJson(Map<String, dynamic> dataJson)
       : price = dataJson['price'],
         available = dataJson['available'];

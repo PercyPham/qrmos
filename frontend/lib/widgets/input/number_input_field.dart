@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 class NumberInputField extends StatefulWidget {
+  final int initialValue;
   final InputDecoration decoration;
   final void Function(int) onChanged;
   const NumberInputField({
     Key? key,
+    this.initialValue = 0,
     required this.onChanged,
     this.decoration = const InputDecoration(),
   }) : super(key: key);
@@ -21,7 +23,8 @@ class _NumberInputFieldState extends State<NumberInputField> {
   @override
   void initState() {
     super.initState();
-    _controler.text = _currVal;
+    _currNumVal = widget.initialValue;
+    _controler.text = '$_currNumVal';
   }
 
   @override
