@@ -5,6 +5,7 @@ import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/table/table.dart';
 
 import 'edit_item.dart';
+import 'widgets/image_preview.dart';
 
 class MenuItemDetailScreen extends StatefulWidget {
   final int itemId;
@@ -73,11 +74,7 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                           }),
                     ],
                   ),
-                  SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Image.network(_item!.image, fit: BoxFit.cover),
-                  ),
+                  ImagePreview(_item!.image),
                   const Text("Lựa chọn:"),
                   _itemOptions(),
                   if (isManager) Container(height: 10),

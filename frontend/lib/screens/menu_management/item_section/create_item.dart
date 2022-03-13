@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/input/number_input_field.dart';
 
+import 'widgets/image_preview.dart';
 import 'widgets/item_option_input.dart';
 
 class CreateMenuItemScreen extends StatefulWidget {
@@ -73,12 +74,7 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
                 });
               },
             ),
-            if (_image != "")
-              SizedBox(
-                width: 200,
-                height: 200,
-                child: Image.network(_image, fit: BoxFit.cover),
-              ),
+            if (_image != "") ImagePreview(_image),
             _numInputRow(
               label: "Giá cơ bản: ",
               onChanged: (val) {
@@ -189,14 +185,22 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
         return;
       }
 
-      var resp = await createMenuItem(MenuItem(
+      Map<String, MenuItemOption> options = {};
+      for (var itemOpt in _itemOptions) {
+        options[itemOpt.name] = itemOpt.option;
+      }
+
+      var menuItem = MenuItem(
         id: 0,
         name: _name,
         description: _description,
         available: _available,
         image: _image,
         baseUnitPrice: _baseUnitPrice,
-      ));
+        options: options,
+      );
+
+      var resp = await createMenuItem(menuItem);
       if (resp.error != null) {
         setState(() {
           _errMsg = translateErrMsg(resp.error);
@@ -221,6 +225,18 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
       _setErrMsg("Giá cơ bản phải lớn hơn 0");
       return false;
     }
+    Map<String, bool> m = {};
+    for (var itemOpt in _itemOptions) {
+      if (itemOpt.isModifying == true) {
+        _setErrMsg("Vẫn còn có tuỳ chọn đang chỉnh sửa");
+        return false;
+      }
+      if (m[itemOpt.name] == true) {
+        _setErrMsg("Tuỳ chọn '${itemOpt.name}' bị trùng");
+        return false;
+      }
+      m[itemOpt.name] = true;
+    }
     return true;
   }
 
@@ -238,15 +254,23 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
         key: itemOpt.uniqueKey,
         optionName: itemOpt.name,
         option: itemOpt.option,
+        isModifying: itemOpt.isModifying,
+        onModifyingChanged: (val) {
+          setState(() {
+            itemOpt.isModifying = val;
+          });
+        },
         onChanged: (optName, option) {
           setState(() {
             itemOpt.name = optName;
             itemOpt.option = option;
+            _errMsg = "";
           });
         },
         onDeleteOptionPressed: () {
           setState(() {
             _itemOptions.removeAt(i);
+            _errMsg = "";
           });
         },
       ));
@@ -256,7 +280,8 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
 
   _onAddOptionButtonPressed() {
     setState(() {
-      _itemOptions.add(_ItemOption("", MenuItemOption()));
+      _itemOptions.add(_ItemOption("", MenuItemOption(), true));
+      _errMsg = "";
     });
   }
 }
@@ -265,6 +290,7 @@ class _ItemOption {
   UniqueKey uniqueKey;
   String name;
   MenuItemOption option;
+  bool isModifying;
 
-  _ItemOption(this.name, this.option) : uniqueKey = UniqueKey();
+  _ItemOption(this.name, this.option, this.isModifying) : uniqueKey = UniqueKey();
 }
