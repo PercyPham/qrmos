@@ -41,3 +41,8 @@ class MenuItemResponse {
       : data = apiResp.dataJson != null ? MenuItem.fromJson(apiResp.dataJson) : null,
         error = apiResp.error;
 }
+
+Future<ApiBoolResponse> deleteMenuItem(int itemId) async {
+  var apiRawResp = await delete('/menu/items/$itemId');
+  return ApiBoolResponse.fromJson(apiRawResp);
+}
