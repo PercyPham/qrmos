@@ -8,6 +8,8 @@ class ItemOptionInput extends StatefulWidget {
   final MenuItemOption option;
   final void Function(String, MenuItemOption) onChanged;
   final void Function() onDeleteOptionPressed;
+  final bool isModifying;
+  final void Function(bool) onModifyingChanged;
 
   const ItemOptionInput({
     Key? key,
@@ -15,6 +17,8 @@ class ItemOptionInput extends StatefulWidget {
     required this.option,
     required this.onChanged,
     required this.onDeleteOptionPressed,
+    required this.isModifying,
+    required this.onModifyingChanged,
   }) : super(key: key);
 
   @override
@@ -22,7 +26,6 @@ class ItemOptionInput extends StatefulWidget {
 }
 
 class _ItemOptionInputState extends State<ItemOptionInput> {
-  bool _isModifying = true;
   String _optName = "";
   MenuItemOption _option = MenuItemOption();
 
@@ -61,12 +64,12 @@ class _ItemOptionInputState extends State<ItemOptionInput> {
                   3: FixedColumnWidth(400),
                 },
                 children: [
-                  _isModifying ? _modifyTable() : _showInfoTable(),
+                  widget.isModifying ? _modifyTable() : _showInfoTable(),
                 ],
               ),
               const SizedBox(width: 5, height: 5),
               Column(children: [
-                _isModifying
+                widget.isModifying
                     ? ElevatedButton(
                         child: const Text("Chỉnh xong"),
                         onPressed: _onDoneButtonPressed,
@@ -74,9 +77,7 @@ class _ItemOptionInputState extends State<ItemOptionInput> {
                     : ElevatedButton(
                         child: const Text("Chỉnh"),
                         onPressed: () {
-                          setState(() {
-                            _isModifying = true;
-                          });
+                          widget.onModifyingChanged(true);
                         },
                       ),
                 const SizedBox(width: 5, height: 5),
@@ -99,7 +100,6 @@ class _ItemOptionInputState extends State<ItemOptionInput> {
       return;
     }
     setState(() {
-      _isModifying = false;
       _errMsg = "";
     });
     _option.choices = {};
@@ -107,6 +107,7 @@ class _ItemOptionInputState extends State<ItemOptionInput> {
       _option.choices[choice.name] = choice.choice;
     }
     widget.onChanged(_optName, _option);
+    widget.onModifyingChanged(false);
   }
 
   bool _validateInputs() {
@@ -370,9 +371,19 @@ class _ItemOptionInputState extends State<ItemOptionInput> {
             ..._option.choices.keys
                 .map((choiceName) => TableRow(
                       children: [
-                        Text('Lựa chọn: $choiceName'),
-                        Text('Giá: ${_option.choices[choiceName]!.price}'),
-                        Text(_option.choices[choiceName]!.available ? "Còn hàng" : "Hết hàng"),
+                        Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text('Lựa chọn: $choiceName'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text('Giá: ${_option.choices[choiceName]!.price}'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: Text(
+                              _option.choices[choiceName]!.available ? "Còn hàng" : "Hết hàng"),
+                        ),
                       ],
                     ))
                 .toList(),
