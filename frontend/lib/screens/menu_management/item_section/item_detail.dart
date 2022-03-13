@@ -5,6 +5,7 @@ import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/table/table.dart';
 
 import 'edit_item.dart';
+import 'widgets/image_preview.dart';
 
 class MenuItemDetailScreen extends StatefulWidget {
   final int itemId;
@@ -73,17 +74,30 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                           }),
                     ],
                   ),
-                  Image.network(_item!.image, height: 200, width: 200),
+                  ImagePreview(_item!.image),
                   const Text("Lựa chọn:"),
                   _itemOptions(),
                   if (isManager) Container(height: 10),
                   if (isManager)
-                    ElevatedButton(
-                      child: const Text('Chỉnh sửa'),
-                      onPressed: () async {
-                        await _openEditPage(context);
-                        _loadItem();
-                      },
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ElevatedButton(
+                          child: const Text('Chỉnh sửa'),
+                          onPressed: () async {
+                            await _openEditPage(context);
+                            _loadItem();
+                          },
+                        ),
+                        const SizedBox(height: 10, width: 10),
+                        ElevatedButton(
+                          child: const Text("Xoá"),
+                          onPressed: () {
+                            _onDeleteItemButtonPressed(context);
+                          },
+                        ),
+                      ],
                     ),
                 ],
               ),
@@ -179,5 +193,43 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
       MaterialPageRoute(builder: (context) => MenuItemEditScreen(_item!.id)),
     );
     _loadItem();
+  }
+
+  void _onDeleteItemButtonPressed(BuildContext context) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: Text("Xoá ${_item!.name}?"),
+          children: [
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Huỷ'),
+            ),
+            SimpleDialogOption(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Xoá'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != true) {
+      return;
+    }
+
+    var resp = await deleteMenuItem(widget.itemId);
+    if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 }
