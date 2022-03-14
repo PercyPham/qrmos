@@ -4,9 +4,10 @@ import "dart:convert";
 import 'dart:collection';
 import 'access_token.dart';
 
-final String _apiBaseUrl = kDebugMode
-    ? 'http://localhost:5000/api'
-    : '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}/api';
+final String baseUrl =
+    kDebugMode ? 'http://localhost:5000' : '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}';
+
+final String _apiBaseUrl = '$baseUrl/api';
 
 Future<ApiResponse> get(
   String apiRelativePath, {
