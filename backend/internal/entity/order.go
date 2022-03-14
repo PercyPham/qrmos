@@ -26,7 +26,7 @@ type Order struct {
 	Payment             *OrderPayment `json:"payment,omitempty"`
 	FailReason          string        `json:"failReason,omitempty"`
 	Creator             *OrderCreator `json:"creator"`
-	OrderItems          []*OrderItem  `json:"orderItems"`
+	OrderItems          []*OrderItem  `json:"orderItems,omitempty"`
 	CreatedAt           time.Time     `json:"createdAt"`
 }
 

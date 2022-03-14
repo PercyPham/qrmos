@@ -22,3 +22,22 @@ func (u *GetOrderUsecase) GetOrderByID(orderID int) (*entity.Order, error) {
 	}
 	return order, nil
 }
+
+func (u *GetOrderUsecase) GetOrders(filter *repo.GetOrdersFilter) (*GetOrdersResponse, error) {
+	if err := filter.Validate(); err != nil {
+		return nil, apperror.Wrap(err, "validate filter")
+	}
+	orders, total, err := u.orderRepo.GetOrders(filter)
+	if err != nil {
+		return nil, apperror.Wrap(err, "get orders with filter")
+	}
+	return &GetOrdersResponse{
+		Orders: orders,
+		Total:  total,
+	}, nil
+}
+
+type GetOrdersResponse struct {
+	Orders []*entity.Order `json:"orders"`
+	Total  int             `json:"total"`
+}

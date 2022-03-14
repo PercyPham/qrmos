@@ -31,6 +31,17 @@ func getIntParam(c *gin.Context, key string) (int, error) {
 	return int(num), err
 }
 
+func getIntQuery(c *gin.Context, key string) (int, error) {
+	raw := c.Query(key)
+	num, err := strconv.ParseInt(raw, 10, 32)
+	if err != nil {
+		return 0, apperror.Wrapf(err, "parse '%s' query to int", key).
+			WithCode(http.StatusBadRequest).
+			WithPublicMessagef("expected '%s' query to be int, got '%v'", key, raw)
+	}
+	return int(num), err
+}
+
 func getBoolQuery(c *gin.Context, key string) (bool, error) {
 	val := c.Query(key)
 	if val == "true" {
