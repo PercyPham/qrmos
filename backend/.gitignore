@@ -1,2 +1,5 @@
 # env that overwrite .default.env
 .env
+
+# temp images folder
+images

@@ -1,8 +1,8 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/input/number_input_field.dart';
 
-import 'widgets/image_preview.dart';
 import 'widgets/item_option_input.dart';
 
 class CreateMenuItemScreen extends StatefulWidget {
@@ -16,7 +16,7 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
   String _name = "";
   String _description = "";
   bool _available = false;
-  String _image = "";
+  PlatformFile? _image;
   int _baseUnitPrice = 0;
 
   final List<_ItemOption> _itemOptions = [];
@@ -65,16 +65,7 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
                 });
               },
             ),
-            _textInputRow(
-              label: "Link Hình: ",
-              onChanged: (val) {
-                setState(() {
-                  _image = val;
-                  _errMsg = "";
-                });
-              },
-            ),
-            if (_image != "") ImagePreview(_image),
+            _imagePicker(),
             _numInputRow(
               label: "Giá cơ bản: ",
               onChanged: (val) {
@@ -138,6 +129,39 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
     );
   }
 
+  Widget _imagePicker() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(children: [
+          const Text("Hình:"),
+          Container(width: 20),
+          ElevatedButton(
+              child: const Text("Chọn"),
+              onPressed: () async {
+                var picked = await FilePicker.platform.pickFiles(type: FileType.image);
+                if (picked != null) {
+                  setState(() {
+                    _image = picked.files.first;
+                    _errMsg = "";
+                  });
+                }
+              }),
+          if (_image != null) Container(width: 10),
+          if (_image != null) Text(_image!.name),
+        ]),
+        if (_image != null)
+          Container(
+            width: 200,
+            height: 200,
+            padding: const EdgeInsets.all(5),
+            child: Image.memory(_image!.bytes!, fit: BoxFit.cover),
+          ),
+      ],
+    );
+  }
+
   Row _numInputRow({
     required String label,
     required void Function(int) onChanged,
@@ -185,6 +209,13 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
         return;
       }
 
+      var imgResp = await uploadImage(_image!);
+      if (imgResp.error != null) {
+        _setErrMsg(translateErrMsg(imgResp.error));
+        return;
+      }
+      var imageLink = imgResp.data!;
+
       Map<String, MenuItemOption> options = {};
       for (var itemOpt in _itemOptions) {
         options[itemOpt.name] = itemOpt.option;
@@ -195,8 +226,8 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
         name: _name,
         description: _description,
         available: _available,
-        image: _image,
         baseUnitPrice: _baseUnitPrice,
+        image: imageLink,
         options: options,
       );
 
@@ -217,7 +248,7 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
       _setErrMsg("Tên món không được để trống");
       return false;
     }
-    if (_image == "") {
+    if (_image == null) {
       _setErrMsg("Hình không được để trống");
       return false;
     }

@@ -67,9 +67,12 @@ SERVER_PROD_SSH?=qrmos_prod
 deploy: build
 	@echo "$(GREEN)> Building backend on prod server ...$(NC)"
 	@ssh -t ${SERVER_PROD_SSH} '\
-		rm -rf ~/app;\
+		rm -rf ~/app/web;\
+		rm ~/app/qrmos;\
+		rm ~/app/.default.env;\
+		rm ~/app/.env;\
 		~/build_backend.sh;\
-		cp -r ~/qrmos/build ~/app;\
+		cp -r ~/qrmos/build/. ~/app;\
 		cp ~/.env ~/app/.env'
 
 	@echo "$(GREEN)> Copying built web to prod server ...$(NC)"
