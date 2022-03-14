@@ -106,6 +106,7 @@ func (s *server) Run() {
 
 func (s *server) runDev() {
 	s.r.Use(CORSMiddleware())
+	s.serveImageStatic()
 	s.setupAPIs()
 
 	port := strconv.Itoa(config.App().Port)
@@ -126,6 +127,7 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func (s *server) runStaging() {
+	s.serveImageStatic()
 	s.serveWebStatic()
 	s.setupAPIs()
 
@@ -134,6 +136,7 @@ func (s *server) runStaging() {
 }
 
 func (s *server) runProd() {
+	s.serveImageStatic()
 	s.serveWebStatic()
 	s.setupAPIs()
 
@@ -141,6 +144,11 @@ func (s *server) runProd() {
 		c.String(http.StatusOK, "pong")
 	})
 	log.Fatal(autotls.Run(s.r, config.App().Domains...))
+}
+
+func (s *server) serveImageStatic() {
+	s.r.POST("/images", s.uploadImage)
+	s.serveStatic("/images/", "./images")
 }
 
 func (s *server) serveWebStatic() {
