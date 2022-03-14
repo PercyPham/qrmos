@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' as qrmos;
+import 'package:qrmos/widgets/big_screen.dart';
 
 import 'package:qrmos/widgets/table/table.dart';
 import 'package:qrmos/widgets/screen_name.dart';
@@ -41,8 +42,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(15),
+    return BigScreen(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

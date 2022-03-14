@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show User, getUserByUsername;
+import 'package:qrmos/widgets/big_screen.dart';
 import '../edit_user/edit_user.dart';
 
 class UserDetailScreen extends StatefulWidget {
@@ -50,8 +51,7 @@ class _UserDetailScreenState extends State<UserDetailScreen> {
       ),
       body: _isLoading
           ? const Text("Loading...")
-          : Container(
-              padding: const EdgeInsets.all(15),
+          : BigScreen(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

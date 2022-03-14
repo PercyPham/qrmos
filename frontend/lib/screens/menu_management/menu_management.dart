@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
+import 'package:qrmos/widgets/big_screen.dart';
 
 import 'association_section/association_management.dart';
 import 'cat_section/cat_management.dart';
@@ -61,8 +62,7 @@ class _MenuManagementScreenState extends State<MenuManagementScreen> {
     var auth = Provider.of<AuthModel>(context).staffRole;
     var isManager = auth == StaffRole.manager;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(15),
+    return BigScreen(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show User, updateUser;
+import 'package:qrmos/widgets/big_screen.dart';
 
 class EditUserScreen extends StatefulWidget {
   static const routeName = "/create-user";
@@ -35,8 +36,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
       appBar: AppBar(
         title: const Text("Chỉnh Sửa Thông Tin Người Dùng"),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
+      body: BigScreen(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show User, createUser, translateErrMsg;
+import 'package:qrmos/widgets/big_screen.dart';
 
 class CreateUserScreen extends StatefulWidget {
   const CreateUserScreen({Key? key}) : super(key: key);
@@ -23,8 +24,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
       appBar: AppBar(
         title: const Text("Chỉnh Sửa Thông Tin Người Dùng"),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
+      body: BigScreen(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
