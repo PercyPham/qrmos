@@ -5,12 +5,18 @@ import (
 	"os"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
 func (s *server) uploadImage(c *gin.Context) {
+	if _, err := s.authCheck.IsManager(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+
 	file, _, err := c.Request.FormFile("image")
 	if err != nil {
 		response.Error(c, apperror.Wrap(err, "get file from request"))
