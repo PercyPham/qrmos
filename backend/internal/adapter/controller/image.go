@@ -46,3 +46,16 @@ func (s *server) uploadImage(c *gin.Context) {
 
 	response.Success(c, gin.H{"imageRelativePath": "/images/" + filename})
 }
+
+func (s *server) deleteImage(c *gin.Context) {
+	if _, err := s.authCheck.IsManager(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+	imgName := c.Param("imgName")
+	if err := os.Remove("./images/" + imgName); err != nil {
+		response.Error(c, apperror.Wrap(err, "os delete image"))
+		return
+	}
+	response.Success(c, true)
+}

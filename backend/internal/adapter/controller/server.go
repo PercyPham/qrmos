@@ -148,6 +148,7 @@ func (s *server) runProd() {
 
 func (s *server) serveImageStatic() {
 	s.r.POST("/images", s.uploadImage)
+	s.r.DELETE("/images/:imgName", s.deleteImage)
 	s.serveStatic("/images/", "./images")
 }
 

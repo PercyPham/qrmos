@@ -1,8 +1,8 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart';
 import 'package:qrmos/widgets/input/number_input_field.dart';
 
-import 'widgets/image_preview.dart';
 import 'widgets/item_option_input.dart';
 
 class MenuItemEditScreen extends StatefulWidget {
@@ -18,7 +18,8 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
   String _name = "";
   String _description = "";
   bool _available = false;
-  String _image = "";
+  String _previoudImage = "";
+  PlatformFile? _image;
   int _baseUnitPrice = 0;
 
   final List<_ItemOption> _itemOptions = [];
@@ -47,7 +48,7 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
       _name = item.name;
       _description = item.description;
       _available = item.available;
-      _image = item.image;
+      _previoudImage = item.image;
       _baseUnitPrice = item.baseUnitPrice;
 
       _itemOptions.addAll(item.options.keys.map((optName) => _ItemOption(
@@ -104,17 +105,7 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
                       });
                     },
                   ),
-                  _textInputRow(
-                    label: "Link Hình: ",
-                    initialValue: _image,
-                    onChanged: (val) {
-                      setState(() {
-                        _image = val;
-                        _errMsg = "";
-                      });
-                    },
-                  ),
-                  if (_image != "") ImagePreview(_image),
+                  _imagePicker(),
                   _numInputRow(
                     label: "Giá cơ bản: ",
                     initialValue: _baseUnitPrice,
@@ -181,6 +172,54 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
     );
   }
 
+  Widget _imagePicker() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(children: [
+          const Text("Hình:"),
+          Container(width: 20),
+          ElevatedButton(
+              child: const Text("Chọn"),
+              onPressed: () async {
+                var picked = await FilePicker.platform.pickFiles(type: FileType.image);
+                if (picked != null) {
+                  setState(() {
+                    _image = picked.files.first;
+                    _errMsg = "";
+                  });
+                }
+              }),
+          if (_image != null) Container(width: 10),
+          if (_image != null) Text(_image!.name),
+          if (_image != null) Container(width: 10),
+          if (_image != null)
+            ElevatedButton(
+              child: const Text("Huỷ chọn"),
+              onPressed: () {
+                setState(() {
+                  _image = null;
+                });
+              },
+            ),
+        ]),
+        _image != null
+            ? Container(
+                width: 200,
+                height: 200,
+                padding: const EdgeInsets.all(5),
+                child: Image.memory(_image!.bytes!, fit: BoxFit.cover),
+              )
+            : SizedBox(
+                width: 200,
+                height: 200,
+                child: Image.network(_previoudImage, fit: BoxFit.cover),
+              ),
+      ],
+    );
+  }
+
   Row _numInputRow({
     int initialValue = 0,
     required String label,
@@ -230,6 +269,16 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
         return;
       }
 
+      var imageLink = _previoudImage;
+      if (_image != null) {
+        var imgResp = await uploadImage(_image!);
+        if (imgResp.error != null) {
+          _setErrMsg(translateErrMsg(imgResp.error));
+          return;
+        }
+        imageLink = imgResp.data!;
+      }
+
       Map<String, MenuItemOption> options = {};
       for (var itemOpt in _itemOptions) {
         options[itemOpt.name] = itemOpt.option;
@@ -240,7 +289,7 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
         name: _name,
         description: _description,
         available: _available,
-        image: _image,
+        image: imageLink,
         baseUnitPrice: _baseUnitPrice,
         options: options,
       );
@@ -253,6 +302,8 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
         return;
       }
 
+      if (_image != null) await deleteImageLink(_previoudImage);
+
       Navigator.of(context).pop<bool>(true);
     };
   }
@@ -262,7 +313,7 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
       _setErrMsg("Tên món không được để trống");
       return false;
     }
-    if (_image == "") {
+    if (_previoudImage == "") {
       _setErrMsg("Hình không được để trống");
       return false;
     }

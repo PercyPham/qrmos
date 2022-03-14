@@ -29,3 +29,27 @@ class UploadImageResponse {
 
   UploadImageResponse({this.data, this.error});
 }
+
+Future<ApiBoolResponse> deleteImageLink(String imageLink) async {
+  var imageName = _extractImageName(imageLink);
+  return deleteImage(imageName);
+}
+
+String _extractImageName(String imageLink) {
+  var baseLinkLength = '$baseUrl/images/'.length;
+  if (imageLink.length <= baseLinkLength) {
+    return "invalid-image-name";
+  }
+  return imageLink.substring(baseLinkLength);
+}
+
+Future<ApiBoolResponse> deleteImage(String imageName) async {
+  var accessToken = await getAccessToken();
+  var response = await http.delete(
+    Uri.parse('$baseUrl/images/$imageName'),
+    headers: {
+      "Authorization": "Bearer $accessToken",
+    },
+  );
+  return ApiBoolResponse.fromJson(ApiResponse.fromHttpResponse(response));
+}

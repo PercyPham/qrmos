@@ -156,7 +156,7 @@ class _CreateMenuItemScreenState extends State<CreateMenuItemScreen> {
             width: 200,
             height: 200,
             padding: const EdgeInsets.all(5),
-            child: Image.memory(_image!.bytes!),
+            child: Image.memory(_image!.bytes!, fit: BoxFit.cover),
           ),
       ],
     );
