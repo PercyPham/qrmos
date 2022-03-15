@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
-import '../menu_management/menu_management.dart';
 import './widgets/drawer/drawer.dart';
+import '../menu_management/menu_management.dart';
+import '../order_management/order_management.dart';
 import '../user_management/user_management.dart';
 import '../delivery_management/delivery_management.dart';
 import '../voucher_management/voucher_management.dart';
@@ -124,6 +125,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
         if (currentScreen == screenMenuManagement) {
           return const MenuManagementScreen();
+        }
+        if (currentScreen == screenOrderManagement) {
+          return const OrderManagementScreen();
         }
         return Center(child: Text("Hello " + auth.userFullName));
       },

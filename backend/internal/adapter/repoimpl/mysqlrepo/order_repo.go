@@ -188,13 +188,7 @@ func (r *orderRepo) Create(order *entity.Order) error {
 func (r *orderRepo) GetOrders(filter *repo.GetOrdersFilter) ([]*entity.Order, int, error) {
 	gOrders := []*gormOrder{}
 
-	tx := r.db.Table("orders")
-	if filter.CustomerID != "" {
-		tx = tx.Where("creator_cus = ?", filter.CustomerID)
-	}
-	if filter.State != "" {
-		tx = tx.Where("state = ?", filter.State)
-	}
+	tx := r.txAppliedFilter(filter)
 
 	offset := filter.ItemPerPage * (filter.Page - 1)
 	limit := filter.ItemPerPage
@@ -204,13 +198,38 @@ func (r *orderRepo) GetOrders(filter *repo.GetOrdersFilter) ([]*entity.Order, in
 	}
 
 	orders := make([]*entity.Order, len(gOrders))
+	orderIDs := make([]int, len(orders))
 	var err error
 	for i, gOrder := range gOrders {
 		orders[i], err = gOrder.toOrder()
 		if err != nil {
 			return nil, 0, apperror.Wrap(err, "convert gOrder to Order")
 		}
+		orderIDs[i] = gOrder.ID
 	}
+
+	gOrderItems := []*gormOrderItem{}
+	orderItemsResult := r.db.Table("order_items").Where("order_id IN ?", orderIDs).Find(&gOrderItems)
+	if orderItemsResult.Error != nil {
+		return nil, 0, apperror.Wrap(orderItemsResult.Error, "gorm gets orders' items")
+	}
+
+	m := map[int][]*entity.OrderItem{}
+	for _, gOrderItem := range gOrderItems {
+		if m[gOrderItem.OrderID] == nil {
+			m[gOrderItem.OrderID] = []*entity.OrderItem{}
+		}
+		orderItem, err := gOrderItem.toOrderItem()
+		if err != nil {
+			return nil, 0, apperror.Wrap(err, "convert gorm order item")
+		}
+		m[gOrderItem.OrderID] = append(m[gOrderItem.OrderID], orderItem)
+	}
+	for _, order := range orders {
+		order.OrderItems = m[order.ID]
+	}
+
+	tx = r.txAppliedFilter(filter)
 
 	var total int64 = 0
 	countResult := tx.Count(&total)
@@ -219,6 +238,31 @@ func (r *orderRepo) GetOrders(filter *repo.GetOrdersFilter) ([]*entity.Order, in
 	}
 
 	return orders, int(total), nil
+}
+
+func (r *orderRepo) txAppliedFilter(filter *repo.GetOrdersFilter) *gorm.DB {
+	tx := r.db.Table("orders")
+	if filter.CustomerID != "" {
+		tx = tx.Where("creator_cus = ?", filter.CustomerID)
+	}
+	if filter.State != "" {
+		tx = tx.Where("state = ?", filter.State)
+	}
+
+	sortCreatedAt := "desc"
+	if filter.SortCreatedAt != "" {
+		sortCreatedAt = filter.SortCreatedAt
+	}
+	tx.Order("created_at " + sortCreatedAt)
+
+	if filter.CreatedAtFrom != nil {
+		tx.Where("created_at >= ?", *filter.CreatedAtFrom)
+	}
+	if filter.CreatedAtTo != nil {
+		tx.Where("created_at <= ?", *filter.CreatedAtTo)
+	}
+
+	return tx
 }
 
 func (r *orderRepo) GetByID(id int) *entity.Order {

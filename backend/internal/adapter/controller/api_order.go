@@ -119,21 +119,38 @@ func getOrdersFilterFrom(c *gin.Context) (*repo.GetOrdersFilter, error) {
 	if pageParam := c.Query("page"); pageParam != "" {
 		page, err = getIntQuery(c, "page")
 		if err != nil {
-			return nil, apperror.Wrap(err, "get page from param")
+			return nil, err
 		}
 	}
 	itemPerPage := 10
 	if itemPerPageParam := c.Query("itemPerPage"); itemPerPageParam != "" {
 		itemPerPage, err = getIntQuery(c, "itemPerPage")
 		if err != nil {
-			return nil, apperror.Wrap(err, "get itemPerPage from param")
+			return nil, err
 		}
 	}
-	return &repo.GetOrdersFilter{
-		State:       c.Query("state"),
-		Page:        page,
-		ItemPerPage: itemPerPage,
-	}, nil
+	filter := &repo.GetOrdersFilter{
+		Page:          page,
+		ItemPerPage:   itemPerPage,
+		State:         c.Query("state"),
+		SortCreatedAt: c.Query("sortCreatedAt"),
+	}
+
+	if fromStr := c.Query("from"); fromStr != "" {
+		from, err := getInt64Query(c, "from")
+		if err != nil {
+			return nil, err
+		}
+		filter.CreatedAtFrom = &from
+	}
+	if fromStr := c.Query("to"); fromStr != "" {
+		to, err := getInt64Query(c, "to")
+		if err != nil {
+			return nil, err
+		}
+		filter.CreatedAtFrom = &to
+	}
+	return filter, nil
 }
 
 func (s *server) getOrder(c *gin.Context) {

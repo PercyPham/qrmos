@@ -42,6 +42,17 @@ func getIntQuery(c *gin.Context, key string) (int, error) {
 	return int(num), err
 }
 
+func getInt64Query(c *gin.Context, key string) (int64, error) {
+	raw := c.Query(key)
+	num, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return 0, apperror.Wrapf(err, "parse '%s' query to int64", key).
+			WithCode(http.StatusBadRequest).
+			WithPublicMessagef("expected '%s' query to be int64, got '%v'", key, raw)
+	}
+	return num, err
+}
+
 func getBoolQuery(c *gin.Context, key string) (bool, error) {
 	val := c.Query(key)
 	if val == "true" {

@@ -14,6 +14,18 @@ const OrderStateDelivered = "delivered"
 const OrderStateFailed = "failed"
 const OrderStateCanceled = "canceled"
 
+func IsValidOrderState(state string) bool {
+	validStates := map[string]bool{
+		OrderStatePending:   true,
+		OrderStateConfirmed: true,
+		OrderStateReady:     true,
+		OrderStateDelivered: true,
+		OrderStateFailed:    true,
+		OrderStateCanceled:  true,
+	}
+	return validStates[state]
+}
+
 type Order struct {
 	ID                  int           `json:"id"`
 	State               string        `json:"state"`

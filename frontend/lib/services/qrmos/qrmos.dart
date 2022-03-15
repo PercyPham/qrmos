@@ -4,4 +4,5 @@ export "menu/menu.dart";
 export "voucher/voucher.dart";
 export "delivery/delivery.dart";
 export "image/image.dart";
+export "order/order.dart";
 export 'error_msg_translation.dart';
