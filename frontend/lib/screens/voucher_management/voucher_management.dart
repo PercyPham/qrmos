@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qrmos/widgets/big_screen.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 import 'package:qrmos/widgets/table/table.dart';
 import 'package:qrmos/services/qrmos/qrmos.dart' show Voucher, getVouchers, deleteVoucher;
@@ -38,8 +39,7 @@ class _VoucherManagementScreenState extends State<VoucherManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(15),
+    return BigScreen(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

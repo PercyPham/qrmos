@@ -172,7 +172,7 @@ func (u *CreateOrderUsecase) validateCreationTime(t time.Time) error {
 		return apperror.Wrap(err, "repo get store opening hours config")
 	}
 	if !openingHours.IsInOpeningHours(t) {
-		return apperror.Wrap(err, "not in opening hours").WithCode(http.StatusBadRequest)
+		return apperror.New("not in opening hours").WithCode(http.StatusBadRequest)
 	}
 	return nil
 }
@@ -244,7 +244,11 @@ func (u *CreateOrderUsecase) calculateOrderItem(
 
 	for optName, opt := range menuItem.Options {
 		cusChoices := inputItem.Options[optName]
-		if cusChoices == nil || len(cusChoices) < opt.MinChoice || len(cusChoices) > opt.MaxChoice {
+		cusChoiceCount := 0
+		if cusChoices != nil {
+			cusChoiceCount = len(cusChoices)
+		}
+		if cusChoiceCount < opt.MinChoice || cusChoiceCount > opt.MaxChoice {
 			return 0, nil, apperror.Newf("not enough choices for option '%s' of item '%d'", optName, inputItem.ItemID)
 		}
 	}

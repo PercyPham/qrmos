@@ -6,6 +6,7 @@ import (
 	"qrmos/internal/common/apperror"
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/order_usecase"
+	"qrmos/internal/usecase/repo"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -69,6 +70,87 @@ func (s *server) createOrderAsStaff(c *gin.Context, t time.Time, input *order_us
 	s.logOrderActionByStaff(staff, t, order.ID, entity.OrderActionTypeCreate, "")
 
 	response.Success(c, order)
+}
+
+func (s *server) getOrders(c *gin.Context) {
+	if cus, err := s.authCheck.IsCustomer(c); err == nil {
+		s.getOrdersAsCus(c, cus)
+		return
+	}
+	if _, err := s.authCheck.IsStaff(time.Now(), c); err == nil {
+		s.getOrdersAsStaff(c)
+		return
+	}
+	response.Error(c, newUnauthorizedError(apperror.New("unauthenticated")))
+}
+
+func (s *server) getOrdersAsCus(c *gin.Context, cus *entity.Customer) {
+	filter, err := getOrdersFilterFrom(c)
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	filter.CustomerID = cus.ID
+	s.getOrderWithFilter(c, filter)
+}
+
+func (s *server) getOrdersAsStaff(c *gin.Context) {
+	filter, err := getOrdersFilterFrom(c)
+	if err != nil {
+		response.Error(c, err)
+		return
+	}
+	s.getOrderWithFilter(c, filter)
+}
+
+func (s *server) getOrderWithFilter(c *gin.Context, filter *repo.GetOrdersFilter) {
+	getOrderUsecase := order_usecase.NewGetOrderUsecase(s.orderRepo)
+	resp, err := getOrderUsecase.GetOrders(filter)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase get orders"))
+		return
+	}
+	response.Success(c, resp)
+}
+
+func getOrdersFilterFrom(c *gin.Context) (*repo.GetOrdersFilter, error) {
+	var err error
+	page := 1
+	if pageParam := c.Query("page"); pageParam != "" {
+		page, err = getIntQuery(c, "page")
+		if err != nil {
+			return nil, err
+		}
+	}
+	itemPerPage := 10
+	if itemPerPageParam := c.Query("itemPerPage"); itemPerPageParam != "" {
+		itemPerPage, err = getIntQuery(c, "itemPerPage")
+		if err != nil {
+			return nil, err
+		}
+	}
+	filter := &repo.GetOrdersFilter{
+		Page:          page,
+		ItemPerPage:   itemPerPage,
+		State:         c.Query("state"),
+		SortCreatedAt: c.Query("sortCreatedAt"),
+	}
+
+	if fromStr := c.Query("from"); fromStr != "" {
+		from, err := getInt64Query(c, "from")
+		if err != nil {
+			return nil, err
+		}
+		filter.CreatedAtFrom = &from
+	}
+	if fromStr := c.Query("to"); fromStr != "" {
+		to, err := getInt64Query(c, "to")
+		if err != nil {
+			return nil, err
+		}
+		filter.CreatedAtFrom = &to
+	}
+	return filter, nil
 }
 
 func (s *server) getOrder(c *gin.Context) {

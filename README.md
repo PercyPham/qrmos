@@ -21,7 +21,7 @@ make dev_db_up
 ```
 
 - First time running will take a **few minutes** to complete. Please be patient.
-- `pgAdmin` will be available at `localhost:8081` after spinning up the database.
+- `phpMyAdmin` will be available at `localhost:8081` after spinning up the database.
 - Default database name is `qrmos`.
 
 After spinning up DB for the first time, we need to initialize data by running this command (**only once**):
