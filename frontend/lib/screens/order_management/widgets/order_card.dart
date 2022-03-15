@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 
+import 'payment_dialog.dart';
+
 class OrderCard extends StatelessWidget {
   final Order order;
-  final void Function(String) onActionHappened;
+  final void Function() onActionHappened;
   const OrderCard({
     Key? key,
     required this.order,
@@ -22,7 +24,7 @@ class OrderCard extends StatelessWidget {
             _orderId(),
             _orderDetail(),
             _orderValue(),
-            _orderActions(),
+            _orderActions(context),
           ],
         ),
       ),
@@ -174,13 +176,14 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  _orderActions() {
+  _orderActions(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (order.state == 'pending') _actionButton("Huỷ", _onCancelButtonPressed),
-        if (order.state == 'pending') _actionButton("Thanh toán", _onPayButtonPressed),
+        if (order.state == 'pending')
+          _actionButton("Thanh toán", () => _onPayButtonPressed(context)),
         // TODO: add Failed button
         if (order.state == 'confirmed') _actionButton("Sẵn sàng", _onReadyButtonPressed),
         if (order.state == 'ready') _actionButton("Đã giao", _onDeliveredButtonPressed),
@@ -205,11 +208,17 @@ class OrderCard extends StatelessWidget {
       print(resp.error);
       return;
     }
-    onActionHappened('cancel');
+    onActionHappened();
   }
 
-  void _onPayButtonPressed() async {
-    // TODO: dialog for payment
+  void _onPayButtonPressed(BuildContext context) async {
+    var result = await showDialog<bool>(
+      context: context,
+      builder: (_) => PaymentDialog(order),
+    );
+    if (result == true) {
+      onActionHappened();
+    }
   }
 
   void _onReadyButtonPressed() async {
@@ -219,7 +228,7 @@ class OrderCard extends StatelessWidget {
       print(resp.error);
       return;
     }
-    onActionHappened('ready');
+    onActionHappened();
   }
 
   void _onDeliveredButtonPressed() async {
@@ -229,6 +238,6 @@ class OrderCard extends StatelessWidget {
       print(resp.error);
       return;
     }
-    onActionHappened('deliver');
+    onActionHappened();
   }
 }

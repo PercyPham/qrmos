@@ -38,7 +38,7 @@ class _OrderTableState extends State<OrderTable> {
       page: _page,
       itemPerPage: _itemPerPage,
       state: _state,
-      sortCreatedAt: "asc",
+      sortCreatedAt: "desc",
     );
     if (resp.error != null) {
       // ignore: avoid_print
@@ -71,10 +71,9 @@ class _OrderTableState extends State<OrderTable> {
                   ..._orders
                       .map((order) => TableRow(children: [
                             OrderCard(
-                                order: order,
-                                onActionHappened: (action) {
-                                  _loadOrders();
-                                })
+                              order: order,
+                              onActionHappened: _loadOrders,
+                            )
                           ]))
                       .toList(),
                 ],

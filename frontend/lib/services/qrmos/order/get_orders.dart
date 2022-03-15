@@ -1,6 +1,19 @@
 import '../utils/utils.dart';
 import 'models.dart';
 
+Future<GetOrderByIdResponse> getOrderById(int orderId) async {
+  var apiRawResp = await get('/orders/$orderId');
+  return GetOrderByIdResponse.fromJson(apiRawResp);
+}
+
+class GetOrderByIdResponse {
+  Order? data;
+  ApiError? error;
+  GetOrderByIdResponse.fromJson(ApiResponse apiResp)
+      : error = apiResp.error,
+        data = apiResp.dataJson == null ? null : Order.fromJson(apiResp.dataJson);
+}
+
 Future<GetOrdersResponse> getOrders({
   int page = 1,
   int itemPerPage = 20,
