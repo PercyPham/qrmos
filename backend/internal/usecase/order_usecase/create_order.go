@@ -172,7 +172,7 @@ func (u *CreateOrderUsecase) validateCreationTime(t time.Time) error {
 		return apperror.Wrap(err, "repo get store opening hours config")
 	}
 	if !openingHours.IsInOpeningHours(t) {
-		return apperror.Wrap(err, "not in opening hours").WithCode(http.StatusBadRequest)
+		return apperror.New("not in opening hours").WithCode(http.StatusBadRequest)
 	}
 	return nil
 }
