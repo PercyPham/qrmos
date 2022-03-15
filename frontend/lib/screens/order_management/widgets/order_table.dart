@@ -21,8 +21,6 @@ class _OrderTableState extends State<OrderTable> {
 
   List<Order> _orders = [];
 
-  String _errMsg = "";
-
   @override
   void initState() {
     super.initState();
@@ -43,9 +41,10 @@ class _OrderTableState extends State<OrderTable> {
       sortCreatedAt: "asc",
     );
     if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
       setState(() {
         _isLoading = false;
-        _errMsg = translateErrMsg(resp.error);
       });
       return;
     }
@@ -69,7 +68,15 @@ class _OrderTableState extends State<OrderTable> {
             : Table(
                 columnWidths: {0: FixedColumnWidth(_pageWidth)},
                 children: [
-                  ..._orders.map((order) => TableRow(children: [OrderCard(order)])).toList(),
+                  ..._orders
+                      .map((order) => TableRow(children: [
+                            OrderCard(
+                                order: order,
+                                onActionHappened: (action) {
+                                  _loadOrders();
+                                })
+                          ]))
+                      .toList(),
                 ],
               ),
         _tablePageNav(),

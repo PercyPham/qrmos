@@ -3,7 +3,12 @@ import 'package:qrmos/services/qrmos/order/order.dart';
 
 class OrderCard extends StatelessWidget {
   final Order order;
-  const OrderCard(this.order, {Key? key}) : super(key: key);
+  final void Function(String) onActionHappened;
+  const OrderCard({
+    Key? key,
+    required this.order,
+    required this.onActionHappened,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +21,7 @@ class OrderCard extends StatelessWidget {
           children: [
             _orderId(),
             _orderDetail(),
+            _orderValue(),
             _orderActions(),
           ],
         ),
@@ -85,6 +91,10 @@ class OrderCard extends StatelessWidget {
                         ),
                       ))
                   .toList(),
+              if (item.note != "")
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+                    child: Text('Ghi chú: ${item.note}')),
             ],
           ),
         ),
@@ -149,7 +159,76 @@ class OrderCard extends StatelessWidget {
     );
   }
 
+  _orderValue() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (order.voucher != null) Text('Voucher: ${order.voucher!} [${order.discount!}]'),
+        Text(
+          'Tổng: ${order.total} vnđ',
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+        ),
+      ],
+    );
+  }
+
   _orderActions() {
-    return Container();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (order.state == 'pending') _actionButton("Huỷ", _onCancelButtonPressed),
+        if (order.state == 'pending') _actionButton("Thanh toán", _onPayButtonPressed),
+        // TODO: add Failed button
+        if (order.state == 'confirmed') _actionButton("Sẵn sàng", _onReadyButtonPressed),
+        if (order.state == 'ready') _actionButton("Đã giao", _onDeliveredButtonPressed),
+      ],
+    );
+  }
+
+  _actionButton(String label, void Function() onPressed) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+      child: ElevatedButton(
+        child: Text(label),
+        onPressed: onPressed,
+      ),
+    );
+  }
+
+  void _onCancelButtonPressed() async {
+    var resp = await cancelOrder(order.id);
+    if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
+      return;
+    }
+    onActionHappened('cancel');
+  }
+
+  void _onPayButtonPressed() async {
+    // TODO: dialog for payment
+  }
+
+  void _onReadyButtonPressed() async {
+    var resp = await readyOrder(order.id);
+    if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
+      return;
+    }
+    onActionHappened('ready');
+  }
+
+  void _onDeliveredButtonPressed() async {
+    var resp = await deliverOrder(order.id);
+    if (resp.error != null) {
+      // ignore: avoid_print
+      print(resp.error);
+      return;
+    }
+    onActionHappened('deliver');
   }
 }
