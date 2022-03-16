@@ -17,7 +17,7 @@ class _OrderTableState extends State<OrderTable> {
   bool _isLoading = true;
   int _page = 1;
   int _totalPage = 1;
-  String _state = "pending";
+  String _state = "confirmed";
 
   List<Order> _orders = [];
 

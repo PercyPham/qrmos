@@ -8,7 +8,6 @@ import 'package:qrmos/services/qrmos/store_config/store_config.dart';
 
 import 'widgets/custom_button.dart';
 import 'widgets/edit_store_cfg_open_dialog.dart';
-import 'widgets/error_message.dart';
 
 class StoreConfigManagement extends StatefulWidget {
   const StoreConfigManagement({Key? key}) : super(key: key);
