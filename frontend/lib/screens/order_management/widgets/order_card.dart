@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 
+import 'change_dest_dialog.dart';
 import 'error_message.dart';
 import 'fail_order_dialog.dart';
 import 'payment_dialog.dart';
@@ -26,7 +27,7 @@ class OrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _orderId(),
-            _orderDetail(),
+            _orderDetail(context),
             _orderValue(),
             _orderFailReason(),
             _orderActions(context),
@@ -52,7 +53,7 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  _orderDetail() {
+  _orderDetail(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -61,7 +62,7 @@ class OrderCard extends StatelessWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _orderDelivery(),
+            _orderDelivery(context),
             Container(height: 30),
             _orderStatus(),
           ],
@@ -123,9 +124,10 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  _orderDelivery() {
+  _orderDelivery(BuildContext context) {
     return Container(
-      width: 250,
+      padding: const EdgeInsets.all(5),
+      width: 280,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.grey[300],
@@ -135,12 +137,49 @@ class OrderCard extends StatelessWidget {
           0: FixedColumnWidth(80),
         },
         children: [
-          _orderDeliveryRow("Điểm giao:", order.deliveryDestination),
+          _orderDestRow(context),
           _orderDeliveryRow("Tên:", order.customerName),
           _orderDeliveryRow("Điện thoại:", order.customerPhone),
         ],
       ),
     );
+  }
+
+  _orderDestRow(BuildContext context) {
+    return TableRow(
+      children: [
+        const Padding(
+          padding: EdgeInsets.fromLTRB(8, 8, 0, 8),
+          child: Text("Điểm giao"),
+        ),
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(order.deliveryDestination,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  )),
+            ),
+            ElevatedButton(
+              child: const Text("Đổi"),
+              onPressed: () => _onChangeDestPressed(context),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  _onChangeDestPressed(BuildContext context) async {
+    var result = await showDialog<bool>(
+      context: context,
+      builder: (_) => ChangeDestDialog(order),
+    );
+    if (result == true) {
+      onActionHappened();
+    }
   }
 
   _orderDeliveryRow(String label, value) {
