@@ -91,7 +91,7 @@ func (s *server) handleMoMoIpnCallback(c *gin.Context) {
 		response.Error(c, apperror.Wrap(err, "usecase handle momo ipn callback"))
 		return
 	}
-	s.logOrderMoMoPayActionByCus(order)
+	s.logOrderMoMoPayActionByCus(order, "ipn callback")
 	response.Success(c, true)
 }
 
@@ -104,18 +104,18 @@ func (s *server) handleMoMoPaymentCallback(c *gin.Context) {
 		response.Error(c, apperror.Wrap(err, "usecase handle momo website callback"))
 		return
 	}
-	s.logOrderMoMoPayActionByCus(order)
+	s.logOrderMoMoPayActionByCus(order, "client browser")
 	// TODO: redirect to Order Success page on front-end
 	response.Success(c, true)
 }
 
-func (s *server) logOrderMoMoPayActionByCus(order *entity.Order) {
+func (s *server) logOrderMoMoPayActionByCus(order *entity.Order, extra string) {
 	s.logOrderActionByCus(
 		&entity.Customer{ID: "unknown"},
 		*order.Payment.SuccessAt,
 		order.ID,
 		entity.OrderActionTypePayViaMoMo,
-		"",
+		extra,
 	)
 }
 
