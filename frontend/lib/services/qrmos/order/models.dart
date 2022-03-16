@@ -139,3 +139,29 @@ class OrderItem {
 DateTime? tryParseDateTime(dynamic t) {
   return t == null ? null : DateTime.parse(t);
 }
+
+class OrderLog {
+  final int orderId;
+  final String action;
+  final OrderLogActor actor;
+  final DateTime createdAt;
+  final String? extra;
+
+  OrderLog.fromJson(Map<String, dynamic> dataJson)
+      : orderId = dataJson['orderId'],
+        action = dataJson['action'],
+        extra = dataJson['extra'],
+        actor = OrderLogActor.fromJson(dataJson['actor']),
+        createdAt = DateTime.parse(dataJson['createdAt']);
+}
+
+class OrderLogActor {
+  final String type;
+  final String? customerId;
+  final String? staffUsername;
+
+  OrderLogActor.fromJson(Map<String, dynamic> dataJson)
+      : type = dataJson['type'],
+        customerId = dataJson['customerId'],
+        staffUsername = dataJson['staffUsername'];
+}

@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 
+import '../order_detail/order_detail.dart';
 import 'change_dest_dialog.dart';
+import 'custom_button.dart';
 import 'error_message.dart';
 import 'fail_order_dialog.dart';
 import 'payment_dialog.dart';
@@ -65,6 +67,7 @@ class OrderCard extends StatelessWidget {
             _orderDelivery(context),
             Container(height: 30),
             _orderStatus(),
+            CustomButton('Chi tiết', () => _onDetailPressed(context)),
           ],
         ),
       ],
@@ -209,6 +212,11 @@ class OrderCard extends StatelessWidget {
         fontSize: 20,
       ),
     );
+  }
+
+  _onDetailPressed(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => OrderDetailScreen(order.id)));
   }
 
   _orderValue() {
