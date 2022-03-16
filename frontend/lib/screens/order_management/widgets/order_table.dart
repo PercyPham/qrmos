@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/qrmos.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:qrmos/services/qrmos/order/order.dart';
 
 import 'order_card.dart';
 
@@ -17,7 +19,9 @@ class _OrderTableState extends State<OrderTable> {
   bool _isLoading = true;
   int _page = 1;
   int _totalPage = 1;
-  String _state = "pending";
+  String _state = "confirmed";
+
+  bool _filterForToday = true;
 
   List<Order> _orders = [];
 
@@ -34,11 +38,31 @@ class _OrderTableState extends State<OrderTable> {
       _totalPage = 0;
     });
 
+    int? from;
+    int? to;
+    if (_filterForToday) {
+      const secondInNanos = 1000000000;
+      const minInNanos = 60 * secondInNanos;
+      const hourInNanos = 60 * minInNanos;
+      const dayInNanos = 24 * hourInNanos;
+
+      var now = _getNowInHcmTz();
+      var hour = now.hour * hourInNanos;
+      var min = now.minute * minInNanos;
+      var sec = now.second * secondInNanos;
+
+      var currNanos = now.microsecondsSinceEpoch * 1000;
+      from = currNanos - hour - min - sec;
+      to = from + dayInNanos;
+    }
+
     var resp = await getOrders(
       page: _page,
       itemPerPage: _itemPerPage,
       state: _state,
       sortCreatedAt: "desc",
+      from: from,
+      to: to,
     );
     if (resp.error != null) {
       // ignore: avoid_print
@@ -56,12 +80,21 @@ class _OrderTableState extends State<OrderTable> {
     });
   }
 
+  tz.TZDateTime _getNowInHcmTz() {
+    var now = DateTime.now();
+    tz.initializeTimeZones();
+    final hcmTimeZone = tz.getLocation('Asia/Ho_Chi_Minh');
+    var nowInHcmTime = tz.TZDateTime.from(now, hcmTimeZone);
+    return nowInHcmTime;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        _filterTodayOption(),
         _stateMenu(),
         _isLoading
             ? const Center(child: Text("Loading..."))
@@ -79,6 +112,28 @@ class _OrderTableState extends State<OrderTable> {
                 ],
               ),
         _tablePageNav(),
+      ],
+    );
+  }
+
+  _filterTodayOption() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Text("Chỉ hôm nay: "),
+        Switch(
+          value: _filterForToday,
+          onChanged: (val) {
+            setState(() {
+              _filterForToday = val;
+              _loadOrders();
+            });
+          },
+        ),
+        if (!_filterForToday) const SizedBox(width: 10),
+        if (!_filterForToday) const Text("(Tất cả)"),
       ],
     );
   }

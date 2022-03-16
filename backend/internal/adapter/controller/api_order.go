@@ -143,12 +143,12 @@ func getOrdersFilterFrom(c *gin.Context) (*repo.GetOrdersFilter, error) {
 		}
 		filter.CreatedAtFrom = &from
 	}
-	if fromStr := c.Query("to"); fromStr != "" {
+	if toStr := c.Query("to"); toStr != "" {
 		to, err := getInt64Query(c, "to")
 		if err != nil {
 			return nil, err
 		}
-		filter.CreatedAtFrom = &to
+		filter.CreatedAtTo = &to
 	}
 	return filter, nil
 }
