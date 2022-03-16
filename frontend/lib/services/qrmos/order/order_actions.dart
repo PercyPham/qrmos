@@ -19,3 +19,8 @@ Future<ApiBoolResponse> failOrder(int orderId, String failReason) async {
   var apiRawResp = await patch('/orders/$orderId/failed', body: {"failReason": failReason});
   return ApiBoolResponse.fromJson(apiRawResp);
 }
+
+Future<ApiBoolResponse> changeOrderDest(int orderId, String destName) async {
+  var apiRawResp = await patch('/orders/$orderId/delivery-destination/$destName');
+  return ApiBoolResponse.fromJson(apiRawResp);
+}
