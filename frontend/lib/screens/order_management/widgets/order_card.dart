@@ -37,12 +37,18 @@ class OrderCard extends StatelessWidget {
   }
 
   _orderId() {
-    return Text(
-      '#${order.id}',
-      style: const TextStyle(
-        fontWeight: FontWeight.bold,
-        fontSize: 18,
-      ),
+    return Row(
+      children: [
+        Text(
+          '#${order.id}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text('(${order.createdAt.toLocal()})'),
+      ],
     );
   }
 
