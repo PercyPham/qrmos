@@ -3,6 +3,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 
+import 'error_message.dart';
+
 class PaymentMoMoDialog extends StatefulWidget {
   final Order order;
   final void Function() onCancel;
@@ -105,9 +107,7 @@ class _PaymentMoMoDialogState extends State<PaymentMoMoDialog> {
   _mainDisplay() {
     Widget? content;
     if (_errMsg != "") {
-      content = Center(
-        child: Text(_errMsg, style: const TextStyle(color: Colors.red)),
-      );
+      content = Center(child: ErrorMessage(_errMsg));
     } else if (_isLoading) {
       content = const Center(child: Text("Loading..."));
     } else if (_paymentLink != "") {

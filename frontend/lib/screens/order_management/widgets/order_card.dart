@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 
+import 'error_message.dart';
+import 'fail_order_dialog.dart';
 import 'payment_dialog.dart';
 
 class OrderCard extends StatelessWidget {
@@ -24,6 +28,7 @@ class OrderCard extends StatelessWidget {
             _orderId(),
             _orderDetail(),
             _orderValue(),
+            _orderFailReason(),
             _orderActions(context),
           ],
         ),
@@ -167,7 +172,8 @@ class OrderCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (order.voucher != null) Text('Voucher: ${order.voucher!} [${order.discount!}]'),
+        if (order.voucher != null)
+          Text('Voucher: ${order.voucher!} [đã giảm: ${order.discount!} vnđ]'),
         Text(
           'Tổng: ${order.total} vnđ',
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
@@ -177,6 +183,10 @@ class OrderCard extends StatelessWidget {
   }
 
   _orderActions(BuildContext context) {
+    var isManager = Provider.of<AuthModel>(context).staffRole == StaffRole.manager;
+    var isFailedButtonShown =
+        isManager && ['confirmed', 'ready', 'delivered'].contains(order.state);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -184,20 +194,23 @@ class OrderCard extends StatelessWidget {
         if (order.state == 'pending') _actionButton("Huỷ", _onCancelButtonPressed),
         if (order.state == 'pending')
           _actionButton("Thanh toán", () => _onPayButtonPressed(context)),
-        // TODO: add Failed button
+        if (isFailedButtonShown)
+          _actionButton('Thất bại', () => _onFailedButtonPressed(context), color: Colors.red),
         if (order.state == 'confirmed') _actionButton("Sẵn sàng", _onReadyButtonPressed),
         if (order.state == 'ready') _actionButton("Đã giao", _onDeliveredButtonPressed),
       ],
     );
   }
 
-  _actionButton(String label, void Function() onPressed) {
+  _actionButton(String label, void Function() onPressed, {Color? color}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
       child: ElevatedButton(
-        child: Text(label),
-        onPressed: onPressed,
-      ),
+          child: Text(label),
+          onPressed: onPressed,
+          style: color == null
+              ? null
+              : ButtonStyle(backgroundColor: MaterialStateProperty.all(color))),
     );
   }
 
@@ -215,6 +228,16 @@ class OrderCard extends StatelessWidget {
     var result = await showDialog<bool>(
       context: context,
       builder: (_) => PaymentDialog(order),
+    );
+    if (result == true) {
+      onActionHappened();
+    }
+  }
+
+  void _onFailedButtonPressed(BuildContext context) async {
+    var result = await showDialog<bool>(
+      context: context,
+      builder: (_) => FailOrderDialog(order),
     );
     if (result == true) {
       onActionHappened();
@@ -239,5 +262,11 @@ class OrderCard extends StatelessWidget {
       return;
     }
     onActionHappened();
+  }
+
+  _orderFailReason() {
+    return order.failReason == null
+        ? const SizedBox(height: 0, width: 0)
+        : ErrorMessage('Nguyên do thất bại: ${order.failReason}');
   }
 }
