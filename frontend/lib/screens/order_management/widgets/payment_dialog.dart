@@ -29,14 +29,14 @@ class _PaymentDialogState extends State<PaymentDialog> {
           if (_method == _paymentMethodCash)
             PaymentCashDialog(
               widget.order,
-              onCancel: _onCancel(context),
-              onDone: _onDone(context),
+              onCancel: () => _onCancel(context),
+              onDone: () => _onDone(context),
             ),
           if (_method == _paymentMethodMoMo)
             PaymentMoMoDialog(
               widget.order,
-              onCancel: _onCancel(context),
-              onDone: _onDone(context),
+              onCancel: () => _onCancel(context),
+              onDone: () => _onDone(context),
             ),
         ],
       ),
@@ -93,14 +93,10 @@ class _PaymentDialogState extends State<PaymentDialog> {
   }
 
   _onCancel(BuildContext context) {
-    return () {
-      Navigator.of(context).pop<bool>(false);
-    };
+    Navigator.of(context).pop<bool>(false);
   }
 
   _onDone(BuildContext context) {
-    return () {
-      Navigator.of(context).pop<bool>(true);
-    };
+    Navigator.of(context).pop<bool>(true);
   }
 }

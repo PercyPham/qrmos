@@ -17,4 +17,5 @@ final _errMsgTrans = {
   "username already exists": "Tên đăng nhập đã tồn tại",
   "delivery destination already exists": "Điểm giao nhận đã tồn tại",
   "voucher already exists": "Mã code đã tồn tại",
+  "not in same creation date": "Không cùng ngày khởi tạo",
 };

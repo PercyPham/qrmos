@@ -3,6 +3,8 @@ import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/widgets/input/number_input_field.dart';
 
+import 'error_message.dart';
+
 class PaymentCashDialog extends StatefulWidget {
   final Order order;
   final void Function() onCancel;
@@ -36,10 +38,7 @@ class _PaymentCashDialogState extends State<PaymentCashDialog> {
           _receiveInput(),
           _boldText(
               'Thối lại: ${_receive > widget.order.total ? _receive - widget.order.total : 0} vnđ'),
-          Container(
-            margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
-            child: Text(_errMsg, style: const TextStyle(color: Colors.red)),
-          ),
+          ErrorMessage(_errMsg),
           Row(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
