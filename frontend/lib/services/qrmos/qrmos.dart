@@ -5,4 +5,5 @@ export "voucher/voucher.dart";
 export "delivery/delivery.dart";
 export "image/image.dart";
 export "order/order.dart";
+export "store_config/store_config.dart";
 export 'error_msg_translation.dart';
