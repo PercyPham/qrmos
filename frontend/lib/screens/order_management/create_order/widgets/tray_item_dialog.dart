@@ -4,30 +4,25 @@ import 'package:qrmos/services/qrmos/order/create_order.dart';
 
 import '../../widgets/custom_button.dart';
 import '../../widgets/error_message.dart';
+import '../models/tray_item.dart';
 
-class OrderItemDialog extends StatefulWidget {
-  final MenuItem menuItem;
+class TrayItemDialog extends StatefulWidget {
+  final TrayItem trayItem;
 
-  const OrderItemDialog({
-    Key? key,
-    required this.menuItem,
-  }) : super(key: key);
+  const TrayItemDialog(this.trayItem, {Key? key}) : super(key: key);
 
   @override
-  State<OrderItemDialog> createState() => _OrderItemDialogState();
+  State<TrayItemDialog> createState() => _TrayItemDialogState();
 }
 
-class _OrderItemDialogState extends State<OrderItemDialog> {
-  final CreateOrderItem _item = CreateOrderItem(options: {});
+class _TrayItemDialogState extends State<TrayItemDialog> {
+  CreateOrderItem _item = CreateOrderItem();
   String _errMsg = '';
 
   @override
   void initState() {
     super.initState();
-    _item.itemId = widget.menuItem.id;
-    for (var optName in widget.menuItem.options.keys) {
-      _item.options[optName] = [];
-    }
+    _item = widget.trayItem.orderItem.clone();
   }
 
   @override
@@ -63,7 +58,7 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
             Expanded(
                 flex: 1,
                 child: Text(
-                  widget.menuItem.name,
+                  widget.trayItem.menuItem.name,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -71,7 +66,7 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
                   textAlign: TextAlign.left,
                 )),
             Text(
-              'Đơn giá: ${widget.menuItem.baseUnitPrice} vnđ',
+              'Đơn giá: ${widget.trayItem.menuItem.baseUnitPrice} vnđ',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 15,
@@ -81,17 +76,17 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          child: Text(widget.menuItem.description),
+          child: Text(widget.trayItem.menuItem.description),
         ),
       ],
     );
   }
 
   List<Widget> _optionList() {
-    return widget.menuItem.options.keys
+    return widget.trayItem.menuItem.options.keys
         .map((optName) => _optionInput(
               optName,
-              widget.menuItem.options[optName]!,
+              widget.trayItem.menuItem.options[optName]!,
             ))
         .toList();
   }
@@ -179,6 +174,7 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
     return SizedBox(
       width: double.infinity,
       child: TextFormField(
+          initialValue: _item.note,
           decoration: const InputDecoration(
             label: Text('Ghi chú'),
           ),
@@ -236,9 +232,9 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          CustomButton('Huỷ', () => _onCancel(context)),
+          CustomButton('Huỷ', () => _onCancel(context), color: Colors.grey),
           const SizedBox(width: 15),
-          CustomButton('Thêm', () => _onAdd(context)),
+          CustomButton('Lưu', () => _onSave(context)),
         ],
       ),
     );
@@ -248,14 +244,15 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
     Navigator.of(context).pop<CreateOrderItem?>(null);
   }
 
-  _onAdd(BuildContext context) {
+  _onSave(BuildContext context) {
     if (!_validateInput()) return;
     Navigator.of(context).pop<CreateOrderItem?>(_item);
   }
 
   bool _validateInput() {
-    for (var optName in widget.menuItem.options.keys) {
-      var menuOpt = widget.menuItem.options[optName]!;
+    var menuItem = widget.trayItem.menuItem;
+    for (var optName in menuItem.options.keys) {
+      var menuOpt = menuItem.options[optName]!;
       if (!menuOpt.available) continue;
       var orderOpt = _item.options[optName]!;
       if (orderOpt.length < menuOpt.minChoice) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/delivery/delivery.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
+import 'package:qrmos/services/qrmos/order/create_order.dart';
 import 'package:qrmos/services/qrmos/voucher/voucher.dart';
 
 import '../../widgets/custom_button.dart';
@@ -8,13 +9,18 @@ import '../../widgets/error_message.dart';
 import '../models/tray_item.dart';
 import 'bold_text.dart';
 import 'tray_item_card.dart';
+import 'tray_item_dialog.dart';
 
 class TraySection extends StatefulWidget {
   final List<TrayItem> trayItems;
+  final void Function(TrayItem, CreateOrderItem) onUpdateOrderItem;
+  final void Function(TrayItem) onDeleteTrayItem;
 
   const TraySection({
     Key? key,
     this.trayItems = const [],
+    required this.onUpdateOrderItem,
+    required this.onDeleteTrayItem,
   }) : super(key: key);
 
   @override
@@ -202,9 +208,20 @@ class _TraySectionState extends State<TraySection> {
     return widget.trayItems
         .map((trayItem) => TrayItemCard(
               trayItem: trayItem,
-              onTap: () {},
+              onChangeButtonPressed: () => _onTrayItemCardChangeButtonPressed(context, trayItem),
+              onDeleteButtonPressed: () => widget.onDeleteTrayItem(trayItem),
             ))
         .toList();
+  }
+
+  _onTrayItemCardChangeButtonPressed(BuildContext context, TrayItem trayItem) async {
+    var result = await showDialog<CreateOrderItem>(
+      context: context,
+      builder: (_) => TrayItemDialog(trayItem),
+    );
+    if (result != null) {
+      widget.onUpdateOrderItem(trayItem, result);
+    }
   }
 
   _total() {

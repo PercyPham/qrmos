@@ -75,6 +75,20 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
               flex: 1,
               child: TraySection(
                 trayItems: _trayItems,
+                onUpdateOrderItem: (trayItem, orderItem) {
+                  setState(() {
+                    var foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
+                    _trayItems[foundIdx] = TrayItem(
+                      menuItem: trayItem.menuItem,
+                      orderItem: orderItem,
+                    );
+                  });
+                },
+                onDeleteTrayItem: (trayItem) {
+                  setState(() {
+                    _trayItems.remove(trayItem);
+                  });
+                },
               ),
             ),
           ]),

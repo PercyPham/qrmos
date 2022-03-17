@@ -42,7 +42,7 @@ class CreateOrderItem {
     this.itemId = 0,
     this.quantity = 1,
     this.note = "",
-    required this.options,
+    this.options = const {},
   });
 
   Map toJson() => {
@@ -65,5 +65,21 @@ class CreateOrderItem {
   void removeOptionChoice(String optName, choiceName) {
     if (options[optName] == null) return;
     options[optName] = options[optName]!.where((cName) => cName != choiceName).toList();
+  }
+
+  CreateOrderItem clone() {
+    Map<String, List<String>> _opts = {};
+    for (var optName in options.keys) {
+      _opts[optName] = [];
+      for (var choice in options[optName]!) {
+        _opts[optName]!.add(choice);
+      }
+    }
+    return CreateOrderItem(
+      itemId: itemId,
+      quantity: quantity,
+      note: note,
+      options: _opts,
+    );
   }
 }
