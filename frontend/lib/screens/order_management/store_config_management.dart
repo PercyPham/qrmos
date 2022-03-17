@@ -10,7 +10,11 @@ import 'widgets/custom_button.dart';
 import 'widgets/edit_store_cfg_open_dialog.dart';
 
 class StoreConfigManagement extends StatefulWidget {
-  const StoreConfigManagement({Key? key}) : super(key: key);
+  final void Function(bool) onStoreOpeningChanged;
+  const StoreConfigManagement({
+    Key? key,
+    required this.onStoreOpeningChanged,
+  }) : super(key: key);
 
   @override
   State<StoreConfigManagement> createState() => _StoreConfigManagementState();
@@ -66,6 +70,7 @@ class _StoreConfigManagementState extends State<StoreConfigManagement> {
       _isOpening = _openCfg!.isOpenAt(DateTime.now());
       _errMsg = "";
     });
+    widget.onStoreOpeningChanged(_isOpening);
   }
 
   @override

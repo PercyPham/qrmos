@@ -15,6 +15,8 @@ class OrderManagementScreen extends StatefulWidget {
 }
 
 class _OrderManagementScreenState extends State<OrderManagementScreen> {
+  bool _isStoreOpen = false;
+
   @override
   Widget build(BuildContext context) {
     return BigScreen(
@@ -23,7 +25,13 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
         children: [
           const ScreenNameText("Quản lý đơn hàng"),
           Container(height: 20),
-          const StoreConfigManagement(),
+          StoreConfigManagement(
+            onStoreOpeningChanged: (isOpen) {
+              setState(() {
+                _isStoreOpen = isOpen;
+              });
+            },
+          ),
           Container(height: 20),
           _createOrderButton(context),
           Container(height: 20),
@@ -39,6 +47,6 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
           .push(MaterialPageRoute(builder: (context) => const CreateOrderScreen()));
     }
 
-    return CustomButton('Tạo đơn', onPressed);
+    return CustomButton('Tạo đơn', _isStoreOpen ? onPressed : null);
   }
 }
