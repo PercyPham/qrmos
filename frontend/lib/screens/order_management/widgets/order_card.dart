@@ -67,6 +67,7 @@ class OrderCard extends StatelessWidget {
             _orderDelivery(context),
             Container(height: 30),
             _orderStatus(),
+            Container(height: 10),
             CustomButton('Chi tiết', () => _onDetailPressed(context)),
           ],
         ),

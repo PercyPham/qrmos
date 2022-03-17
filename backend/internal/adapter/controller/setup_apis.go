@@ -38,6 +38,7 @@ func (s *server) setupAPIs() {
 	api.DELETE("/menu/categories/:catID/items/:itemID", s.deleteMenuAssociation)
 
 	api.GET("/vouchers", s.getVouchers)
+	api.GET("/vouchers/:code", s.getVoucher)
 	api.POST("/vouchers", s.createVoucher)
 	api.DELETE("/vouchers/:code", s.deleteVoucher)
 

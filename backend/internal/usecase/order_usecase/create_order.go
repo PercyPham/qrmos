@@ -139,6 +139,11 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 			WithPublicMessage(err.Error())
 	}
 
+	total -= voucher.Discount
+	if total < 0 {
+		total = 0
+	}
+
 	order := &entity.Order{
 		State:               entity.OrderStatePending,
 		CustomerName:        input.CustomerName,
@@ -146,7 +151,7 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 		DeliveryDestination: input.DeliveryDest,
 		Voucher:             voucher.Code,
 		Discount:            voucher.Discount,
-		Total:               total - voucher.Discount,
+		Total:               total,
 		OrderItems:          orderItems,
 		Creator:             input.Creator,
 		CreatedAt:           t,
@@ -243,6 +248,9 @@ func (u *CreateOrderUsecase) calculateOrderItem(
 	options = map[string][]string{}
 
 	for optName, opt := range menuItem.Options {
+		if !opt.Available {
+			continue
+		}
 		cusChoices := inputItem.Options[optName]
 		cusChoiceCount := 0
 		if cusChoices != nil {
@@ -250,6 +258,12 @@ func (u *CreateOrderUsecase) calculateOrderItem(
 		}
 		if cusChoiceCount < opt.MinChoice || cusChoiceCount > opt.MaxChoice {
 			return 0, nil, apperror.Newf("not enough choices for option '%s' of item '%d'", optName, inputItem.ItemID)
+		}
+	}
+
+	for optionName, choices := range inputItem.Options {
+		if len(choices) == 0 {
+			delete(inputItem.Options, optionName)
 		}
 	}
 

@@ -95,6 +95,16 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
                       });
                     },
                   ),
+                  _numInputRow(
+                    label: "Giá cơ bản: ",
+                    initialValue: _baseUnitPrice,
+                    onChanged: (val) {
+                      setState(() {
+                        _baseUnitPrice = val;
+                        _errMsg = "";
+                      });
+                    },
+                  ),
                   _switchInputRow(
                     label: "Còn hàng: ",
                     value: _available,
@@ -106,16 +116,6 @@ class _MenuItemEditScreenState extends State<MenuItemEditScreen> {
                     },
                   ),
                   _imagePicker(),
-                  _numInputRow(
-                    label: "Giá cơ bản: ",
-                    initialValue: _baseUnitPrice,
-                    onChanged: (val) {
-                      setState(() {
-                        _baseUnitPrice = val;
-                        _errMsg = "";
-                      });
-                    },
-                  ),
                   Container(height: 10),
                   const Text("Tuỳ chọn:"),
                   ..._optionInputRows(),

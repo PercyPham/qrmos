@@ -100,6 +100,17 @@ class MenuItem {
         "baseUnitPrice": baseUnitPrice,
         "options": options,
       };
+
+  bool get isChoosable {
+    if (!available) return false;
+    var notValidOpts = options.keys
+        .where((optName) => options[optName]!.available && !options[optName]!.hasValidChoices)
+        .toList();
+    if (notValidOpts.isNotEmpty) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class MenuItemOption {
@@ -134,6 +145,20 @@ class MenuItemOption {
         "maxChoice": maxChoice,
         "choices": choices,
       };
+
+  bool get isChoosable {
+    if (!available) return false;
+    return hasValidChoices;
+  }
+
+  bool get hasValidChoices {
+    var availableChoices =
+        choices.keys.where((choiceName) => choices[choiceName]!.available).toList();
+    if (availableChoices.length < minChoice) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class MenuItemOptionChoice {
