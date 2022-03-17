@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/menu/menu.dart';
 
-import 'models/temp_create_order_item.dart';
+import 'models/tray_item.dart';
 import 'widgets/menu_section.dart';
 import 'widgets/tray_section.dart';
 
@@ -18,7 +18,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   List<MenuItem> _menuItems = [];
   String _errMsg = "";
 
-  final List<TempCreateOrderItem> _orderItems = [];
+  final List<TrayItem> _trayItems = [];
 
   @override
   void initState() {
@@ -63,7 +63,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
                 menuItems: _menuItems,
                 onAddOrderItem: (mItem, orderItem) {
                   setState(() {
-                    _orderItems.add(TempCreateOrderItem(
+                    _trayItems.add(TrayItem(
                       menuItem: mItem,
                       orderItem: orderItem,
                     ));
@@ -74,7 +74,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
             Expanded(
               flex: 1,
               child: TraySection(
-                items: _orderItems,
+                trayItems: _trayItems,
               ),
             ),
           ]),

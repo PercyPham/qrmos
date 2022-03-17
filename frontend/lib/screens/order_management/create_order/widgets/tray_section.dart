@@ -3,15 +3,16 @@ import 'package:qrmos/services/qrmos/delivery/delivery.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 
 import '../../widgets/error_message.dart';
-import '../models/temp_create_order_item.dart';
+import '../models/tray_item.dart';
 import 'bold_text.dart';
+import 'tray_item_card.dart';
 
 class TraySection extends StatefulWidget {
-  final List<TempCreateOrderItem> items;
+  final List<TrayItem> trayItems;
 
   const TraySection({
     Key? key,
-    this.items = const [],
+    this.trayItems = const [],
   }) : super(key: key);
 
   @override
@@ -83,7 +84,10 @@ class _TraySectionState extends State<TraySection> {
             });
           }),
           _destDropdown(),
-          ..._orderItemList(context),
+          const SizedBox(height: 10),
+          const Text('Danh sách món:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          const SizedBox(height: 10),
+          ..._trayItemList(context),
           ErrorMessage(_errMsg),
         ],
       ),
@@ -131,14 +135,12 @@ class _TraySectionState extends State<TraySection> {
     );
   }
 
-  List<Card> _orderItemList(BuildContext context) {
-    return widget.items.map((orderItem) => _orderItemCard(context, orderItem)).toList();
-  }
-
-  Card _orderItemCard(BuildContext context, TempCreateOrderItem orderItem) {
-    return Card(
-      elevation: 10,
-      child: Text('${orderItem.menuItem.name} x ${orderItem.orderItem.quantity}'),
-    );
+  List<TrayItemCard> _trayItemList(BuildContext context) {
+    return widget.trayItems
+        .map((trayItem) => TrayItemCard(
+              trayItem: trayItem,
+              onTap: () {},
+            ))
+        .toList();
   }
 }
