@@ -27,13 +27,15 @@ class MenuItemCard extends StatelessWidget {
             children: [
               Icon(Icons.add_box_rounded, color: color),
               const SizedBox(width: 10),
-              Text(item.name,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: color,
-                  )),
+              Flexible(
+                child: Text(item.name,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: color,
+                    )),
+              ),
             ],
           ),
         ),
