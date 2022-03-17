@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/delivery/delivery.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
+import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/services/qrmos/voucher/voucher.dart';
 
 import '../../widgets/custom_button.dart';
@@ -15,12 +16,14 @@ class TraySection extends StatefulWidget {
   final List<TrayItem> trayItems;
   final void Function(TrayItem, CreateOrderItem) onUpdateOrderItem;
   final void Function(TrayItem) onDeleteTrayItem;
+  final void Function(Order) onOrderCreated;
 
   const TraySection({
     Key? key,
     this.trayItems = const [],
     required this.onUpdateOrderItem,
     required this.onDeleteTrayItem,
+    required this.onOrderCreated,
   }) : super(key: key);
 
   @override
@@ -80,6 +83,7 @@ class _TraySectionState extends State<TraySection> {
     setState(() {
       _discount = 0;
       _voucherErrMsg = "";
+      _errMsg = "";
     });
     if (_voucher == "") {
       return;
@@ -118,16 +122,22 @@ class _TraySectionState extends State<TraySection> {
           _textInputRow('Tên khách hàng: ', _cusName, (val) {
             setState(() {
               _cusName = val;
+              _errMsg = "";
+              _voucherErrMsg = "";
             });
           }),
           _textInputRow('Số điện thoại: ', _cusPhone, (val) {
             setState(() {
               _cusPhone = val;
+              _errMsg = "";
+              _voucherErrMsg = "";
             });
           }),
           _destDropdown(),
           _voucherInput(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          ErrorMessage(_voucherErrMsg),
+          const SizedBox(height: 10),
           const Text('Danh sách món:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           const SizedBox(height: 10),
           ..._trayItemList(context),
@@ -135,7 +145,7 @@ class _TraySectionState extends State<TraySection> {
           _total(),
           const SizedBox(height: 10),
           ErrorMessage(_errMsg),
-          CustomButton('Tạo', _onCreate),
+          CustomButton('Tạo', widget.trayItems.isNotEmpty ? _onCreate : null),
         ],
       ),
     );
@@ -172,6 +182,8 @@ class _TraySectionState extends State<TraySection> {
             onChanged: (val) {
               setState(() {
                 _dest = val;
+                _errMsg = "";
+                _voucherErrMsg = "";
               });
             },
             items: _dests.map((d) => DropdownMenuItem(value: d, child: Text(d.name))).toList(),
@@ -190,13 +202,13 @@ class _TraySectionState extends State<TraySection> {
           setState(() {
             _voucher = val;
             _discount = 0;
+            _errMsg = "";
             _voucherErrMsg = "";
           });
         }),
         const SizedBox(width: 10),
         CustomButton('Kiểm tra', _checkVoucher),
         const SizedBox(width: 10),
-        ErrorMessage(_voucherErrMsg),
         if (_discount > 0)
           const Text('Thành công!',
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
@@ -260,7 +272,33 @@ class _TraySectionState extends State<TraySection> {
     return total;
   }
 
-  void _onCreate() {
-    // TODO: implement
+  void _onCreate() async {
+    setState(() {
+      _errMsg = "";
+      _voucherErrMsg = "";
+    });
+    List<CreateOrderItem> items = [];
+    for (var trayItem in widget.trayItems) {
+      items.add(trayItem.orderItem);
+    }
+
+    CreateOrderPayload payload = CreateOrderPayload(
+      customerName: _cusName,
+      customerPhone: _cusPhone,
+      deliveryDest: _dest!.name,
+      deliveryDestSecurityCode: _dest!.securityCode!,
+      voucher: _voucher,
+      items: items,
+    );
+
+    var resp = await createOrder(payload);
+    if (resp.error != null) {
+      setState(() {
+        _errMsg = translateErrMsg(resp.error);
+      });
+      return;
+    }
+
+    widget.onOrderCreated(resp.data!);
   }
 }

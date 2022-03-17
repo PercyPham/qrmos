@@ -1,15 +1,25 @@
 import '../utils/utils.dart';
+import 'models.dart';
 
-Future<ApiBoolResponse> createOrder(CreateOrderPayload payload) async {
+Future<CreateOrderResponse> createOrder(CreateOrderPayload payload) async {
   var apiRawResp = await post("/orders", body: payload.toJson());
-  return ApiBoolResponse.fromJson(apiRawResp);
+  return CreateOrderResponse.fromJson(apiRawResp);
+}
+
+class CreateOrderResponse {
+  Order? data;
+  ApiError? error;
+
+  CreateOrderResponse.fromJson(ApiResponse apiResp)
+      : error = apiResp.error,
+        data = apiResp.dataJson == null ? null : Order.fromJson(apiResp.dataJson);
 }
 
 class CreateOrderPayload {
   String customerName;
   String customerPhone;
   String deliveryDest;
-  String deliveryDestSecurity;
+  String deliveryDestSecurityCode;
   String voucher;
   List<CreateOrderItem> items;
 
@@ -17,7 +27,7 @@ class CreateOrderPayload {
     this.customerName = "",
     this.customerPhone = "",
     required this.deliveryDest,
-    required this.deliveryDestSecurity,
+    required this.deliveryDestSecurityCode,
     this.voucher = "",
     this.items = const [],
   });
@@ -26,7 +36,7 @@ class CreateOrderPayload {
         'customerName': customerName,
         'customerPhone': customerPhone,
         'deliveryDest': deliveryDest,
-        'deliveryDestSecurity': deliveryDestSecurity,
+        'deliveryDestSecurityCode': deliveryDestSecurityCode,
         'voucher': voucher,
         'items': items,
       };

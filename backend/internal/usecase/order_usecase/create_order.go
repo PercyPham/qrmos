@@ -248,6 +248,9 @@ func (u *CreateOrderUsecase) calculateOrderItem(
 	options = map[string][]string{}
 
 	for optName, opt := range menuItem.Options {
+		if !opt.Available {
+			continue
+		}
 		cusChoices := inputItem.Options[optName]
 		cusChoiceCount := 0
 		if cusChoices != nil {
@@ -255,6 +258,12 @@ func (u *CreateOrderUsecase) calculateOrderItem(
 		}
 		if cusChoiceCount < opt.MinChoice || cusChoiceCount > opt.MaxChoice {
 			return 0, nil, apperror.Newf("not enough choices for option '%s' of item '%d'", optName, inputItem.ItemID)
+		}
+	}
+
+	for optionName, choices := range inputItem.Options {
+		if len(choices) == 0 {
+			delete(inputItem.Options, optionName)
 		}
 	}
 
