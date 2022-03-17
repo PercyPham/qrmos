@@ -58,7 +58,21 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('Tên món: ${_item!.name}'),
+                  Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      verticalDirection: VerticalDirection.down,
+                      children: [
+                        Text(
+                          'Tên món: ${_item!.name}',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        const SizedBox(width: 10),
+                        if (!_item!.isChoosable)
+                          const Text('( không hoạt động )',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      ]),
+                  const SizedBox(width: 20),
                   Text('Mô tả: ${_item!.description}'),
                   Row(
                     mainAxisSize: MainAxisSize.min,

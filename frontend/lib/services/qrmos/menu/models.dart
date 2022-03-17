@@ -100,6 +100,15 @@ class MenuItem {
         "baseUnitPrice": baseUnitPrice,
         "options": options,
       };
+
+  bool get isChoosable {
+    if (!available) return false;
+    var notChoosableOpts = options.keys.where((optName) => !options[optName]!.isChoosable).toList();
+    if (notChoosableOpts.isNotEmpty) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class MenuItemOption {
@@ -134,6 +143,16 @@ class MenuItemOption {
         "maxChoice": maxChoice,
         "choices": choices,
       };
+
+  bool get isChoosable {
+    if (!available) return false;
+    var availableChoices =
+        choices.keys.where((choiceName) => choices[choiceName]!.available).toList();
+    if (availableChoices.length < minChoice) {
+      return false;
+    }
+    return true;
+  }
 }
 
 class MenuItemOptionChoice {
