@@ -139,6 +139,11 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 			WithPublicMessage(err.Error())
 	}
 
+	total -= voucher.Discount
+	if total < 0 {
+		total = 0
+	}
+
 	order := &entity.Order{
 		State:               entity.OrderStatePending,
 		CustomerName:        input.CustomerName,
@@ -146,7 +151,7 @@ func (u *CreateOrderUsecase) Create(t time.Time, input *CreateOrderInput) (*enti
 		DeliveryDestination: input.DeliveryDest,
 		Voucher:             voucher.Code,
 		Discount:            voucher.Discount,
-		Total:               total - voucher.Discount,
+		Total:               total,
 		OrderItems:          orderItems,
 		Creator:             input.Creator,
 		CreatedAt:           t,

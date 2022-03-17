@@ -23,6 +23,21 @@ func (s *server) getVouchers(c *gin.Context) {
 	response.Success(c, vouchers)
 }
 
+func (s *server) getVoucher(c *gin.Context) {
+	if err := s.authCheck.IsAuthenticated(time.Now(), c); err != nil {
+		response.Error(c, newUnauthorizedError(err))
+		return
+	}
+	voucherCode := c.Param("code")
+	getVouchersUsecase := voucher_usecase.NewGetVouchersUsecase(s.voucherRepo)
+	voucher, err := getVouchersUsecase.GetVoucherByCode(voucherCode)
+	if err != nil {
+		response.Error(c, apperror.Wrap(err, "usecase gets voucher by code"))
+		return
+	}
+	response.Success(c, voucher)
+}
+
 func (s *server) createVoucher(c *gin.Context) {
 	now := time.Now()
 	manager, err := s.authCheck.IsManager(now, c)
