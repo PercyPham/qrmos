@@ -15,26 +15,71 @@ class TrayItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: null,
+      onTap: onTap,
       child: Card(
         elevation: 10,
         child: Container(
           padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-          width: 400,
-          height: 50,
-          child: Row(
+          width: 500,
+          child: Column(
             mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(trayItem.menuItem.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  )),
+              _itemNameAndQuan(),
+              ...trayItem.orderItem.options.keys
+                  .where((optName) => trayItem.orderItem.options[optName]!.isNotEmpty)
+                  .map((optName) => _option(optName, trayItem.orderItem.options[optName]!))
+                  .toList(),
+              const SizedBox(height: 10),
+              if (trayItem.orderItem.note != "") _note(),
+              const SizedBox(height: 10),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  _itemNameAndQuan() {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          flex: 1,
+          child: Text(trayItem.menuItem.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              )),
+        ),
+        Text('x ${trayItem.orderItem.quantity}',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+            )),
+      ],
+    );
+  }
+
+  _option(String optName, List<String> choices) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(optName),
+        ...choices.map((choice) => Text(' + $choice')).toList(),
+      ],
+    );
+  }
+
+  _note() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Ghi chú: ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        Text(trayItem.orderItem.note),
+      ],
     );
   }
 }

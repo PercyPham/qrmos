@@ -73,8 +73,11 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 15, color: Colors.red)),
                       ]),
-                  const SizedBox(width: 20),
+                  const SizedBox(height: 20),
                   Text('Mô tả: ${_item!.description}'),
+                  const SizedBox(height: 20),
+                  Text('Giá cơ bản: ${_item!.baseUnitPrice}'),
+                  const SizedBox(height: 10),
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,

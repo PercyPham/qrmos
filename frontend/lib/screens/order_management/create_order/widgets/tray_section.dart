@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/delivery/delivery.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 
+import '../../widgets/custom_button.dart';
 import '../../widgets/error_message.dart';
 import '../models/tray_item.dart';
 import 'bold_text.dart';
@@ -25,6 +26,7 @@ class _TraySectionState extends State<TraySection> {
 
   String _cusName = "unknown";
   String _cusPhone = "unknown";
+  String _voucher = "";
   DeliveryDestination? _dest;
 
   String _errMsg = '';
@@ -84,11 +86,20 @@ class _TraySectionState extends State<TraySection> {
             });
           }),
           _destDropdown(),
-          const SizedBox(height: 10),
+          _textInputRow('Voucher: ', _voucher, (val) {
+            setState(() {
+              _voucher = val;
+            });
+          }),
+          const SizedBox(height: 20),
           const Text('Danh sách món:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
           const SizedBox(height: 10),
           ..._trayItemList(context),
+          const SizedBox(height: 10),
+          _total(),
+          const SizedBox(height: 10),
           ErrorMessage(_errMsg),
+          CustomButton('Tạo', _onCreate),
         ],
       ),
     );
@@ -142,5 +153,26 @@ class _TraySectionState extends State<TraySection> {
               onTap: () {},
             ))
         .toList();
+  }
+
+  _total() {
+    var total = _calculateTotal();
+    return Text('Tổng: $total vnđ',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ));
+  }
+
+  int _calculateTotal() {
+    var total = 0;
+    for (var trayItem in widget.trayItems) {
+      total += trayItem.price;
+    }
+    return total;
+  }
+
+  void _onCreate() {
+    // TODO: implement
   }
 }

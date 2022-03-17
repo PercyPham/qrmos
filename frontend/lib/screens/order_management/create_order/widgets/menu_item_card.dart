@@ -19,16 +19,16 @@ class MenuItemCard extends StatelessWidget {
       child: Card(
         elevation: 10,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-          width: 400,
-          height: 50,
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+          width: 500,
           child: Row(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Icon(Icons.add_box_rounded, color: color),
               const SizedBox(width: 10),
-              Text('${item.name}${item.isChoosable ? '' : ' ( không chọn được )'}',
+              Text(item.name,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,

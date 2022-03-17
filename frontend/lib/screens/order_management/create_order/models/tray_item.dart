@@ -11,4 +11,17 @@ class TrayItem {
     required this.menuItem,
     required this.orderItem,
   }) : key = UniqueKey();
+
+  int get price {
+    var unitPrice = menuItem.baseUnitPrice;
+
+    for (var optName in orderItem.options.keys) {
+      var choiceNames = orderItem.options[optName]!;
+      for (var choiceName in choiceNames) {
+        unitPrice += menuItem.options[optName]!.choices[choiceName]!.price;
+      }
+    }
+
+    return unitPrice * orderItem.quantity;
+  }
 }
