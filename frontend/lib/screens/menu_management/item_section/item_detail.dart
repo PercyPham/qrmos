@@ -70,7 +70,8 @@ class _MenuItemDetailScreenState extends State<MenuItemDetailScreen> {
                         const SizedBox(width: 10),
                         if (!_item!.isChoosable)
                           const Text('( không hoạt động )',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15, color: Colors.red)),
                       ]),
                   const SizedBox(width: 20),
                   Text('Mô tả: ${_item!.description}'),

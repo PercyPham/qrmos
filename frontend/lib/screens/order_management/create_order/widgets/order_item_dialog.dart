@@ -102,12 +102,22 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 5),
-        Text(optName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+        Text(optName,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: menuItemOption.available ? null : Colors.grey[300],
+            )),
         const SizedBox(height: 5),
-        Text('(chọn ít nhất ${menuItemOption.minChoice}, nhiều nhất ${menuItemOption.maxChoice})'),
+        Text(
+          '(chọn ít nhất ${menuItemOption.minChoice}, nhiều nhất ${menuItemOption.maxChoice})',
+          style: TextStyle(color: menuItemOption.available ? null : Colors.grey[300]),
+        ),
         const SizedBox(height: 10),
         ...menuItemOption.choices.keys
             .map((choiceName) => _optionInputChoice(
+                  isDisabled:
+                      !menuItemOption.available || !menuItemOption.choices[choiceName]!.available,
                   choiceName: choiceName,
                   choice: menuItemOption.choices[choiceName]!,
                   isChosen: _item.hasOptionChoice(optName, choiceName),
@@ -134,6 +144,7 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
   }
 
   Widget _optionInputChoice({
+    required bool isDisabled,
     required String choiceName,
     required MenuItemOptionChoice choice,
     required bool isChosen,
@@ -141,20 +152,23 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
   }) {
     return InkWell(
       key: Key(choiceName),
-      onTap: choice.available ? () => onToggled(!isChosen) : null,
+      onTap: isDisabled ? null : () => onToggled(!isChosen),
       child: Container(
         margin: const EdgeInsets.fromLTRB(20, 5, 0, 5),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            choice.available
-                ? isChosen
+            isDisabled
+                ? Icon(Icons.indeterminate_check_box_rounded, color: Colors.grey[300])
+                : isChosen
                     ? const Icon(Icons.check_box)
-                    : const Icon(Icons.check_box_outline_blank)
-                : Icon(Icons.indeterminate_check_box_rounded, color: Colors.grey[300]),
+                    : const Icon(Icons.check_box_outline_blank),
             const SizedBox(width: 5),
-            Text('$choiceName (giá: ${choice.price}) (${choice.available ? 'còn' : 'hết'})')
+            Text(
+              '$choiceName (giá: ${choice.price}) (${choice.available ? 'còn' : 'hết'})',
+              style: TextStyle(color: isDisabled ? Colors.grey[300] : null),
+            )
           ],
         ),
       ),
@@ -242,6 +256,7 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
   bool _validateInput() {
     for (var optName in widget.menuItem.options.keys) {
       var menuOpt = widget.menuItem.options[optName]!;
+      if (!menuOpt.available) continue;
       var orderOpt = _item.options[optName]!;
       if (orderOpt.length < menuOpt.minChoice) {
         setState(() {

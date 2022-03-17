@@ -103,8 +103,10 @@ class MenuItem {
 
   bool get isChoosable {
     if (!available) return false;
-    var notChoosableOpts = options.keys.where((optName) => !options[optName]!.isChoosable).toList();
-    if (notChoosableOpts.isNotEmpty) {
+    var notValidOpts = options.keys
+        .where((optName) => options[optName]!.available && !options[optName]!.hasValidChoices)
+        .toList();
+    if (notValidOpts.isNotEmpty) {
       return false;
     }
     return true;
@@ -146,6 +148,10 @@ class MenuItemOption {
 
   bool get isChoosable {
     if (!available) return false;
+    return hasValidChoices;
+  }
+
+  bool get hasValidChoices {
     var availableChoices =
         choices.keys.where((choiceName) => choices[choiceName]!.available).toList();
     if (availableChoices.length < minChoice) {
