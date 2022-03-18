@@ -54,6 +54,15 @@ class AuthModel extends ChangeNotifier {
     }
   }
 
+  Future<String> createCustomer(String name, phone) async {
+    var loginResp = await qrmos.createCustomer(name, phone);
+    if (loginResp.error != null) {
+      return qrmos.translateErrMsg(loginResp.error!);
+    }
+    await loadAccessTokenFromLocal();
+    return "";
+  }
+
   Future<String> login(String username, String password) async {
     var loginResp = await qrmos.login(username, password);
     if (loginResp.error != null) {
