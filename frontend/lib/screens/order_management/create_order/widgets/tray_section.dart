@@ -5,8 +5,8 @@ import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/services/qrmos/voucher/voucher.dart';
 import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/error_message.dart';
+import 'package:qrmos/widgets/tray_item.dart';
 
-import '../models/tray_item.dart';
 import 'bold_text.dart';
 import 'tray_item_card.dart';
 import 'tray_item_dialog.dart';

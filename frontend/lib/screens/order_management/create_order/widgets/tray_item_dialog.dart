@@ -3,8 +3,7 @@ import 'package:qrmos/services/qrmos/menu/models.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
 import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/error_message.dart';
-
-import '../models/tray_item.dart';
+import 'package:qrmos/widgets/tray_item.dart';
 
 class TrayItemDialog extends StatefulWidget {
   final TrayItem trayItem;
