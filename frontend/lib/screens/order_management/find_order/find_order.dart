@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/widgets/big_screen.dart';
+import 'package:qrmos/widgets/custom_button.dart';
+import 'package:qrmos/widgets/error_message.dart';
 import 'package:qrmos/widgets/input/number_input_field.dart';
 
-import '../widgets/custom_button.dart';
-import '../widgets/error_message.dart';
 import '../widgets/order_card.dart';
 
 class FindOrderScreen extends StatefulWidget {

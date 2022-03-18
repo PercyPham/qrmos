@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/widgets/big_screen.dart';
+import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 
 import 'create_order/create_order.dart';
 import 'find_order/find_order.dart';
 import 'report/report.dart';
 import 'store_config_management.dart';
-import 'widgets/custom_button.dart';
 import 'widgets/order_table.dart';
 
 class OrderManagementScreen extends StatefulWidget {

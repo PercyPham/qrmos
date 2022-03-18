@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:qrmos/widgets/custom_button.dart';
 
-import '../../widgets/custom_button.dart';
 import '../models/tray_item.dart';
 
 class TrayItemCard extends StatelessWidget {

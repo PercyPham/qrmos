@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
-
-import 'error_message.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
 class FailOrderDialog extends StatefulWidget {
   final Order order;

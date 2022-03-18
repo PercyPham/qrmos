@@ -3,9 +3,9 @@ import 'package:qrmos/services/qrmos/delivery/delivery.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/services/qrmos/voucher/voucher.dart';
+import 'package:qrmos/widgets/custom_button.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
-import '../../widgets/custom_button.dart';
-import '../../widgets/error_message.dart';
 import '../models/tray_item.dart';
 import 'bold_text.dart';
 import 'tray_item_card.dart';

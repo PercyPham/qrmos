@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/menu/models.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
-
-import '../../widgets/custom_button.dart';
-import '../../widgets/error_message.dart';
+import 'package:qrmos/widgets/custom_button.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
 class OrderItemDialog extends StatefulWidget {
   final MenuItem menuItem;
