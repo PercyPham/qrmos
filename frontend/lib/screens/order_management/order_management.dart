@@ -3,6 +3,7 @@ import 'package:qrmos/widgets/big_screen.dart';
 import 'package:qrmos/widgets/screen_name.dart';
 
 import 'create_order/create_order.dart';
+import 'find_order/find_order.dart';
 import 'store_config_management.dart';
 import 'widgets/custom_button.dart';
 import 'widgets/order_table.dart';
@@ -33,7 +34,7 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
             },
           ),
           Container(height: 20),
-          _createOrderButton(context),
+          _actionButtons(context),
           Container(height: 20),
           const OrderTable(),
         ],
@@ -41,12 +42,23 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
     );
   }
 
-  _createOrderButton(BuildContext context) {
-    onPressed() {
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (context) => const CreateOrderScreen()));
-    }
+  _actionButtons(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomButton('Tạo đơn', _isStoreOpen ? () => _onCreateButtonPressed(context) : null),
+        const SizedBox(width: 15),
+        CustomButton('Tìm đơn', () => _onFindOrderButtonPressed(context)),
+      ],
+    );
+  }
 
-    return CustomButton('Tạo đơn', _isStoreOpen ? onPressed : null);
+  _onCreateButtonPressed(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const CreateOrderScreen()));
+  }
+
+  _onFindOrderButtonPressed(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FindOrderScreen()));
   }
 }

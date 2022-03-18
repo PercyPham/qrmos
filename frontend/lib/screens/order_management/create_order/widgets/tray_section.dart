@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/delivery/delivery.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
-import 'package:qrmos/services/qrmos/order/create_order.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/services/qrmos/voucher/voucher.dart';
 
