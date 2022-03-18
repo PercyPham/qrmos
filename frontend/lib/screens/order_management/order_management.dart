@@ -4,6 +4,7 @@ import 'package:qrmos/widgets/screen_name.dart';
 
 import 'create_order/create_order.dart';
 import 'find_order/find_order.dart';
+import 'report/report.dart';
 import 'store_config_management.dart';
 import 'widgets/custom_button.dart';
 import 'widgets/order_table.dart';
@@ -50,6 +51,8 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
         CustomButton('Tạo đơn', _isStoreOpen ? () => _onCreateButtonPressed(context) : null),
         const SizedBox(width: 15),
         CustomButton('Tìm đơn', () => _onFindOrderButtonPressed(context)),
+        const SizedBox(width: 15),
+        CustomButton('Báo cáo', () => _onReportButtonPressed(context)),
       ],
     );
   }
@@ -60,5 +63,9 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
 
   _onFindOrderButtonPressed(BuildContext context) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) => const FindOrderScreen()));
+  }
+
+  _onReportButtonPressed(BuildContext context) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReportScreen()));
   }
 }
