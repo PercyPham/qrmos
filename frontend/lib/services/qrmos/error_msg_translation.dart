@@ -20,4 +20,5 @@ final _errMsgTrans = {
   "not in same creation date": "Không cùng ngày khởi tạo",
   "fullName must be provided": "Bạn vui lòng cho biết tên nhé",
   "phoneNumber must be provided": "Bạn vui lòng cho biết số điện thoại nhé",
+  "voucher not found": "Voucher không tồn tại",
 };

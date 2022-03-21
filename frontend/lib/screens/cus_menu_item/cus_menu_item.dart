@@ -65,8 +65,19 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
           option: option,
           chosenChoices: _item.options[optName]!,
           onToggleChoice: (choice) {
+            var isAdding = !_item.options[optName]!.contains(choice);
+            if (isAdding) {
+              var currChoiceNum = _item.options[optName]!.length;
+              var option = widget.menuItem.options[optName]!;
+              if (currChoiceNum < option.maxChoice) {
+                setState(() {
+                  _item.addOptionChoice(optName, choice);
+                });
+              }
+              return;
+            }
             setState(() {
-              _item.toggleOptionChoice(optName, choice);
+              _item.removeOptionChoice(optName, choice);
             });
           },
         ));

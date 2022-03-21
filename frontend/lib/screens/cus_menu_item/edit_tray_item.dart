@@ -62,8 +62,19 @@ class _EditTrayItemScreenState extends State<EditTrayItemScreen> {
           option: option,
           chosenChoices: _item.options[optName]!,
           onToggleChoice: (choice) {
+            var isAdding = !_item.options[optName]!.contains(choice);
+            if (isAdding) {
+              var currChoiceNum = _item.options[optName]!.length;
+              var option = widget.trayItem.menuItem.options[optName]!;
+              if (currChoiceNum < option.maxChoice) {
+                setState(() {
+                  _item.addOptionChoice(optName, choice);
+                });
+              }
+              return;
+            }
             setState(() {
-              _item.toggleOptionChoice(optName, choice);
+              _item.removeOptionChoice(optName, choice);
             });
           },
         ));
@@ -109,14 +120,14 @@ class _EditTrayItemScreenState extends State<EditTrayItemScreen> {
       child: Center(
         child: CustomButton(
           'Lưu thay đổi',
-          isValidInput ? () => _onSaVe(context) : null,
+          isValidInput ? () => _onSave(context) : null,
           color: isValidInput ? Colors.brown : Colors.grey[300],
         ),
       ),
     );
   }
 
-  _onSaVe(BuildContext context) {
+  _onSave(BuildContext context) {
     Navigator.of(context).pop<CreateOrderItem?>(_item);
   }
 
