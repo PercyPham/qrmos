@@ -201,7 +201,25 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
       child: const Icon(Icons.shopping_cart_checkout),
       onPressed: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => CusTrayScreen(trayItems: _trayItems)),
+          MaterialPageRoute(
+              builder: (context) => CusTrayScreen(
+                    trayItems: _trayItems,
+                    onUpdateOrderItem: (trayItem, orderItem) {
+                      setState(() {
+                        final foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
+                        _trayItems[foundIdx] = TrayItem(
+                          menuItem: trayItem.menuItem,
+                          orderItem: orderItem,
+                        );
+                      });
+                    },
+                    onDeleteTrayItem: (trayItem) {
+                      setState(() {
+                        final foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
+                        _trayItems.removeAt(foundIdx);
+                      });
+                    },
+                  )),
         );
       },
     );
