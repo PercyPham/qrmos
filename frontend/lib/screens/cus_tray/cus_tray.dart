@@ -13,6 +13,7 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Khay'),
+        backgroundColor: Colors.brown,
       ),
       body: Container(),
     );

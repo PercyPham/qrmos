@@ -52,7 +52,7 @@ class _CusInfoInputScreenState extends State<CusInfoInputScreen> {
           const SizedBox(height: 20),
           ErrorMessage(_errMsg),
           const SizedBox(height: 10),
-          CustomButton('Tiếp Tục', _onContinueButtonPressed, color: Colors.green),
+          CustomButton('Tiếp Tục', _onContinueButtonPressed, color: Colors.brown),
         ],
       ),
     );

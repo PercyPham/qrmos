@@ -34,9 +34,8 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.brown[900]),
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.brown,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -113,7 +112,7 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
         child: CustomButton(
           'Thêm Vào Khay',
           isValidInput ? () => _onAddTray(context) : null,
-          color: isValidInput ? Colors.green : Colors.grey[300],
+          color: isValidInput ? Colors.brown : Colors.grey[300],
         ),
       ),
     );

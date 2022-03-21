@@ -91,16 +91,15 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
     return AppBar(
       centerTitle: false,
       leadingWidth: 0,
-      title: Text(title, style: const TextStyle(color: Colors.black)),
+      title: Text(title),
       automaticallyImplyLeading: false,
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.brown,
       actions: [
         IconButton(
           icon: const Icon(Icons.history),
           onPressed: () => _onHistoryButtonPressed(context),
         ),
       ],
-      actionsIconTheme: const IconThemeData(color: Colors.brown),
     );
   }
 
@@ -185,7 +184,7 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
 
   _floatingTrayButton(BuildContext context) {
     return FloatingActionButton(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.brown,
       child: const Icon(Icons.shopping_cart_checkout),
       onPressed: () {
         Navigator.of(context).push(

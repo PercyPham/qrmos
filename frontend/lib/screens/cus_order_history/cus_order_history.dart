@@ -12,8 +12,8 @@ class _CusOrderHistoryScreenState extends State<CusOrderHistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Lịch sử', style: TextStyle(color: Colors.brown)),
-        backgroundColor: Colors.white,
+        title: const Text('Lịch sử'),
+        backgroundColor: Colors.brown,
       ),
       body: Container(),
     );
