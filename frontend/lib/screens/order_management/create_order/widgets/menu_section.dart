@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/menu/menu.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
-import '../../widgets/error_message.dart';
 import 'bold_text.dart';
 import 'menu_item_card.dart';
 import 'order_item_dialog.dart';

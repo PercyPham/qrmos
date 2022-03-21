@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qrmos/models/auth_model.dart';
-import 'package:qrmos/screens/login/login.dart';
-import 'package:qrmos/screens/dashboard/dashboard.dart';
+
+import 'models/auth_model.dart';
+
+import 'screens/login/login.dart';
+import 'screens/dashboard/dashboard.dart';
+import 'screens/cus_menu/cus_menu.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
         "/": (context) => const DashboardScreen(),
         LoginScreen.routeName: (context) => const LoginScreen(),
         DashboardScreen.routeName: (context) => const DashboardScreen(),
+        CusMenuScreen.routeName: (context) => const CusMenuScreen(),
       },
     );
   }

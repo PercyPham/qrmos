@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/menu/models.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
-
-import '../../widgets/custom_button.dart';
-import '../../widgets/error_message.dart';
+import 'package:qrmos/widgets/custom_button.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
 class OrderItemDialog extends StatefulWidget {
   final MenuItem menuItem;
@@ -18,13 +17,14 @@ class OrderItemDialog extends StatefulWidget {
 }
 
 class _OrderItemDialogState extends State<OrderItemDialog> {
-  final CreateOrderItem _item = CreateOrderItem(options: {});
+  final CreateOrderItem _item = CreateOrderItem();
   String _errMsg = '';
 
   @override
   void initState() {
     super.initState();
     _item.itemId = widget.menuItem.id;
+    _item.options = {};
     for (var optName in widget.menuItem.options.keys) {
       _item.options[optName] = [];
     }

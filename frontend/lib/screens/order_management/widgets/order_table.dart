@@ -41,18 +41,18 @@ class _OrderTableState extends State<OrderTable> {
     int? from;
     int? to;
     if (_filterForToday) {
-      const secondInNanos = 1000000000;
-      const minInNanos = 60 * secondInNanos;
-      const hourInNanos = 60 * minInNanos;
-      const dayInNanos = 24 * hourInNanos;
-
       var now = _getNowInHcmTz();
-      var hour = now.hour * hourInNanos;
-      var min = now.minute * minInNanos;
-      var sec = now.second * secondInNanos;
 
-      var currNanos = now.microsecondsSinceEpoch * 1000;
-      from = currNanos - hour - min - sec;
+      var startDateTime = now.subtract(Duration(
+          hours: now.hour,
+          minutes: now.minute,
+          seconds: now.second,
+          milliseconds: now.millisecond,
+          microseconds: now.microsecond));
+
+      const dayInNanos = 24 * 60 * 60 * 1000000000;
+
+      from = startDateTime.microsecondsSinceEpoch * 1000;
       to = from + dayInNanos;
     }
 

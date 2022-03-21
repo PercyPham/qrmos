@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/menu/menu.dart';
 import 'package:qrmos/services/qrmos/order/models.dart';
+import 'package:qrmos/widgets/tray_item.dart';
 
 import '../order_created/order_created.dart';
-import 'models/tray_item.dart';
 import 'widgets/menu_section.dart';
 import 'widgets/tray_section.dart';
 

@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
+import 'package:qrmos/widgets/custom_button.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
 import '../order_detail/order_detail.dart';
 import 'change_dest_dialog.dart';
-import 'custom_button.dart';
-import 'error_message.dart';
 import 'fail_order_dialog.dart';
 import 'payment_dialog.dart';
 
 class OrderCard extends StatelessWidget {
   final Order order;
-  final void Function() onActionHappened;
+  final void Function()? onActionHappened;
   const OrderCard({
     Key? key,
     required this.order,
-    required this.onActionHappened,
+    this.onActionHappened,
   }) : super(key: key);
 
   @override
@@ -182,7 +182,7 @@ class OrderCard extends StatelessWidget {
       builder: (_) => ChangeDestDialog(order),
     );
     if (result == true) {
-      onActionHappened();
+      _onActionHappened();
     }
   }
 
@@ -275,7 +275,7 @@ class OrderCard extends StatelessWidget {
       print(resp.error);
       return;
     }
-    onActionHappened();
+    _onActionHappened();
   }
 
   void _onPayButtonPressed(BuildContext context) async {
@@ -284,7 +284,7 @@ class OrderCard extends StatelessWidget {
       builder: (_) => PaymentDialog(order),
     );
     if (result == true) {
-      onActionHappened();
+      _onActionHappened();
     }
   }
 
@@ -294,7 +294,7 @@ class OrderCard extends StatelessWidget {
       builder: (_) => FailOrderDialog(order),
     );
     if (result == true) {
-      onActionHappened();
+      _onActionHappened();
     }
   }
 
@@ -305,7 +305,7 @@ class OrderCard extends StatelessWidget {
       print(resp.error);
       return;
     }
-    onActionHappened();
+    _onActionHappened();
   }
 
   void _onDeliveredButtonPressed() async {
@@ -315,12 +315,16 @@ class OrderCard extends StatelessWidget {
       print(resp.error);
       return;
     }
-    onActionHappened();
+    _onActionHappened();
   }
 
   _orderFailReason() {
     return order.failReason == null
         ? const SizedBox(height: 0, width: 0)
         : ErrorMessage('Nguyên do thất bại: ${order.failReason}');
+  }
+
+  _onActionHappened() {
+    if (onActionHappened != null) onActionHappened!();
   }
 }

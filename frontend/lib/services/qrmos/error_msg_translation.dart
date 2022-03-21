@@ -18,4 +18,6 @@ final _errMsgTrans = {
   "delivery destination already exists": "Điểm giao nhận đã tồn tại",
   "voucher already exists": "Mã code đã tồn tại",
   "not in same creation date": "Không cùng ngày khởi tạo",
+  "fullName must be provided": "Bạn vui lòng cho biết tên nhé",
+  "phoneNumber must be provided": "Bạn vui lòng cho biết số điện thoại nhé",
 };

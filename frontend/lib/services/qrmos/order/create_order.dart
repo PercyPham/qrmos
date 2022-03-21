@@ -77,6 +77,15 @@ class CreateOrderItem {
     options[optName] = options[optName]!.where((cName) => cName != choiceName).toList();
   }
 
+  void toggleOptionChoice(String optName, choiceName) {
+    if (options[optName] == null) return;
+    if (options[optName]!.contains(choiceName)) {
+      removeOptionChoice(optName, choiceName);
+    } else {
+      addOptionChoice(optName, choiceName);
+    }
+  }
+
   CreateOrderItem clone() {
     Map<String, List<String>> _opts = {};
     for (var optName in options.keys) {

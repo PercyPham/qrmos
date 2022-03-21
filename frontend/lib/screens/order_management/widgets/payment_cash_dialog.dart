@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
+import 'package:qrmos/widgets/error_message.dart';
 import 'package:qrmos/widgets/input/number_input_field.dart';
-
-import 'error_message.dart';
 
 class PaymentCashDialog extends StatefulWidget {
   final Order order;

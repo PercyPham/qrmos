@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
 class NumberInputField extends StatefulWidget {
+  final bool autofocus;
   final int initialValue;
   final InputDecoration decoration;
   final void Function(int) onChanged;
+
   const NumberInputField({
     Key? key,
+    this.autofocus = false,
     this.initialValue = 0,
     required this.onChanged,
     this.decoration = const InputDecoration(),
@@ -30,6 +33,7 @@ class _NumberInputFieldState extends State<NumberInputField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      autofocus: widget.autofocus,
       decoration: widget.decoration,
       controller: _controler,
       onChanged: (val) {

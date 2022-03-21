@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
-
-import 'error_message.dart';
+import 'package:qrmos/widgets/error_message.dart';
 
 class PaymentMoMoDialog extends StatefulWidget {
   final Order order;
