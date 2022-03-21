@@ -1,9 +1,8 @@
-// ignore: avoid_web_libraries_in_flutter
-import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/widgets/tray_item.dart';
+import 'package:qrmos/services/local/get_dest_info.dart';
 
 import 'widgets/edit_name_dialog.dart';
 import 'widgets/edit_phone_dialog.dart';
@@ -62,7 +61,7 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
               _infoText('Tên: ', auth.userFullName, () => _editNamePressed(context)),
               _infoText('Sđt: ', auth.customerPhone, () => _editPhonePressed(context)),
               const SizedBox(height: 10),
-              _infoText('Tại: ', _getDestNameFromUrl(), null),
+              _infoText('Tại: ', _getDestNameFromLocal(), null),
               const SizedBox(height: 10),
             ],
           ),
@@ -98,8 +97,8 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
     );
   }
 
-  String _getDestNameFromUrl() {
-    var destName = window.localStorage['destName'];
-    return destName ?? 'Vui lòng quét mã QR tại quán';
+  String _getDestNameFromLocal() {
+    final destName = getDestInfo();
+    return destName?.name ?? 'Vui lòng quét mã QR tại quán';
   }
 }
