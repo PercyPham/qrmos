@@ -1,3 +1,5 @@
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
@@ -52,11 +54,15 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _infoText('Tên: ', auth.userFullName, () => _editNamePressed(context)),
+              const Text(
+                'Gửi tới:',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
               const SizedBox(height: 10),
+              _infoText('Tên: ', auth.userFullName, () => _editNamePressed(context)),
               _infoText('Sđt: ', auth.customerPhone, () => _editPhonePressed(context)),
               const SizedBox(height: 10),
-              _infoText('Điểm giao: ', 'Bàn 01', null),
+              _infoText('Tại: ', _getDestNameFromUrl(), null),
               const SizedBox(height: 10),
             ],
           ),
@@ -90,5 +96,10 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
       context: context,
       builder: (_) => const EditCusPhoneDialog(),
     );
+  }
+
+  String _getDestNameFromUrl() {
+    var destName = window.localStorage['destName'];
+    return destName ?? 'Vui lòng quét mã QR tại quán';
   }
 }
