@@ -81,6 +81,7 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
           children: [
             ..._categorizedMenuItemsCards(context),
             ..._uncategorizedMenuItemsCards(context),
+            const SizedBox(height: 80),
           ],
         ),
       ),
@@ -188,7 +189,7 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
       child: const Icon(Icons.shopping_cart_checkout),
       onPressed: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const CusTrayScreen()),
+          MaterialPageRoute(builder: (context) => CusTrayScreen(trayItems: _trayItems)),
         );
       },
     );
