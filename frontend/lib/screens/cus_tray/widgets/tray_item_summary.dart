@@ -38,6 +38,7 @@ class TrayItemSummary extends StatelessWidget {
                     Text(trayItem.menuItem.name,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     ..._choices(),
+                    if (trayItem.orderItem.note != '') Text('Ghi chú: ${trayItem.orderItem.note}'),
                     _editButton(),
                   ],
                 ),
@@ -65,7 +66,7 @@ class TrayItemSummary extends StatelessWidget {
       var optChoices = trayItem.orderItem.options[optName]!;
       choices.addAll(optChoices);
     }
-    return choices.map((choice) => Text(choice)).toList();
+    return choices.map((choice) => Text('- $choice')).toList();
   }
 
   _editButton() {

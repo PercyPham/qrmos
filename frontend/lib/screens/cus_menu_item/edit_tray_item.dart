@@ -78,6 +78,7 @@ class _EditTrayItemScreenState extends State<EditTrayItemScreen> {
       color: Colors.white,
       width: double.infinity,
       child: TextFormField(
+          initialValue: _item.note,
           decoration: const InputDecoration(label: Text('Ghi chú')),
           onChanged: (val) {
             _item.note = val;

@@ -27,6 +27,8 @@ class CusTrayScreen extends StatefulWidget {
 }
 
 class _CusTrayScreenState extends State<CusTrayScreen> {
+  var _forceRedraw;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +44,7 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               _cusInfoSection(),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               _orderSummarySection(context),
             ],
           ),
@@ -64,8 +66,8 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
             children: [
               _sectionTitle('Gửi tới:'),
               const SizedBox(height: 10),
-              _infoText('Tên: ', auth.userFullName, () => _editNamePressed(context)),
-              _infoText('Sđt: ', auth.customerPhone, () => _editPhonePressed(context)),
+              _infoText('Tên: ', auth.userFullName, () => _editNamePressed(ctx)),
+              _infoText('Sđt: ', auth.customerPhone, () => _editPhonePressed(ctx)),
               const SizedBox(height: 10),
               _infoText('Tại: ', _getDestNameFromLocal(), null),
               const SizedBox(height: 10),
@@ -127,28 +129,10 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
                     key: trayItem.key,
                     trayItem: trayItem,
                     onEditPressed: () => _onEditTrayItemPressed(context, trayItem),
-                    onDeletePressed: () => widget.onDeleteTrayItem(trayItem),
+                    onDeletePressed: () => _onDeleteTrayItem(trayItem),
                   ))
               .toList(),
-          SizedBox(
-            height: 50,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Expanded(
-                  flex: 1,
-                  child: Text('Tổng tạm:'),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                    '${_calculateSubtotal()} đ',
-                    textAlign: TextAlign.end,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _subtotalSummary(),
         ],
       ),
     );
@@ -159,7 +143,39 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
         MaterialPageRoute(builder: (context) => EditTrayItemScreen(trayItem)));
     if (result != null) {
       widget.onUpdateOrderItem(trayItem, result);
+      setState(() {
+        _forceRedraw = Object();
+      });
     }
+  }
+
+  _onDeleteTrayItem(TrayItem trayItem) {
+    widget.onDeleteTrayItem(trayItem);
+    setState(() {
+      _forceRedraw = Object();
+    });
+  }
+
+  _subtotalSummary() {
+    return SizedBox(
+      height: 50,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Expanded(
+            flex: 1,
+            child: Text('Tổng tạm:'),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text(
+              '${_calculateSubtotal()} đ',
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   _calculateSubtotal() {

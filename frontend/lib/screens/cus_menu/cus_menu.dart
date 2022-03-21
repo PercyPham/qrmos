@@ -215,8 +215,7 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
                     },
                     onDeleteTrayItem: (trayItem) {
                       setState(() {
-                        final foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
-                        _trayItems.removeAt(foundIdx);
+                        _trayItems.remove(trayItem);
                       });
                     },
                   )),
