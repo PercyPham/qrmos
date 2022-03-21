@@ -9,6 +9,8 @@ import 'package:qrmos/widgets/tray_item.dart';
 
 import '../cus_menu_item/cus_menu_item.dart';
 import '../cus_info_input/cus_info_input.dart';
+import '../cus_order_history/cus_order_history.dart';
+import '../cus_tray/cus_tray.dart';
 import 'widgets/category_card.dart';
 
 class CusMenuScreen extends StatefulWidget {
@@ -60,7 +62,8 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
       builder: (ctx, auth, _) => auth.userType != UserType.customer
           ? CusInfoInputScreen(onDone: _loadMenu)
           : Scaffold(
-              appBar: _appBar('FlyWithCodeX Coffee'),
+              appBar: _appBar('FlyWithCodeX Coffee', context),
+              floatingActionButton: _floatingTrayButton(context),
               body: _errMsg != ""
                   ? Center(child: ErrorMessage(_errMsg))
                   : _isLoading
@@ -84,14 +87,26 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
     );
   }
 
-  _appBar(String title) {
+  _appBar(String title, BuildContext context) {
     return AppBar(
       centerTitle: false,
       leadingWidth: 0,
       title: Text(title, style: const TextStyle(color: Colors.black)),
       automaticallyImplyLeading: false,
       backgroundColor: Colors.white,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.history),
+          onPressed: () => _onHistoryButtonPressed(context),
+        ),
+      ],
+      actionsIconTheme: const IconThemeData(color: Colors.brown),
     );
+  }
+
+  _onHistoryButtonPressed(BuildContext context) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => const CusOrderHistoryScreen()));
   }
 
   _categorizedMenuItemsCards(BuildContext context) {
@@ -166,5 +181,17 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
         orderItem: result,
       ));
     }
+  }
+
+  _floatingTrayButton(BuildContext context) {
+    return FloatingActionButton(
+      backgroundColor: Colors.green,
+      child: const Icon(Icons.shopping_cart_checkout),
+      onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const CusTrayScreen()),
+        );
+      },
+    );
   }
 }
