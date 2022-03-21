@@ -7,9 +7,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 import 'package:qrmos/services/qrmos/qrmos.dart' show refreshDestSecurityCode, getDestByName;
 
-final String _menuBaseUrl = kDebugMode
-    ? '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}/#/menu'
-    : '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}/web/#/menu';
+final String _webBaseUrl = kDebugMode
+    ? '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}'
+    : '${Uri.base.scheme}://${Uri.base.host}:${Uri.base.port}/web';
 
 class DestQrDialog extends StatefulWidget {
   final String name;
@@ -120,7 +120,7 @@ class _DestQrDialogState extends State<DestQrDialog> {
   }
 
   String _getQrCodeData() {
-    return '$_menuBaseUrl?dest=$_name&securityCode=$_securityCode';
+    return '$_webBaseUrl?dest=$_name&securityCode=$_securityCode';
   }
 
   void _onRefreshButtonPressed() async {

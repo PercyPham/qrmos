@@ -44,8 +44,11 @@
   <!-- This script store Delivery Destination Name and Security Code 
     when encounter them in URL from QR code -->
   <script>
+
+    // // TODO: reconsider should we delete these values every reloads?
     window.localStorage.removeItem('destName');
     window.localStorage.removeItem('destSecurityCode');
+
     const params = new URLSearchParams(window.location.search);
     const destName = params.get('dest');
     if (destName != null) {
