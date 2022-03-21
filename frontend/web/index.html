@@ -30,7 +30,7 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>qrmos</title>
+  <title>FlyWithCodeX</title>
   <link rel="manifest" href="manifest.json">
 
   <link rel="stylesheet" href="$FLUTTER_BASE_HREFsplash/loading.css">
@@ -40,25 +40,6 @@
   <div class="loading">
     <div class="loader"></div>
   </div>
-
-  <!-- This script store Delivery Destination Name and Security Code 
-    when encounter them in URL from QR code -->
-  <script>
-
-    // // TODO: reconsider should we delete these values every reloads?
-    window.localStorage.removeItem('destName');
-    window.localStorage.removeItem('destSecurityCode');
-
-    const params = new URLSearchParams(window.location.search);
-    const destName = params.get('dest');
-    if (destName != null) {
-      window.localStorage.setItem('destName', destName);
-    }
-    const destSecurityCode = params.get('securityCode');
-    if (destSecurityCode != null) {
-      window.localStorage.setItem('destSecurityCode', destSecurityCode);
-    }
-  </script>
 
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:

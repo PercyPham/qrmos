@@ -120,7 +120,7 @@ class _DestQrDialogState extends State<DestQrDialog> {
   }
 
   String _getQrCodeData() {
-    return '$_webBaseUrl?dest=$_name&securityCode=$_securityCode';
+    return '$_webBaseUrl/init-qr.html?dest=$_name&securityCode=$_securityCode';
   }
 
   void _onRefreshButtonPressed() async {

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlyWithCodeX</title>
+</head>
+
+<body>
+
+  <h1>FlyWithCodeX Coffee Xin Chào!!!</h1>
+  <br />
+  <a href="./">Tới Menu</a>
+
+  <!-- This script store Delivery Destination Name and Security Code 
+    when encounter them in URL from QR code -->
+  <script>
+
+    // // TODO: reconsider should we delete these values every reloads?
+    window.localStorage.removeItem('destName');
+    window.localStorage.removeItem('destSecurityCode');
+
+    const params = new URLSearchParams(window.location.search);
+    const destName = params.get('dest');
+    if (destName != null) {
+      window.localStorage.setItem('destName', destName);
+    }
+    const destSecurityCode = params.get('securityCode');
+    if (destSecurityCode != null) {
+      window.localStorage.setItem('destSecurityCode', destSecurityCode);
+    }
+  </script>
+</body>
+
+</html>
