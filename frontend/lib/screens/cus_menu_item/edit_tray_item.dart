@@ -1,32 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:qrmos/services/qrmos/menu/menu.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
 import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/input/quantity_input_section.dart';
+import 'package:qrmos/widgets/tray_item.dart';
 
 import 'widget/item_main_info.dart';
 import 'widget/item_option_card.dart';
 
-class CusMenuItemScreen extends StatefulWidget {
-  final MenuItem menuItem;
-  const CusMenuItemScreen(this.menuItem, {Key? key}) : super(key: key);
+class EditTrayItemScreen extends StatefulWidget {
+  final TrayItem trayItem;
+  const EditTrayItemScreen(this.trayItem, {Key? key}) : super(key: key);
 
   @override
-  State<CusMenuItemScreen> createState() => _CusMenuItemScreenState();
+  State<EditTrayItemScreen> createState() => _EditTrayItemScreenState();
 }
 
-class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
-  final CreateOrderItem _item = CreateOrderItem();
+class _EditTrayItemScreenState extends State<EditTrayItemScreen> {
+  CreateOrderItem _item = CreateOrderItem();
 
   @override
   void initState() {
     super.initState();
-    _item.itemId = widget.menuItem.id;
-    _item.options = {};
-    for (var optName in widget.menuItem.options.keys) {
-      var option = widget.menuItem.options[optName]!;
-      if (option.isChoosable) _item.options[optName] = [];
-    }
+
+    _item = widget.trayItem.orderItem.clone();
   }
 
   @override
@@ -40,7 +36,7 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            ItemMainInfo(widget.menuItem),
+            ItemMainInfo(widget.trayItem.menuItem),
             ..._optionCards(),
             const SizedBox(height: 10),
             _noteInput(),
@@ -56,8 +52,9 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
 
   List<Widget> _optionCards() {
     List<Widget> cards = [];
-    for (var optName in widget.menuItem.options.keys) {
-      var option = widget.menuItem.options[optName]!;
+    var options = widget.trayItem.menuItem.options;
+    for (var optName in options.keys) {
+      var option = options[optName]!;
       if (option.isChoosable) {
         cards.add(const SizedBox(height: 15));
         cards.add(ItemOptionCard(
@@ -68,7 +65,7 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
             var isAdding = !_item.options[optName]!.contains(choice);
             if (isAdding) {
               var currChoiceNum = _item.options[optName]!.length;
-              var option = widget.menuItem.options[optName]!;
+              var option = widget.trayItem.menuItem.options[optName]!;
               if (currChoiceNum < option.maxChoice) {
                 setState(() {
                   _item.addOptionChoice(optName, choice);
@@ -92,6 +89,7 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
       color: Colors.white,
       width: double.infinity,
       child: TextFormField(
+          initialValue: _item.note,
           decoration: const InputDecoration(label: Text('Ghi chú')),
           onChanged: (val) {
             _item.note = val;
@@ -121,21 +119,22 @@ class _CusMenuItemScreenState extends State<CusMenuItemScreen> {
       width: double.infinity,
       child: Center(
         child: CustomButton(
-          'Thêm Vào Khay',
-          isValidInput ? () => _onAddTray(context) : null,
+          'Lưu thay đổi',
+          isValidInput ? () => _onSave(context) : null,
           color: isValidInput ? Colors.brown : Colors.grey[300],
         ),
       ),
     );
   }
 
-  _onAddTray(BuildContext context) {
+  _onSave(BuildContext context) {
     Navigator.of(context).pop<CreateOrderItem?>(_item);
   }
 
   bool _validateInput() {
-    for (var optName in widget.menuItem.options.keys) {
-      var menuOpt = widget.menuItem.options[optName]!;
+    var options = widget.trayItem.menuItem.options;
+    for (var optName in options.keys) {
+      var menuOpt = options[optName]!;
       if (!menuOpt.available) continue;
       var orderOpt = _item.options[optName]!;
       if (orderOpt.length < menuOpt.minChoice) {

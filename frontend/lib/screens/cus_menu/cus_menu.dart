@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
+import 'package:qrmos/services/local/get_dest_info.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/menu/menu.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
@@ -33,6 +34,8 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
   void initState() {
     super.initState();
     _loadMenu();
+    Provider.of<AuthModel>(context, listen: false).loadAccessTokenFromLocal();
+    _checkSavedDestInfo();
   }
 
   _loadMenu() async {
@@ -54,6 +57,15 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
       _isLoading = false;
       _menu = resp.data;
     });
+  }
+
+  void _checkSavedDestInfo() {
+    final destInfo = getDestInfo();
+    if (destInfo == null) {
+      setState(() {
+        _errMsg = 'Vui lòng quét mã QR tại quán';
+      });
+    }
   }
 
   @override
@@ -189,7 +201,24 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
       child: const Icon(Icons.shopping_cart_checkout),
       onPressed: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => CusTrayScreen(trayItems: _trayItems)),
+          MaterialPageRoute(
+              builder: (context) => CusTrayScreen(
+                    trayItems: _trayItems,
+                    onUpdateOrderItem: (trayItem, orderItem) {
+                      setState(() {
+                        final foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
+                        _trayItems[foundIdx] = TrayItem(
+                          menuItem: trayItem.menuItem,
+                          orderItem: orderItem,
+                        );
+                      });
+                    },
+                    onDeleteTrayItem: (trayItem) {
+                      setState(() {
+                        _trayItems.remove(trayItem);
+                      });
+                    },
+                  )),
         );
       },
     );
