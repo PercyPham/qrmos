@@ -5,7 +5,7 @@ import 'package:qrmos/services/qrmos/delivery/models.dart';
 
 DeliveryDestination? getDestInfo() {
   final name = window.localStorage['destName'];
-  final securityCode = window.localStorage['securityCode'];
+  final securityCode = window.localStorage['destSecurityCode'];
 
   if (name == null || securityCode == null) {
     return null;
