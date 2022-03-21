@@ -5,7 +5,8 @@ import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/error_message.dart';
 
 class CusInfoInputScreen extends StatefulWidget {
-  const CusInfoInputScreen({Key? key}) : super(key: key);
+  final void Function() onDone;
+  const CusInfoInputScreen({Key? key, required this.onDone}) : super(key: key);
 
   @override
   State<CusInfoInputScreen> createState() => _CusInfoInputScreenState();
@@ -81,6 +82,8 @@ class _CusInfoInputScreenState extends State<CusInfoInputScreen> {
       setState(() {
         _errMsg = errMsg;
       });
+      return;
     }
+    widget.onDone();
   }
 }

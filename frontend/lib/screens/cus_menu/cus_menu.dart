@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:qrmos/models/auth_model.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/menu/menu.dart';
+import 'package:qrmos/services/qrmos/order/create_order.dart';
 import 'package:qrmos/widgets/error_message.dart';
+import 'package:qrmos/widgets/tray_item.dart';
 
+import '../cus_menu_item/cus_menu_item.dart';
 import '../cus_info_input/cus_info_input.dart';
 import 'widgets/category_card.dart';
 
@@ -21,6 +24,8 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
   bool _isLoading = false;
   Menu? _menu;
   String _errMsg = '';
+
+  final List<TrayItem> _trayItems = [];
 
   @override
   void initState() {
@@ -53,7 +58,7 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
   Widget build(BuildContext context) {
     return Consumer<AuthModel>(
       builder: (ctx, auth, _) => auth.userType != UserType.customer
-          ? const CusInfoInputScreen()
+          ? CusInfoInputScreen(onDone: _loadMenu)
           : Scaffold(
               appBar: _appBar('FlyWithCodeX Coffee'),
               body: _errMsg != ""
@@ -92,13 +97,20 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
   _categorizedMenuItemsCards(BuildContext context) {
     var categories = _menu!.categories;
     categories.sort((a, b) => a.name.compareTo(b.name));
-    return categories
-        .map((cat) => CategoryCard(
-              category: cat,
-              menuItems: _getMenuItemsOfCategory(cat.id),
-              onMenuItemTap: (mItem) => _onMenuItemTap(context, mItem),
-            ))
-        .toList();
+
+    List<CategoryCard> cards = [];
+    for (var cat in categories) {
+      var menuItems = _getMenuItemsOfCategory(cat.id);
+      if (menuItems.isNotEmpty) {
+        cards.add(CategoryCard(
+          category: cat,
+          menuItems: menuItems,
+          onMenuItemTap: (mItem) => _onMenuItemTap(context, mItem),
+        ));
+      }
+    }
+
+    return cards;
   }
 
   List<MenuItem> _getMenuItemsOfCategory(int catId) {
@@ -111,6 +123,7 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
     for (var a in associations) {
       menuItems.add(m[a.itemId]!);
     }
+    menuItems = menuItems.where((i) => i.isChoosable).toList();
     menuItems.sort((a, b) => a.id.compareTo(b.id));
     return menuItems;
   }
@@ -139,11 +152,19 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
         menuItems.add(menuItem);
       }
     }
+    menuItems = menuItems.where((i) => i.isChoosable).toList();
     menuItems.sort((a, b) => a.id.compareTo(b.id));
     return menuItems;
   }
 
-  _onMenuItemTap(BuildContext context, MenuItem mItem) {
-    print('Item id "${mItem.id}" has been pressed!');
+  _onMenuItemTap(BuildContext context, MenuItem mItem) async {
+    var result = await Navigator.of(context)
+        .push<CreateOrderItem>(MaterialPageRoute(builder: (context) => CusMenuItemScreen(mItem)));
+    if (result != null) {
+      _trayItems.add(TrayItem(
+        menuItem: mItem,
+        orderItem: result,
+      ));
+    }
   }
 }

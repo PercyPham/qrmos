@@ -17,13 +17,14 @@ class OrderItemDialog extends StatefulWidget {
 }
 
 class _OrderItemDialogState extends State<OrderItemDialog> {
-  final CreateOrderItem _item = CreateOrderItem(options: {});
+  final CreateOrderItem _item = CreateOrderItem();
   String _errMsg = '';
 
   @override
   void initState() {
     super.initState();
     _item.itemId = widget.menuItem.id;
+    _item.options = {};
     for (var optName in widget.menuItem.options.keys) {
       _item.options[optName] = [];
     }
