@@ -318,7 +318,7 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
           CustomButton(
             'Tạo Đơn',
             widget.trayItems.isNotEmpty ? () => _createOrder(context) : null,
-            color: Colors.brown,
+            color: widget.trayItems.isNotEmpty ? Colors.brown : Colors.grey[300],
           ),
           if (_errMsg != '') const SizedBox(height: 5),
           if (_errMsg != '') ErrorMessage(_errMsg),
