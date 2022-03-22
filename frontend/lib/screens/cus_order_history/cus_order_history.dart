@@ -4,6 +4,7 @@ import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/widgets/error_message.dart';
 
 import 'widgets/order_card.dart';
+import 'widgets/page_nav.dart';
 
 class CusOrderHistoryScreen extends StatefulWidget {
   const CusOrderHistoryScreen({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class _CusOrderHistoryScreenState extends State<CusOrderHistoryScreen> {
   bool _isLoading = true;
   int _page = 1;
   int _totalItemCount = 0;
+  final int _itemPerPage = 10;
   List<Order> _orders = [];
 
   String _errMsg = '';
@@ -35,7 +37,7 @@ class _CusOrderHistoryScreenState extends State<CusOrderHistoryScreen> {
 
     var resp = await getOrders(
       page: _page,
-      itemPerPage: 10,
+      itemPerPage: _itemPerPage,
     );
     if (resp.error != null) {
       setState(() {
@@ -68,6 +70,16 @@ class _CusOrderHistoryScreenState extends State<CusOrderHistoryScreen> {
               if (_isLoading) const Center(child: Text('Loading...')),
               if (!_isLoading) ..._ordersCards(),
               ErrorMessage(_errMsg),
+              PageNav(
+                currentPage: _page,
+                totalPageCount: (_totalItemCount / _itemPerPage).ceil(),
+                onPageChanged: (page) {
+                  setState(() {
+                    _page = page;
+                  });
+                  _loadOrderHistory();
+                },
+              ),
             ],
           ),
         ),
