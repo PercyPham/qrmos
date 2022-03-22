@@ -3,33 +3,42 @@ import 'package:qrmos/services/qrmos/order/order.dart';
 
 class OrderCard extends StatelessWidget {
   final Order order;
-  const OrderCard(this.order, {Key? key}) : super(key: key);
+  final void Function() onTap;
+
+  const OrderCard({
+    Key? key,
+    required this.order,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 10,
-      color: Colors.white,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        width: double.infinity,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('#${order.id}',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                  Text('${order.createdAt.toLocal()}',
-                      style: const TextStyle(fontStyle: FontStyle.italic)),
-                  Text('Giá trị: ${order.total}'),
-                ],
+    return InkWell(
+      onTap: onTap,
+      child: Card(
+        elevation: 10,
+        color: Colors.white,
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          width: double.infinity,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('#${order.id}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                    Text('${order.createdAt.toLocal()}',
+                        style: const TextStyle(fontStyle: FontStyle.italic)),
+                    Text('Giá trị: ${order.total}'),
+                  ],
+                ),
               ),
-            ),
-            _orderState(),
-          ],
+              _orderState(),
+            ],
+          ),
         ),
       ),
     );
@@ -46,11 +55,11 @@ class OrderCard extends StatelessWidget {
       case 'delivered':
         return _stateText('Delivered', Colors.green.shade800);
       case 'cancelled':
-        return _stateText('Cancelled', Colors.grey.shade700);
+        return _stateText('Cancelled', Colors.grey);
       case 'failed':
         return _stateText('Failed', Colors.red);
       default:
-        throw Exception('Invalid order state: ' + order.state);
+        return _stateText('Invalid state\n${order.state}', Colors.black);
     }
   }
 

@@ -21,4 +21,5 @@ final _errMsgTrans = {
   "fullName must be provided": "Bạn vui lòng cho biết tên nhé",
   "phoneNumber must be provided": "Bạn vui lòng cho biết số điện thoại nhé",
   "voucher not found": "Voucher không tồn tại",
+  "not in opening hours": "Hiện đang đóng cửa",
 };

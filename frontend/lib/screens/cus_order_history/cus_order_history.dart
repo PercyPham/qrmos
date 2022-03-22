@@ -3,6 +3,7 @@ import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/widgets/error_message.dart';
 
+import '../cus_order_detail/cus_order_detail.dart';
 import 'widgets/order_card.dart';
 import 'widgets/page_nav.dart';
 
@@ -68,7 +69,7 @@ class _CusOrderHistoryScreenState extends State<CusOrderHistoryScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (_isLoading) const Center(child: Text('Loading...')),
-              if (!_isLoading) ..._ordersCards(),
+              if (!_isLoading) ..._ordersCards(context),
               ErrorMessage(_errMsg),
               PageNav(
                 currentPage: _page,
@@ -87,10 +88,17 @@ class _CusOrderHistoryScreenState extends State<CusOrderHistoryScreen> {
     );
   }
 
-  _ordersCards() {
+  _ordersCards(BuildContext context) {
     List<Widget> widgets = [];
     for (int i = 0; i < _orders.length; i++) {
-      widgets.add(OrderCard(_orders[i]));
+      widgets.add(OrderCard(
+        order: _orders[i],
+        onTap: () async {
+          await Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => CusOrderDetailScreen(_orders[i].id)));
+          _loadOrderHistory();
+        },
+      ));
       if (i < _orders.length - 1) widgets.add(const SizedBox(height: 5));
     }
     return widgets;

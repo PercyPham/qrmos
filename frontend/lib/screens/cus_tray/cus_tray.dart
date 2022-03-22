@@ -9,8 +9,8 @@ import 'package:qrmos/widgets/error_message.dart';
 import 'package:qrmos/widgets/tray_item.dart';
 import 'package:qrmos/services/local/get_dest_info.dart';
 
-import '../cus_created_order/cus_created_order.dart';
 import '../cus_menu_item/edit_tray_item.dart';
+import '../cus_order_detail/cus_order_detail.dart';
 import 'widgets/edit_name_dialog.dart';
 import 'widgets/edit_phone_dialog.dart';
 import 'widgets/tray_item_summary.dart';
@@ -363,6 +363,6 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
 
     var createdOrder = resp.data!;
     Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => CusOrderCreatedScreen(createdOrder)));
+        MaterialPageRoute(builder: (context) => CusOrderDetailScreen(createdOrder.id)));
   }
 }
