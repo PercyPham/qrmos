@@ -105,8 +105,7 @@ func (s *server) handleMoMoPaymentCallback(c *gin.Context) {
 		return
 	}
 	s.logOrderMoMoPayActionByCus(order, "client browser")
-	// TODO: redirect to Order Success page on front-end
-	response.Success(c, true)
+	c.String(200, "Đã thực hiện xong quy trình thanh toán MoMo. Bạn vui lòng đóng tab này và quay lại trang chi tiết đơn hàng để cập nhật thông tin mới!")
 }
 
 func (s *server) logOrderMoMoPayActionByCus(order *entity.Order, extra string) {

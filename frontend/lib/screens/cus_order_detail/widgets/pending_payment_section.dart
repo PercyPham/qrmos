@@ -84,6 +84,6 @@ class _PendingPaymentSectionState extends State<PendingPaymentSection> {
   }
 
   _onMomoPaymentButtonPressed() {
-    js.context.callMethod('open', [_momoPaymentLink, '_self']);
+    js.context.callMethod('open', [_momoPaymentLink]);
   }
 }
