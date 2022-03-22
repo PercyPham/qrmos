@@ -12,7 +12,7 @@ const OrderStateConfirmed = "confirmed"
 const OrderStateReady = "ready"
 const OrderStateDelivered = "delivered"
 const OrderStateFailed = "failed"
-const OrderStateCanceled = "canceled"
+const OrderStateCancelled = "cancelled"
 
 func IsValidOrderState(state string) bool {
 	validStates := map[string]bool{
@@ -21,7 +21,7 @@ func IsValidOrderState(state string) bool {
 		OrderStateReady:     true,
 		OrderStateDelivered: true,
 		OrderStateFailed:    true,
-		OrderStateCanceled:  true,
+		OrderStateCancelled: true,
 	}
 	return validStates[state]
 }
@@ -94,14 +94,14 @@ type OrderItem struct {
 }
 
 func (order *Order) Cancel() (hasUpdated bool, err error) {
-	if order.State == OrderStateCanceled {
+	if order.State == OrderStateCancelled {
 		return false, nil
 	}
 	if order.State != OrderStatePending {
 		return false, apperror.Newf("cannot cancel order with state '%s'", order.State).
 			WithCode(http.StatusForbidden)
 	}
-	order.State = OrderStateCanceled
+	order.State = OrderStateCancelled
 	return true, nil
 }
 
