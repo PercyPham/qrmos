@@ -4,6 +4,7 @@ import 'package:qrmos/services/qrmos/order/order.dart';
 import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/error_message.dart';
 
+import 'widgets/dest_select_dialog.dart';
 import 'widgets/order_item.dart';
 import 'widgets/pending_payment_section.dart';
 
@@ -71,8 +72,12 @@ class _CusOrderDetailScreenState extends State<CusOrderDetailScreen> {
                         const SizedBox(height: 10),
                         _infoText('Tên người nhận: ', _order!.customerName),
                         _infoText('Số điện thoại: ', _order!.customerPhone),
-                        _infoText('Nhận tại: ', _order!.deliveryDestination),
                         _infoText('Tạo lúc: ', '${_order!.createdAt.toLocal()}'),
+                        _infoText(
+                          'Nhận tại: ',
+                          _order!.deliveryDestination,
+                          onEditPressed: _onEditDestPressed(context),
+                        ),
                         if (_order!.voucher != null) _infoText('Voucher: ', '${_order!.voucher}'),
                         const SizedBox(height: 10),
                         const Divider(thickness: 1.5),
@@ -119,17 +124,47 @@ class _CusOrderDetailScreenState extends State<CusOrderDetailScreen> {
     );
   }
 
-  _infoText(String label, value) {
+  _infoText(String label, value, {void Function()? onEditPressed}) {
     return Container(
       margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           SizedBox(width: 120, child: Text(label)),
           Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          if (onEditPressed != null) const SizedBox(width: 10),
+          if (onEditPressed != null)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: onEditPressed,
+              iconSize: 20,
+            ),
         ],
       ),
     );
+  }
+
+  _onEditDestPressed(BuildContext context) {
+    if (!['pending', 'confirmed'].contains(_order!.state)) {
+      return null;
+    }
+    return () async {
+      var result = await showDialog(
+        context: context,
+        builder: (context) => DestSelectDialog(_order!.deliveryDestination),
+      );
+      if (result != null) {
+        var resp = await changeOrderDest(_order!.id, result);
+        if (resp.error != null) {
+          setState(() {
+            _errMsg = translateErrMsg(resp.error);
+          });
+          return;
+        }
+        _loadOrder();
+      }
+    };
   }
 
   _totalSection() {
