@@ -6,15 +6,17 @@ import (
 	"qrmos/internal/entity"
 	"qrmos/internal/usecase/order_usecase/momo"
 	"qrmos/internal/usecase/repo"
+	"qrmos/internal/usecase/store_cfg_usecase"
 	"time"
 )
 
-func NewFailOrderUsecase(or repo.Order) *FailOrderUsecase {
-	return &FailOrderUsecase{or}
+func NewFailOrderUsecase(or repo.Order, scr repo.StoreConfig) *FailOrderUsecase {
+	return &FailOrderUsecase{or, scr}
 }
 
 type FailOrderUsecase struct {
-	orderRepo repo.Order
+	orderRepo       repo.Order
+	storeConfigRepo repo.StoreConfig
 }
 
 type FailOrderInput struct {
@@ -39,6 +41,10 @@ func (u *FailOrderUsecase) MarkAsFailed(t time.Time, input *FailOrderInput) erro
 		return apperror.New("order not found").WithCode(http.StatusNotFound)
 	}
 
+	if err := u.validateFailTime(t, order); err != nil {
+		return apperror.Wrap(err, "validate fail time")
+	}
+
 	if err := order.MarkAsFailed(t, input.FailReason); err != nil {
 		return apperror.Wrap(err, "mark order as failed")
 	}
@@ -56,6 +62,17 @@ func (u *FailOrderUsecase) MarkAsFailed(t time.Time, input *FailOrderInput) erro
 		return apperror.Wrap(err, "repo updates order")
 	}
 
+	return nil
+}
+
+func (u *FailOrderUsecase) validateFailTime(t time.Time, order *entity.Order) error {
+	openingHours, err := store_cfg_usecase.GetOpeningHoursCfg(u.storeConfigRepo)
+	if err != nil {
+		return apperror.Wrap(err, "usecase gets store opening hours config")
+	}
+	if err := entity.CheckIfOrderUpdatableAt(t, order, openingHours); err != nil {
+		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusBadRequest)
+	}
 	return nil
 }
 

@@ -389,7 +389,7 @@ func (s *server) markOrderAsFailed(c *gin.Context) {
 	}
 	body.OrderID = orderID
 
-	failOrderUsecase := order_usecase.NewFailOrderUsecase(s.orderRepo)
+	failOrderUsecase := order_usecase.NewFailOrderUsecase(s.orderRepo, s.storeConfigRepo)
 	if err := failOrderUsecase.MarkAsFailed(now, body); err != nil {
 		response.Error(c, apperror.Wrap(err, "usecase marks order as failed"))
 		return
