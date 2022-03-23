@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:qrmos/common/hcm_time.dart';
 import 'package:qrmos/services/qrmos/order/order.dart';
 
 import 'order_card.dart';
@@ -41,18 +40,7 @@ class _OrderTableState extends State<OrderTable> {
     int? from;
     int? to;
     if (_filterForToday) {
-      var now = _getNowInHcmTz();
-
-      var startDateTime = now.subtract(Duration(
-          hours: now.hour,
-          minutes: now.minute,
-          seconds: now.second,
-          milliseconds: now.millisecond,
-          microseconds: now.microsecond));
-
-      const dayInNanos = 24 * 60 * 60 * 1000000000;
-
-      from = startDateTime.microsecondsSinceEpoch * 1000;
+      from = getNanoOfStartOfTodayInHcmTz();
       to = from + dayInNanos;
     }
 
@@ -78,14 +66,6 @@ class _OrderTableState extends State<OrderTable> {
       _orders = resp.data!.orders;
       _totalPage = (resp.data!.total / _itemPerPage).ceil();
     });
-  }
-
-  tz.TZDateTime _getNowInHcmTz() {
-    var now = DateTime.now();
-    tz.initializeTimeZones();
-    final hcmTimeZone = tz.getLocation('Asia/Ho_Chi_Minh');
-    var nowInHcmTime = tz.TZDateTime.from(now, hcmTimeZone);
-    return nowInHcmTime;
   }
 
   @override
