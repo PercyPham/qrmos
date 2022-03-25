@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qrmos/models/auth_model.dart';
+import 'package:qrmos/providers/auth_model.dart';
 import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/error_message.dart';
 

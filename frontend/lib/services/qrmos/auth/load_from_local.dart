@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:qrmos/models/auth_model.dart';
+import 'package:qrmos/providers/auth_model.dart';
 import '../utils/utils.dart';
 
 Future<AccessTokenInfo> loadAccessTokenFromLocal() async {
