@@ -71,7 +71,7 @@ func (u *FailOrderUsecase) validateFailTime(t time.Time, order *entity.Order) er
 		return apperror.Wrap(err, "usecase gets store opening hours config")
 	}
 	if err := entity.CheckIfOrderUpdatableAt(t, order, openingHours); err != nil {
-		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusBadRequest)
+		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusForbidden)
 	}
 	return nil
 }
