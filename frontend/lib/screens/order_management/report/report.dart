@@ -149,8 +149,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
     setState(() {
       _isLoadingReport = false;
-      _orders =
-          resp.data!.orders.where((o) => !['pending', 'cancelled'].contains(o.state)).toList();
+      _orders = resp.data!.orders.where((o) => !['pending', 'canceled'].contains(o.state)).toList();
     });
   }
 
@@ -234,7 +233,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   bool _isMoneyCollectable(Order order) {
-    if (['pending', 'cancelled', 'failed'].contains(order.state)) {
+    if (['pending', 'canceled', 'failed'].contains(order.state)) {
       return false;
     }
     return true;

@@ -54,8 +54,8 @@ class OrderCard extends StatelessWidget {
         return _stateText('Ready', Colors.green.shade800);
       case 'delivered':
         return _stateText('Delivered', Colors.green.shade800);
-      case 'cancelled':
-        return _stateText('Cancelled', Colors.grey);
+      case 'canceled':
+        return _stateText('Canceled', Colors.grey);
       case 'failed':
         return _stateText('Failed', Colors.red);
       default:
