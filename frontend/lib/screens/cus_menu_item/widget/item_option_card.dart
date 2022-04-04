@@ -40,21 +40,26 @@ class ItemOptionCard extends StatelessWidget {
     for (var choiceName in option.choices.keys) {
       var choice = option.choices[choiceName]!;
       var isChosen = chosenChoices.contains(choiceName);
-      if (choice.available) {
-        choices.add(const SizedBox(height: 10));
-        choices.add(InkWell(
-          onTap: () => onToggleChoice(choiceName),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              isChosen ? const Icon(Icons.check_box) : const Icon(Icons.check_box_outline_blank),
-              const SizedBox(width: 5),
-              Text('$choiceName (${choice.price}đ)')
-            ],
-          ),
-        ));
-      }
+      choices.add(const SizedBox(height: 10));
+      choices.add(InkWell(
+        onTap: choice.available ? () => onToggleChoice(choiceName) : null,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            choice.available
+                ? isChosen
+                    ? const Icon(Icons.check_box)
+                    : const Icon(Icons.check_box_outline_blank)
+                : const Icon(Icons.check_box_outline_blank, color: Colors.grey),
+            const SizedBox(width: 5),
+            Text(
+              '$choiceName (${choice.price}đ)${choice.available ? '' : ' (tạm hết)'}',
+              style: choice.available ? null : const TextStyle(color: Colors.grey),
+            )
+          ],
+        ),
+      ));
     }
     return choices;
   }
