@@ -40,6 +40,7 @@ class ItemTable extends StatelessWidget {
                 TableHeaderText("Tên"),
                 TableHeaderText("Mô Tả"),
                 TableHeaderText("Còn Hàng"),
+                TableHeaderText("Hoạt động"),
                 TableHeaderText("Chi Tiết"),
               ],
             ),
@@ -61,6 +62,14 @@ class ItemTable extends StatelessWidget {
         child: Switch(
             value: item.available,
             onChanged: (val) => onToggleItemAvailabilityPressed(item.id, val)),
+      ),
+      Container(
+        padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
+        child: Center(
+          child: item.isChoosable
+              ? const Text('Có', style: TextStyle(color: Colors.green))
+              : const Text('Không', style: TextStyle(color: Colors.red)),
+        ),
       ),
       Container(
         padding: const EdgeInsets.fromLTRB(10, 5, 5, 5),
