@@ -150,7 +150,6 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
     for (var a in associations) {
       menuItems.add(m[a.itemId]!);
     }
-    menuItems = menuItems.where((i) => i.isChoosable).toList();
     menuItems.sort((a, b) => a.id.compareTo(b.id));
     return menuItems;
   }
@@ -179,7 +178,6 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
         menuItems.add(menuItem);
       }
     }
-    menuItems = menuItems.where((i) => i.isChoosable).toList();
     menuItems.sort((a, b) => a.id.compareTo(b.id));
     return menuItems;
   }

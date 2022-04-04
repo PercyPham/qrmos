@@ -30,6 +30,7 @@ class CategoryCard extends StatelessWidget {
             if (category.description != '') const SizedBox(height: 5),
             ...menuItems
                 .map((mItem) => ItemCard(
+                      isChoosable: mItem.isChoosable,
                       menuItem: mItem,
                       onTap: onMenuItemTap == null ? null : () => onMenuItemTap!(mItem),
                     ))

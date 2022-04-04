@@ -3,11 +3,13 @@ import 'package:qrmos/services/qrmos/menu/menu.dart';
 import 'package:qrmos/widgets/wrap_text.dart';
 
 class ItemCard extends StatelessWidget {
+  final bool isChoosable;
   final MenuItem menuItem;
   final void Function()? onTap;
 
   const ItemCard({
     Key? key,
+    required this.isChoosable,
     required this.menuItem,
     required this.onTap,
   }) : super(key: key);
@@ -15,7 +17,7 @@ class ItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: isChoosable ? onTap : null,
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(5),
@@ -33,13 +35,30 @@ class ItemCard extends StatelessWidget {
   }
 
   _itemImage() {
-    return SizedBox(
-      width: 50,
-      height: 50,
-      child: Image.network(
-        menuItem.image,
-        fit: BoxFit.cover,
-      ),
+    return Stack(
+      children: [
+        SizedBox(
+          width: 50,
+          height: 50,
+          child: Image.network(
+            menuItem.image,
+            fit: BoxFit.cover,
+          ),
+        ),
+        if (!isChoosable)
+          Container(
+            width: 50,
+            height: 50,
+            color: Colors.white.withOpacity(0.7),
+            child: Center(
+              child: Text(
+                'Tạm\nhết',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -54,7 +73,10 @@ class ItemCard extends StatelessWidget {
             width: width,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isChoosable ? null : Colors.grey,
+            ),
           ),
           if (menuItem.description != '') const SizedBox(height: 5),
           if (menuItem.description != '')
@@ -63,6 +85,9 @@ class ItemCard extends StatelessWidget {
               width: width,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: isChoosable ? null : Colors.grey,
+              ),
             ),
         ]);
   }
