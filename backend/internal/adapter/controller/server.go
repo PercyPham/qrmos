@@ -156,6 +156,9 @@ func (s *server) serveWebStatic() {
 	s.r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/web/")
 	})
+	s.r.GET("/dashboard", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/web/#/dashboard")
+	})
 	s.serveStatic("/web/", "./web")
 }
 

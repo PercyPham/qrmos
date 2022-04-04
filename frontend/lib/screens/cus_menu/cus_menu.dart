@@ -33,12 +33,21 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
   @override
   void initState() {
     super.initState();
-    _loadMenu();
     Provider.of<AuthModel>(context, listen: false).loadAccessTokenFromLocal();
-    _checkSavedDestInfo();
+    _loadContent();
+  }
+
+  _loadContent() {
+    if (_checkSavedDestInfo()) {
+      _loadMenu();
+    }
   }
 
   _loadMenu() async {
+    if (!_checkSavedDestInfo()) {
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _errMsg = '';
@@ -59,20 +68,22 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
     });
   }
 
-  void _checkSavedDestInfo() {
+  bool _checkSavedDestInfo() {
     final destInfo = getDestInfo();
     if (destInfo == null) {
       setState(() {
         _errMsg = 'Vui lòng quét mã QR tại quán';
       });
+      return false;
     }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthModel>(
       builder: (ctx, auth, _) => auth.userType != UserType.customer
-          ? CusInfoInputScreen(onDone: _loadMenu)
+          ? CusInfoInputScreen(onDone: _loadContent)
           : Scaffold(
               appBar: _appBar('FlyWithCodeX Coffee', context),
               floatingActionButton: _floatingTrayButton(context),
