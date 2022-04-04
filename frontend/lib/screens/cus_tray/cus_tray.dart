@@ -19,12 +19,14 @@ class CusTrayScreen extends StatefulWidget {
   final List<TrayItem> trayItems;
   final void Function(TrayItem, CreateOrderItem) onUpdateOrderItem;
   final void Function(TrayItem) onDeleteTrayItem;
+  final void Function() onOrderCreated;
 
   const CusTrayScreen({
     Key? key,
     required this.trayItems,
     required this.onUpdateOrderItem,
     required this.onDeleteTrayItem,
+    required this.onOrderCreated,
   }) : super(key: key);
 
   @override
@@ -360,6 +362,8 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
       });
       return;
     }
+
+    widget.onOrderCreated();
 
     var createdOrder = resp.data!;
     Navigator.of(context).pushReplacement(

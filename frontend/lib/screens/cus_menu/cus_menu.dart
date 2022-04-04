@@ -186,39 +186,70 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
     var result = await Navigator.of(context)
         .push<CreateOrderItem>(MaterialPageRoute(builder: (context) => CusMenuItemScreen(mItem)));
     if (result != null) {
-      _trayItems.add(TrayItem(
-        menuItem: mItem,
-        orderItem: result,
-      ));
+      setState(() {
+        _trayItems.add(TrayItem(
+          menuItem: mItem,
+          orderItem: result,
+        ));
+      });
     }
   }
 
   _floatingTrayButton(BuildContext context) {
+    var count = _trayItems.isEmpty
+        ? 0
+        : _trayItems.map((i) => i.orderItem.quantity).reduce((v, e) => v + e);
     return FloatingActionButton(
       backgroundColor: Colors.brown,
-      child: const Icon(Icons.shopping_cart_checkout),
-      onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (context) => CusTrayScreen(
-                    trayItems: _trayItems,
-                    onUpdateOrderItem: (trayItem, orderItem) {
-                      setState(() {
-                        final foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
-                        _trayItems[foundIdx] = TrayItem(
-                          menuItem: trayItem.menuItem,
-                          orderItem: orderItem,
-                        );
-                      });
-                    },
-                    onDeleteTrayItem: (trayItem) {
-                      setState(() {
-                        _trayItems.remove(trayItem);
-                      });
-                    },
-                  )),
-        );
-      },
+      child: Stack(children: [
+        const Center(child: Icon(Icons.shopping_cart_checkout)),
+        if (count != 0)
+          Container(
+            alignment: Alignment.topRight,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                const Icon(Icons.circle, color: Colors.red),
+                Text('$count', style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+      ]),
+      onPressed: () => _onTrayButtonPressed(context),
     );
+  }
+
+  _onTrayButtonPressed(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+          builder: (context) => CusTrayScreen(
+                trayItems: _trayItems,
+                onUpdateOrderItem: _onUpdateOrderItem,
+                onDeleteTrayItem: _onDeleteTrayItem,
+                onOrderCreated: _onOrderCreated,
+              )),
+    );
+  }
+
+  _onUpdateOrderItem(TrayItem trayItem, CreateOrderItem orderItem) {
+    setState(() {
+      final foundIdx = _trayItems.indexWhere((i) => i.key == trayItem.key);
+      _trayItems[foundIdx] = TrayItem(
+        menuItem: trayItem.menuItem,
+        orderItem: orderItem,
+      );
+    });
+  }
+
+  _onDeleteTrayItem(TrayItem trayItem) {
+    setState(() {
+      _trayItems.remove(trayItem);
+    });
+  }
+
+  void _onOrderCreated() {
+    setState(() {
+      _trayItems.clear();
+    });
   }
 }
