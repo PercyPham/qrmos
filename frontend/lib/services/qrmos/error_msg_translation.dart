@@ -24,4 +24,6 @@ final _errMsgTrans = {
   "phoneNumber must be provided": "Bạn vui lòng cho biết số điện thoại nhé",
   "voucher not found": "Voucher không tồn tại",
   "not in opening hours": "Hiện đang đóng cửa",
+  "invalid delivery destination security code":
+      "Mã bảo vệ không khớp, vui lòng quét lại mã QR tại quán hoặc liên hệ nhân viên để được trợ giúp",
 };

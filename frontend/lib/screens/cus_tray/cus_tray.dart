@@ -347,9 +347,15 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
     }
 
     var dest = getDestInfo();
+    if (dest == null) {
+      setState(() {
+        _errMsg = "Vui lòng quét lại mã QR tại quán";
+      });
+      return;
+    }
 
     CreateOrderPayload payload = CreateOrderPayload(
-      deliveryDest: dest!.name,
+      deliveryDest: dest.name,
       deliveryDestSecurityCode: dest.securityCode!,
       voucher: _discount > 0 ? _voucher : '',
       items: items,
