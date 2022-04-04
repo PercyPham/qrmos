@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qrmos/models/auth_model.dart';
+import 'package:qrmos/providers/auth_model.dart';
 import './widgets/drawer/drawer.dart';
 import '../menu_management/menu_management.dart';
 import '../order_management/order_management.dart';

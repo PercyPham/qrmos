@@ -17,9 +17,13 @@ final _errMsgTrans = {
   "username already exists": "Tên đăng nhập đã tồn tại",
   "delivery destination already exists": "Điểm giao nhận đã tồn tại",
   "voucher already exists": "Mã code đã tồn tại",
+  "category already exists": "Danh mục đã tồn tại",
+  "item already exists": "Món đã tồn tại",
   "not in same creation date": "Không cùng ngày khởi tạo",
   "fullName must be provided": "Bạn vui lòng cho biết tên nhé",
   "phoneNumber must be provided": "Bạn vui lòng cho biết số điện thoại nhé",
   "voucher not found": "Voucher không tồn tại",
   "not in opening hours": "Hiện đang đóng cửa",
+  "invalid delivery destination security code":
+      "Mã bảo vệ không khớp, vui lòng quét lại mã QR tại quán hoặc liên hệ nhân viên để được trợ giúp",
 };

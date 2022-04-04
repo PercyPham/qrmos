@@ -10,7 +10,7 @@ import (
 )
 
 func (s *server) getStoreOpeningHoursConfig(c *gin.Context) {
-	if _, err := s.authCheck.IsStaff(time.Now(), c); err != nil {
+	if err := s.authCheck.IsAuthenticated(time.Now(), c); err != nil {
 		response.Error(c, newUnauthorizedError(err))
 		return
 	}

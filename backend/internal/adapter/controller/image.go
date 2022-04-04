@@ -2,6 +2,7 @@ package controller
 
 import (
 	"io"
+	"net/http"
 	"os"
 	"qrmos/internal/adapter/controller/internal/response"
 	"qrmos/internal/common/apperror"
@@ -19,7 +20,9 @@ func (s *server) uploadImage(c *gin.Context) {
 
 	file, _, err := c.Request.FormFile("image")
 	if err != nil {
-		response.Error(c, apperror.Wrap(err, "get file from request"))
+		appErr := apperror.Wrap(err, "get image from form key 'image' from request").WithCode(http.StatusBadRequest)
+		appErr = appErr.WithPublicMessage(appErr.Error())
+		response.Error(c, appErr)
 		return
 	}
 
@@ -53,9 +56,6 @@ func (s *server) deleteImage(c *gin.Context) {
 		return
 	}
 	imgName := c.Param("imgName")
-	if err := os.Remove("./images/" + imgName); err != nil {
-		response.Error(c, apperror.Wrap(err, "os delete image"))
-		return
-	}
+	_ = os.Remove("./images/" + imgName)
 	response.Success(c, true)
 }

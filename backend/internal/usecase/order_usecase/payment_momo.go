@@ -49,7 +49,9 @@ func (u *MoMoPaymentUsecase) createPaymentLink(t time.Time, order *entity.Order)
 	}
 
 	if order.State != entity.OrderStatePending {
-		return "", apperror.Newf("'%s' order cannot have new payment link", order.State)
+		return "", apperror.
+			Newf("'%s' order cannot have new payment link", order.State).
+			WithCode(http.StatusForbidden)
 	}
 
 	cachedPaymentLink := order.GetCachedMoMoPaymentLink(t)
@@ -80,7 +82,7 @@ func (u *MoMoPaymentUsecase) validatePaymentTime(t time.Time, order *entity.Orde
 		return apperror.Wrap(err, "usecase gets store opening hours config")
 	}
 	if err := entity.CheckIfOrderUpdatableAt(t, order, openingHours); err != nil {
-		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusBadRequest)
+		return apperror.Wrap(err, "check if order is updatable").WithCode(http.StatusForbidden)
 	}
 	return nil
 }

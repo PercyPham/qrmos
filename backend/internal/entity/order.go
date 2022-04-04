@@ -12,7 +12,7 @@ const OrderStateConfirmed = "confirmed"
 const OrderStateReady = "ready"
 const OrderStateDelivered = "delivered"
 const OrderStateFailed = "failed"
-const OrderStateCancelled = "cancelled"
+const OrderStateCanceled = "canceled"
 
 func IsValidOrderState(state string) bool {
 	validStates := map[string]bool{
@@ -21,7 +21,7 @@ func IsValidOrderState(state string) bool {
 		OrderStateReady:     true,
 		OrderStateDelivered: true,
 		OrderStateFailed:    true,
-		OrderStateCancelled: true,
+		OrderStateCanceled:  true,
 	}
 	return validStates[state]
 }
@@ -94,14 +94,14 @@ type OrderItem struct {
 }
 
 func (order *Order) Cancel() (hasUpdated bool, err error) {
-	if order.State == OrderStateCancelled {
+	if order.State == OrderStateCanceled {
 		return false, nil
 	}
 	if order.State != OrderStatePending {
 		return false, apperror.Newf("cannot cancel order with state '%s'", order.State).
 			WithCode(http.StatusForbidden)
 	}
-	order.State = OrderStateCancelled
+	order.State = OrderStateCanceled
 	return true, nil
 }
 
@@ -178,7 +178,9 @@ func (order *Order) MarkAsFailed(t time.Time, failReason string) error {
 	if !(order.State == OrderStateConfirmed ||
 		order.State == OrderStateReady ||
 		order.State == OrderStateDelivered) {
-		return apperror.Newf("cannot mark '%s' order as '%s'", order.State, OrderStateFailed)
+		return apperror.
+			Newf("cannot mark '%s' order as '%s'", order.State, OrderStateFailed).
+			WithCode(http.StatusForbidden)
 	}
 	order.State = OrderStateFailed
 	order.FailReason = failReason

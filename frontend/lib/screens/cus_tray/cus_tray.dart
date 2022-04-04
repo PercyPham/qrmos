@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qrmos/models/auth_model.dart';
+import 'package:qrmos/providers/auth_model.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/order/create_order.dart';
 import 'package:qrmos/services/qrmos/voucher/voucher.dart';
@@ -19,12 +19,14 @@ class CusTrayScreen extends StatefulWidget {
   final List<TrayItem> trayItems;
   final void Function(TrayItem, CreateOrderItem) onUpdateOrderItem;
   final void Function(TrayItem) onDeleteTrayItem;
+  final void Function() onOrderCreated;
 
   const CusTrayScreen({
     Key? key,
     required this.trayItems,
     required this.onUpdateOrderItem,
     required this.onDeleteTrayItem,
+    required this.onOrderCreated,
   }) : super(key: key);
 
   @override
@@ -345,9 +347,15 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
     }
 
     var dest = getDestInfo();
+    if (dest == null) {
+      setState(() {
+        _errMsg = "Vui lòng quét lại mã QR tại quán";
+      });
+      return;
+    }
 
     CreateOrderPayload payload = CreateOrderPayload(
-      deliveryDest: dest!.name,
+      deliveryDest: dest.name,
       deliveryDestSecurityCode: dest.securityCode!,
       voucher: _discount > 0 ? _voucher : '',
       items: items,
@@ -360,6 +368,8 @@ class _CusTrayScreenState extends State<CusTrayScreen> {
       });
       return;
     }
+
+    widget.onOrderCreated();
 
     var createdOrder = resp.data!;
     Navigator.of(context).pushReplacement(

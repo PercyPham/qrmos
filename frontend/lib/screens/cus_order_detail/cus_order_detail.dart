@@ -104,8 +104,8 @@ class _CusOrderDetailScreenState extends State<CusOrderDetailScreen> {
         return _colorText('Ready', Colors.green.shade800);
       case 'delivered':
         return _colorText('Delivered', Colors.green.shade800);
-      case 'cancelled':
-        return _colorText('Cancelled', Colors.grey);
+      case 'canceled':
+        return _colorText('Canceled', Colors.grey);
       case 'failed':
         return _colorText('Failed', Colors.red);
       default:
@@ -197,7 +197,7 @@ class _CusOrderDetailScreenState extends State<CusOrderDetailScreen> {
             'Đơn hàng đã được chuẩn bị xong!\n\nFWCX đang chuẩn bị giao.', Colors.green);
       case 'delivered':
         return _stateInfoText('Đơn hàng đã được giao thành công!', Colors.green);
-      case 'cancelled':
+      case 'canceled':
         return _stateInfoText('Đơn hàng đã được huỷ!', Colors.grey);
       case 'failed':
         return _stateInfoText(

@@ -33,6 +33,10 @@ func (u *DeleteVoucherUsecase) Delete(input *DeleteVoucherInput) error {
 	}
 
 	voucher := u.voucherRepo.GetByCode(input.Code)
+	if voucher == nil {
+		return nil
+	}
+
 	if voucher.IsUsed {
 		return apperror.New("cannot delete used voucher").
 			WithCode(http.StatusForbidden)

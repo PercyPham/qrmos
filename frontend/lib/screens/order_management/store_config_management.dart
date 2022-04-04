@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:qrmos/models/auth_model.dart';
+import 'package:qrmos/providers/auth_model.dart';
 import 'package:qrmos/services/qrmos/error_msg_translation.dart';
 import 'package:qrmos/services/qrmos/store_config/store_config.dart';
 import 'package:qrmos/widgets/custom_button.dart';
