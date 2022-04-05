@@ -22,7 +22,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Chỉnh Sửa Thông Tin Người Dùng"),
+        title: const Text("Tạo Người Dùng Mới"),
       ),
       body: BigScreen(
         child: Column(

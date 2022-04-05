@@ -22,6 +22,7 @@ class _ReportScreenState extends State<ReportScreen> {
   late DateTime _chosenEnd;
 
   bool _isLoadingReport = false;
+  bool _isReportLoaded = false;
   List<Order> _orders = [];
 
   String _errMsg = '';
@@ -60,7 +61,10 @@ class _ReportScreenState extends State<ReportScreen> {
               ErrorMessage(_errMsg),
               const SizedBox(height: 10),
               if (_isLoadingReport) const Text("Loading..."),
-              if (_orders.isNotEmpty) _reportSection(),
+              if (_isReportLoaded)
+                _orders.isNotEmpty
+                    ? _reportSection()
+                    : const Text("Không có đơn hàng cho báo cáo."),
             ],
           ),
         ),
@@ -136,7 +140,7 @@ class _ReportScreenState extends State<ReportScreen> {
     resp = await getOrders(
       from: start,
       to: end,
-      itemPerPage: total,
+      itemPerPage: total != 0 ? total : 1,
       page: 1,
     );
     if (resp.error != null) {
@@ -148,6 +152,7 @@ class _ReportScreenState extends State<ReportScreen> {
     }
 
     setState(() {
+      _isReportLoaded = true;
       _isLoadingReport = false;
       _orders = resp.data!.orders.where((o) => !['pending', 'canceled'].contains(o.state)).toList();
     });

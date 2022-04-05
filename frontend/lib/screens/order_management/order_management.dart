@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:qrmos/widgets/big_screen.dart';
 import 'package:qrmos/widgets/custom_button.dart';
 import 'package:qrmos/widgets/screen_name.dart';
+import 'package:qrmos/providers/auth_model.dart';
 
 import 'create_order/create_order.dart';
 import 'find_order/find_order.dart';
@@ -44,6 +46,8 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
   }
 
   _actionButtons(BuildContext context) {
+    bool isManager = Provider.of<AuthModel>(context).staffRole == StaffRole.manager;
+
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,8 +55,8 @@ class _OrderManagementScreenState extends State<OrderManagementScreen> {
         CustomButton('Tạo đơn', _isStoreOpen ? () => _onCreateButtonPressed(context) : null),
         const SizedBox(width: 15),
         CustomButton('Tìm đơn', () => _onFindOrderButtonPressed(context)),
-        const SizedBox(width: 15),
-        CustomButton('Báo cáo', () => _onReportButtonPressed(context)),
+        if (isManager) const SizedBox(width: 15),
+        if (isManager) CustomButton('Báo cáo', () => _onReportButtonPressed(context)),
       ],
     );
   }

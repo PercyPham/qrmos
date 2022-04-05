@@ -27,6 +27,7 @@ class _NumberInputFieldState extends State<NumberInputField> {
   void initState() {
     super.initState();
     _currNumVal = widget.initialValue;
+    _currVal = '${widget.initialValue}';
     _controler.text = '$_currNumVal';
   }
 
