@@ -196,19 +196,29 @@ func (u *CreateOrderUsecase) validateDeliveryDest(destName, destSecurityCode str
 func (u *CreateOrderUsecase) getAllMenuItemsFrom(
 	inputItems []*CreateOrderItemInput,
 ) (map[int]*entity.MenuItem, error) {
-	menuItems := make(map[int]*entity.MenuItem)
+	itemIDsMap := make(map[int]bool)
+	itemIDs := []int{}
 	for _, inputItem := range inputItems {
-		if _, ok := menuItems[inputItem.ItemID]; ok {
-			continue
+		if !itemIDsMap[inputItem.ItemID] {
+			itemIDsMap[inputItem.ItemID] = true
+			itemIDs = append(itemIDs, inputItem.ItemID)
 		}
-		menuItem := u.menuRepo.GetItemByID(inputItem.ItemID)
-		if menuItem == nil {
-			return nil, apperror.Newf("item with id '%d' not found", inputItem.ItemID).
-				WithCode(http.StatusNotFound)
-		}
-		menuItems[inputItem.ItemID] = menuItem
 	}
-	return menuItems, nil
+
+	menuItems, err := u.menuRepo.GetItemsByIDs(itemIDs)
+	if err != nil {
+		return nil, apperror.Wrap(err, "repo gets menu items by ids")
+	}
+	if len(menuItems) != len(itemIDs) {
+		return nil, apperror.New("menu item not found, please reload menu to get new menu items")
+	}
+
+	menuItemsMap := make(map[int]*entity.MenuItem)
+	for _, menuItem := range menuItems {
+		menuItemsMap[menuItem.ID] = menuItem
+	}
+
+	return menuItemsMap, nil
 }
 
 func (u *CreateOrderUsecase) calculateOrderItems(

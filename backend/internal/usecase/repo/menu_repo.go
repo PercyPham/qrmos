@@ -11,6 +11,7 @@ type Menu interface {
 
 	CreateItem(*entity.MenuItem) error
 	GetAllItems() ([]*entity.MenuItem, error)
+	GetItemsByIDs(ids []int) ([]*entity.MenuItem, error)
 	GetItemByID(id int) *entity.MenuItem
 	GetItemByName(name string) *entity.MenuItem
 	UpdateItem(item *entity.MenuItem) error
