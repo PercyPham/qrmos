@@ -141,6 +141,23 @@ func (r *menuRepo) GetAllItems() ([]*entity.MenuItem, error) {
 	return items, nil
 }
 
+func (r *menuRepo) GetItemsByIDs(itemIDs []int) ([]*entity.MenuItem, error) {
+	gItems := []gormMenuItem{}
+	result := r.db.Table("menu_items").Where("id IN ?", itemIDs).Find(&gItems)
+	if result.Error != nil {
+		return nil, apperror.Wrapf(result.Error, "gorm gets items by ids")
+	}
+	items := []*entity.MenuItem{}
+	for _, gItem := range gItems {
+		item, err := gItem.toMenuItem()
+		if err != nil {
+			return nil, apperror.Wrap(err, "gorm convert gItem to menu item")
+		}
+		items = append(items, item)
+	}
+	return items, nil
+}
+
 func (r *menuRepo) GetItemByID(itemID int) *entity.MenuItem {
 	gItem := new(gormMenuItem)
 	result := r.db.Table("menu_items").Where("id = ?", itemID).First(gItem)
