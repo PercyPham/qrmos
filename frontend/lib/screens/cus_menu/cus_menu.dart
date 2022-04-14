@@ -104,9 +104,21 @@ class _CusMenuScreenState extends State<CusMenuScreen> {
           children: [
             ..._categorizedMenuItemsCards(context),
             ..._uncategorizedMenuItemsCards(context),
-            const SizedBox(height: 80),
+            const SizedBox(height: 20),
+            _refreshMenuButton(),
+            const SizedBox(height: 30),
           ],
         ),
+      ),
+    );
+  }
+
+  _refreshMenuButton() {
+    return Center(
+      child: IconButton(
+        icon: const Icon(Icons.refresh),
+        onPressed: _loadContent,
+        iconSize: 30,
       ),
     );
   }
