@@ -81,7 +81,7 @@ class ItemCard extends StatelessWidget {
           if (menuItem.description != '') const SizedBox(height: 5),
           if (menuItem.description != '')
             WrapText(
-              menuItem.name,
+              menuItem.description,
               width: width,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
