@@ -166,7 +166,7 @@ class _OrderItemDialogState extends State<OrderItemDialog> {
                     : const Icon(Icons.check_box_outline_blank),
             const SizedBox(width: 5),
             Text(
-              '$choiceName (giá: ${choice.price}) (${choice.available ? 'còn' : 'hết'})',
+              '$choiceName (giá: ${choice.price})${choice.available ? '' : ' (hết)'}',
               style: TextStyle(color: isDisabled ? Colors.grey[300] : null),
             )
           ],
