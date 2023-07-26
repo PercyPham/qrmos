@@ -22,6 +22,7 @@ dependencies:
   file_saver: ^0.1.0
   file_picker: ^4.5.1
   timezone: ^0.8.0
+  file: ^6.1.4
 
 dev_dependencies:
   flutter_test:
