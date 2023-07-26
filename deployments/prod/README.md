@@ -74,6 +74,11 @@ sudo tar -C /usr/local -xvf go1.17.5.linux-amd64.tar.gz
 
 Make a copy of [build_backend.sh](./build_backend.sh) to `~/.build_backend.sh` on prod server.
 
+Make `~/.build_backend.sh` executable:
+```
+chmod +x ~/.build_backend.sh
+```
+
 Clone this repo on prod server (must setup `git` first):
 ```
 git clone git@github.com:PercyPham/qrmos.git ~/qrmos
